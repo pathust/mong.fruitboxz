@@ -1,6 +1,6 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { Modules } from "@medusajs/framework/utils"
-import { getGlobalSettings } from "../../../lib/global-settings"
+import { getGlobalSettings, updateGlobalSettings } from "../../../lib/global-settings"
 
 function startOfDay(d: Date) {
   const x = new Date(d)
@@ -44,13 +44,20 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
     let profitTotal = 0
     let unpaidTotal = 0
     let ordersToday = 0
+    let billableOrderCount = 0
     const statusMap: Record<string, number> = {}
+    const paymentStatusMap: Record<string, number> = {}
     const revenueByDayMap: Record<string, number> = {}
+    const profitByDayMap: Record<string, number> = {}
+    const ordersByDayMap: Record<string, number> = {}
 
     for (let i = 0; i < 7; i++) {
       const d = new Date(day7)
       d.setDate(day7.getDate() + i)
-      revenueByDayMap[d.toISOString().slice(0, 10)] = 0
+      const key = d.toISOString().slice(0, 10)
+      revenueByDayMap[key] = 0
+      profitByDayMap[key] = 0
+      ordersByDayMap[key] = 0
     }
 
     for (const o of orders) {
@@ -60,7 +67,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
       const status = (o.status || "unknown").toString()
       statusMap[status] = (statusMap[status] || 0) + 1
 
-      const paymentStatus = o.metadata?.payment_status || "not_paid"
+      const paymentStatus = ((o.metadata as any)?.payment_status || "not_paid").toString()
 
       let orderRevenue = 0
       let orderCost = 0
@@ -81,8 +88,11 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
 
       // Only count revenue for non-canceled orders
       if (status !== "canceled" && status !== "archived") {
+        const orderProfit = orderRevenue - orderCost
+        paymentStatusMap[paymentStatus] = (paymentStatusMap[paymentStatus] || 0) + 1
+        billableOrderCount += 1
         revenueTotal += orderRevenue
-        profitTotal += (orderRevenue - orderCost)
+        profitTotal += orderProfit
 
         if (paymentStatus !== "paid" && paymentStatus !== "captured") {
           unpaidTotal += orderRevenue
@@ -90,7 +100,11 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
 
         if (orderDay.getTime() === day0.getTime()) ordersToday += 1
         const key = orderDay.toISOString().slice(0, 10)
-        if (key in revenueByDayMap) revenueByDayMap[key] += orderRevenue
+        if (key in revenueByDayMap) {
+          revenueByDayMap[key] += orderRevenue
+          profitByDayMap[key] += orderProfit
+          ordersByDayMap[key] += 1
+        }
       }
     }
 
@@ -120,10 +134,16 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
         profit_total: profitTotal,
         unpaid_total: unpaidTotal,
         orders_today: ordersToday,
-        avg_order_value: orders.length ? Math.round(revenueTotal / orders.length) : 0,
+        avg_order_value: billableOrderCount ? Math.round(revenueTotal / billableOrderCount) : 0,
       },
       order_status: statusMap,
-      revenue_7d: Object.entries(revenueByDayMap).map(([date, revenue]) => ({ date, revenue })),
+      payment_status: paymentStatusMap,
+      revenue_7d: Object.entries(revenueByDayMap).map(([date, revenue]) => ({
+        date,
+        revenue,
+        profit: profitByDayMap[date] || 0,
+        orders: ordersByDayMap[date] || 0,
+      })),
       top_products: topProducts,
     })
   } catch (error: any) {
@@ -140,7 +160,6 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
       const { settings } = req.body as any
       if (!settings) return res.status(400).json({ message: "No settings provided" })
 
-      const { updateGlobalSettings } = await import("../../../lib/global-settings.js")
       const updated = await updateGlobalSettings(siteService, settings)
       return res.json({ settings: updated })
     }

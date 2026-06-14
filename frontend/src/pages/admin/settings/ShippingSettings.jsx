@@ -14,12 +14,15 @@ export default function ShippingSettings() {
     shipping_origin_address: "",
     shipping_base_fee: 18000,
     shipping_fee_per_km: 2200,
+    shipping_min_fee: 18000,
     shipping_max_fee: 60000,
     shipping_non_hanoi_fee: 45000
   })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [locating, setLocating] = useState(false)
+  const [message, setMessage] = useState("")
+  const [error, setError] = useState("")
 
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
@@ -98,6 +101,7 @@ export default function ShippingSettings() {
           shipping_origin_address: res.settings.shipping_origin_address ?? "",
           shipping_base_fee: res.settings.shipping_base_fee ?? 18000,
           shipping_fee_per_km: res.settings.shipping_fee_per_km ?? 2200,
+          shipping_min_fee: res.settings.shipping_min_fee ?? 18000,
           shipping_max_fee: res.settings.shipping_max_fee ?? 60000,
           shipping_non_hanoi_fee: res.settings.shipping_non_hanoi_fee ?? 45000
         })
@@ -117,6 +121,8 @@ export default function ShippingSettings() {
   const handleSave = async () => {
     try {
       setSaving(true)
+      setMessage("")
+      setError("")
       await api("/admin/custom?mode=settings", {
         method: "POST",
         body: {
@@ -129,14 +135,15 @@ export default function ShippingSettings() {
             shipping_origin_lng: Number(settings.shipping_origin_lng),
             shipping_base_fee: Number(settings.shipping_base_fee),
             shipping_fee_per_km: Number(settings.shipping_fee_per_km),
+            shipping_min_fee: Number(settings.shipping_min_fee),
             shipping_max_fee: Number(settings.shipping_max_fee),
             shipping_non_hanoi_fee: Number(settings.shipping_non_hanoi_fee)
           }
         }
       })
-      alert("Lưu cài đặt vận chuyển thành công")
+      setMessage("Đã lưu cài đặt vận chuyển thành công.")
     } catch (error) {
-      alert("Lỗi lưu cài đặt: " + error.message)
+      setError(error.message || "Không thể lưu cài đặt vận chuyển.")
     } finally {
       setSaving(false)
     }
@@ -167,6 +174,16 @@ export default function ShippingSettings() {
           {saving ? "Đang lưu..." : "Lưu cài đặt"}
         </button>
       </div>
+
+      {(message || error) && (
+        <div className={`rounded-xl border px-4 py-3 text-sm font-medium ${
+          error
+            ? "border-red-200 bg-red-50 text-red-700"
+            : "border-emerald-200 bg-emerald-50 text-emerald-700"
+        }`}>
+          {error || message}
+        </div>
+      )}
 
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
         <div className="p-6 space-y-8">
@@ -300,6 +317,17 @@ export default function ShippingSettings() {
                   type="number"
                   value={settings.shipping_fee_per_km}
                   onChange={(e) => setSettings({ ...settings, shipping_fee_per_km: e.target.value })}
+                  className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Mức phí ship tối thiểu (VNĐ)</label>
+                <input
+                  type="number"
+                  min={0}
+                  value={settings.shipping_min_fee}
+                  onChange={(e) => setSettings({ ...settings, shipping_min_fee: e.target.value })}
                   className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                 />
               </div>
