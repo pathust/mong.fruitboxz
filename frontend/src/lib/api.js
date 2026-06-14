@@ -6,6 +6,14 @@ async function parseJsonSafe(res) {
   }
 }
 
+function serializeBody(body) {
+  if (!body || typeof body !== 'object') return body
+  if (body instanceof FormData || body instanceof URLSearchParams || body instanceof Blob) {
+    return body
+  }
+  return JSON.stringify(body)
+}
+
 export async function apiFetch(path, { token, headers, timeoutMs = 15000, ...options } = {}) {
   const finalHeaders = {
     'Content-Type': 'application/json',
@@ -29,6 +37,7 @@ export async function apiFetch(path, { token, headers, timeoutMs = 15000, ...opt
     res = await fetch(path, {
       credentials: 'omit',
       ...options,
+      body: serializeBody(options.body),
       headers: finalHeaders,
       signal: options.signal || controller.signal,
     })
