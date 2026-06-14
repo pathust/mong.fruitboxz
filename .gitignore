@@ -1,0 +1,44 @@
+# Local tooling and editor settings
+.agents/
+.codex/
+.idea/
+.vscode/
+.DS_Store
+
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.template
+
+# Dependencies
+node_modules/
+.pnp.*
+.yarn/
+
+# Build output and caches
+dist/
+dist-buildcheck/
+dist-ssr/
+build/
+.cache/
+.medusa/
+coverage/
+*.tsbuildinfo
+
+# Logs and test output
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+test-results/
+playwright-report/
+
+# Runtime and generated data
+uploads/
+scraped_data/
+raw_views.txt
+scraped_images.json
+targets.json
+frontend/public/images/

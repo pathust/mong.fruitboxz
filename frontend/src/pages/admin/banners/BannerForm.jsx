@@ -1,0 +1,126 @@
+import { useState, useEffect } from "react"
+import { useNavigate, useParams } from "react-router-dom"
+import { useAdminAuth } from "../../../context/AdminAuthContext"
+import ImagePicker from "../../../components/admin/ImagePicker"
+import ProductPicker from "../../../components/admin/ProductPicker"
+
+export default function BannerForm() {
+  const { api } = useAdminAuth()
+  const navigate = useNavigate()
+  const { id } = useParams()
+  const isNew = !id
+  const [loading, setLoading] = useState(!isNew)
+  const [saving, setSaving] = useState(false)
+  const [form, setForm] = useState({ title: "", subtitle: "", image: "", link: "", active: true })
+  const [showImagePicker, setShowImagePicker] = useState(false)
+  const [showProductPicker, setShowProductPicker] = useState(false)
+
+  useEffect(() => {
+    if (!isNew) {
+      api(`/admin/banners/${id}`)
+        .then(d => setForm({ title: d.banner.title, subtitle: d.banner.subtitle || "", image: d.banner.image || "", link: d.banner.link || "", active: d.banner.active ?? true }))
+        .finally(() => setLoading(false))
+    }
+  }, [id, isNew, api])
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setSaving(true)
+    try {
+      const method = isNew ? "POST" : "PUT"
+      const url = isNew ? "/admin/banners" : `/admin/banners/${id}`
+      await api(url, { method, body: JSON.stringify(form) })
+      navigate("/admin/banners")
+    } catch (err) {
+      alert("Error: " + err.message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (loading) return <div className="text-center py-12 text-secondary-light">Loading...</div>
+
+  return (
+    <div className="max-w-2xl">
+      <h1 className="text-2xl font-bold text-secondary mb-6">{isNew ? "Add Banner" : "Edit Banner"}</h1>
+      <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-secondary mb-1">Banner Name (Internal)</label>
+          <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" required placeholder="e.g. Khuyến mãi Cam vàng" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-secondary mb-1">Quick Link Product</label>
+          <button
+            type="button"
+            onClick={() => setShowProductPicker(true)}
+            className="w-full text-left px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-white hover:bg-gray-50 text-gray-700 flex justify-between items-center"
+          >
+            <span>-- Choose a product to auto-fill image and link --</span>
+            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+          </button>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-secondary mb-1">Image</label>
+          <div className="flex items-center gap-4">
+            {form.image && (
+              <img src={form.image} alt="Banner" className="h-16 w-32 rounded-xl object-cover border border-gray-200" />
+            )}
+            <button
+              type="button"
+              onClick={() => setShowImagePicker(true)}
+              className="px-4 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50 text-secondary"
+            >
+              {form.image ? "Change Image" : "Choose Image"}
+            </button>
+            {form.image && (
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, image: "" })}
+                className="text-red-500 text-sm hover:underline"
+              >
+                Remove
+              </button>
+            )}
+          </div>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-secondary mb-1">Link</label>
+          <input value={form.link} onChange={e => setForm({ ...form, link: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
+        </div>
+        <div className="flex items-center gap-2">
+          <input type="checkbox" id="active" checked={form.active} onChange={e => setForm({ ...form, active: e.target.checked })} className="rounded" />
+          <label htmlFor="active" className="text-sm text-secondary">Active</label>
+        </div>
+        <div className="flex gap-3 pt-2">
+          <button type="submit" disabled={saving} className="bg-primary text-white px-6 py-2.5 rounded-xl font-medium hover:bg-primary-dark disabled:opacity-50">{saving ? "Saving..." : isNew ? "Create Banner" : "Save Changes"}</button>
+          <button type="button" onClick={() => navigate("/admin/banners")} className="px-6 py-2.5 border border-gray-200 rounded-xl font-medium hover:bg-gray-50">Cancel</button>
+        </div>
+      </form>
+
+      {showImagePicker && (
+        <ImagePicker
+          onClose={() => setShowImagePicker(false)}
+          onSelect={(val) => {
+            setForm({ ...form, image: val })
+            setShowImagePicker(false)
+          }}
+          selected={form.image}
+        />
+      )}
+
+      {showProductPicker && (
+        <ProductPicker
+          onClose={() => setShowProductPicker(false)}
+          onSelect={(p) => {
+            setForm(f => ({
+              ...f,
+              image: p.thumbnail || f.image,
+              link: `/products/${p.handle || p.id}`
+            }))
+            setShowProductPicker(false)
+          }}
+        />
+      )}
+    </div>
+  )
+}
