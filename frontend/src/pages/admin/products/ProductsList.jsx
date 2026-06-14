@@ -52,19 +52,22 @@ export default function ProductsList() {
   }, [query])
 
   useEffect(() => {
-    setLoading(true)
-    let url = `/admin/products?fields=id,title,handle,status,thumbnail,images,variants,created_at&limit=${limit}&offset=${offset}`
-    if (debouncedQuery) {
-      url += `&q=${encodeURIComponent(debouncedQuery)}`
-    }
+    const timer = window.setTimeout(() => {
+      setLoading(true)
+      let url = `/admin/products?fields=id,title,handle,status,thumbnail,images,variants,created_at&limit=${limit}&offset=${offset}`
+      if (debouncedQuery) {
+        url += `&q=${encodeURIComponent(debouncedQuery)}`
+      }
 
-    api(url)
-      .then(d => {
-        setProducts(d.products || [])
-        setTotal(d.count || 0)
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false))
+      api(url)
+        .then(d => {
+          setProducts(d.products || [])
+          setTotal(d.count || 0)
+        })
+        .catch(() => {})
+        .finally(() => setLoading(false))
+    }, 0)
+    return () => window.clearTimeout(timer)
   }, [api, offset, debouncedQuery])
 
   const deleteProduct = async (id) => {

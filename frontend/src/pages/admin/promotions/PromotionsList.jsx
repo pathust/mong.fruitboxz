@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react"
-import { Tag, Plus, Edit2, Trash2, Calendar } from "lucide-react"
+import { useCallback, useState, useEffect } from "react"
+import { Tag, Plus, Edit2, Trash2 } from "lucide-react"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
 
 // Simple inline modal
@@ -38,23 +38,34 @@ export default function PromotionsList() {
     maxDiscount: ""
   })
 
-  useEffect(() => {
-    fetchPromotions()
-  }, [])
-
-  const fetchPromotions = async () => {
+  const fetchPromotions = useCallback(async () => {
     try {
       setLoading(true)
       const res = await api("/admin/promotions")
       if (res?.promotions) {
-        setPromotions(res.promotions)
+        const promotionsWithMetadata = await Promise.all(
+          res.promotions.map(async (promotion) => {
+            try {
+              const result = await api(`/admin/promotions/${promotion.id}/metadata`)
+              return { ...promotion, metadata: result.metadata || {} }
+            } catch {
+              return { ...promotion, metadata: {} }
+            }
+          })
+        )
+        setPromotions(promotionsWithMetadata)
       }
     } catch (error) {
       console.error("Failed to fetch promotions:", error)
     } finally {
       setLoading(false)
     }
-  }
+  }, [api])
+
+  useEffect(() => {
+    const timer = window.setTimeout(fetchPromotions, 0)
+    return () => window.clearTimeout(timer)
+  }, [fetchPromotions])
 
   const handleSave = async (e) => {
     e.preventDefault()

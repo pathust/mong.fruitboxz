@@ -67,8 +67,10 @@ export function AdminAuthProvider({ children }) {
 
   useEffect(() => {
     if (user && (!user.permissions)) {
-      fetchPermissions()
+      const timer = window.setTimeout(fetchPermissions, 0)
+      return () => window.clearTimeout(timer)
     }
+    return undefined
   }, [user, fetchPermissions])
 
   const login = useCallback(async (email, password) => {

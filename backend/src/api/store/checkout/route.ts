@@ -3,6 +3,7 @@ import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
 import { z } from "zod"
 import { resolveShippingQuote } from "../../../lib/geocoding"
 import { getGlobalSettings } from "../../../lib/global-settings"
+import { getPromotionMetadata } from "../../../lib/promotion-metadata"
 
 const CheckoutSchema = z.object({
   items: z.array(z.object({
@@ -185,6 +186,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
 
       if (promotions && promotions.length > 0) {
         const promo = promotions[0] as any
+        const promotionMetadata = await getPromotionMetadata(siteService, promo.id)
 
         let isValid = true
         if (promo.campaign) {
@@ -200,10 +202,12 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
               const query = req.scope.resolve("query")
               const { data } = await query.graph({
                 entity: "order",
-                fields: ["id"],
-                filters: { metadata: { $contains: { promotion_code: promo.code } } }
+                fields: ["id", "metadata"],
               })
-              if (data && data.length >= promo.campaign.budget.limit) {
+              const usedCount = (data as Array<{ metadata?: Record<string, unknown> | null }>)
+                .filter((order) => order.metadata?.promotion_code === promo.code)
+                .length
+              if (usedCount >= promo.campaign.budget.limit) {
                 isValid = false
               }
             } catch (e) {
@@ -212,7 +216,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
           }
         }
 
-        const minOrderValue = Number(promo.metadata?.min_order_value || 0)
+        const minOrderValue = Number(promotionMetadata.min_order_value || 0)
         if (minOrderValue > 0 && originalSubtotal < minOrderValue) {
           return res.status(400).json({
             message: `Mã giảm giá yêu cầu đơn hàng tối thiểu ${new Intl.NumberFormat('vi-VN').format(minOrderValue)}đ`
@@ -225,7 +229,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
 
         const appMethod = promo.application_method
         if (appMethod) {
-          const maxDiscount = Number(promo.metadata?.max_discount || 0)
+          const maxDiscount = Number(promotionMetadata.max_discount || 0)
           if (appMethod.type === "fixed") {
             discountAmount = Math.min(Number(appMethod.value), originalSubtotal)
           } else if (appMethod.type === "percentage") {

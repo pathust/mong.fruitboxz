@@ -79,7 +79,7 @@ export function CatalogProvider({ children }) {
               if (product) {
                 image = product.thumbnail || product.images?.[0]?.url || ""
               }
-            } catch (e) {
+            } catch {
               console.error("Failed to fetch fallback image for category:", c.name)
             }
           }

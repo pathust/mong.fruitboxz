@@ -41,7 +41,7 @@ const navGroups = [
 ]
 
 export default function AdminLayout() {
-  const { user, logout, hasPermission } = useAdminAuth()
+  const { user, logout } = useAdminAuth()
   const location = useLocation()
   const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)

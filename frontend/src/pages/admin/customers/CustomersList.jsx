@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useCallback, useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
 import { Users, Search, MoreVertical, Mail, Phone, Calendar } from "lucide-react"
@@ -9,11 +9,7 @@ export default function CustomersList() {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
 
-  useEffect(() => {
-    fetchCustomers()
-  }, [])
-
-  const fetchCustomers = async () => {
+  const fetchCustomers = useCallback(async () => {
     try {
       setLoading(true)
       const res = await api("/admin/customers?fields=*orders,*orders.items")
@@ -35,7 +31,12 @@ export default function CustomersList() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [api])
+
+  useEffect(() => {
+    const timer = window.setTimeout(fetchCustomers, 0)
+    return () => window.clearTimeout(timer)
+  }, [fetchCustomers])
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount)

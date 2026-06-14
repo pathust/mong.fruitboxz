@@ -112,17 +112,6 @@ export default function Checkout() {
   const subtotal = cart.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const [shipping, setShipping] = useState(30000)
   const { address, lat, lng } = form
-  const selectLocation = (item) => {
-    setForm((prev) => ({
-      ...prev,
-      lat: item.lat,
-      lng: item.lng,
-    }))
-    setMatchedLocation({
-      lat: item.lat,
-      lng: item.lng,
-    })
-  }
 
   const handleApplyPromo = async () => {
     if (!promoCode.trim()) return
@@ -218,10 +207,12 @@ export default function Checkout() {
 
   useEffect(() => {
     if (!address.trim()) {
-      setShipping(30000)
-      setQuoteMode('pending-address')
-      setMatchedLocation(null)
-      return
+      const timer = window.setTimeout(() => {
+        setShipping(30000)
+        setQuoteMode('pending-address')
+        setMatchedLocation(null)
+      }, 0)
+      return () => window.clearTimeout(timer)
     }
 
     const controller = new AbortController()

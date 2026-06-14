@@ -9,7 +9,7 @@ export default function Search() {
   const [searchParams] = useSearchParams()
   const query = searchParams.get('q') || ''
   const deferredQuery = useDeferredValue(query)
-  const { loading: catalogLoading, searchProducts } = useCatalog()
+  const { loading: catalogLoading } = useCatalog()
   const [results, setResults] = useState([])
   const [mode, setMode] = useState('empty')
   const [loading, setLoading] = useState(false)

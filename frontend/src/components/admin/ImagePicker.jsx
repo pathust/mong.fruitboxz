@@ -10,7 +10,6 @@ export default function ImagePicker({ selected, onSelect, multiple }) {
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
   const [search, setSearch] = useState("")
-  const [objectStorage, setObjectStorage] = useState(false)
   const fileRef = useRef()
 
   const readFileAsDataUrl = (file) => new Promise((resolve, reject) => {
@@ -24,7 +23,6 @@ export default function ImagePicker({ selected, onSelect, multiple }) {
     api("/admin/media")
       .then(d => {
         setImages(d.images || [])
-        setObjectStorage(Boolean(d.object_storage))
       })
       .catch(() => {})
       .finally(() => setLoading(false))
@@ -42,7 +40,6 @@ export default function ImagePicker({ selected, onSelect, multiple }) {
       })
       const d = await api("/admin/media")
       setImages(d.images || [])
-      setObjectStorage(Boolean(d.object_storage))
       pushToast("Ảnh đã được tải lên.", "success")
     } catch (err) {
       pushToast("Upload failed: " + (err instanceof Error ? err.message : err), "error")

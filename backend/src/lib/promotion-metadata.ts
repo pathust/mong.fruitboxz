@@ -1,0 +1,34 @@
+export type PromotionMetadata = {
+  min_order_value?: number | null
+  max_discount?: number | null
+  [key: string]: unknown
+}
+
+const promotionMetadataKey = (promotionId: string) => `promotion:${promotionId}:metadata`
+
+export async function getPromotionMetadata(
+  siteService: any,
+  promotionId: string
+): Promise<PromotionMetadata> {
+  const [rows] = await siteService.listAndCountSiteSettings({
+    key: promotionMetadataKey(promotionId),
+  })
+  return (rows?.[0]?.value as PromotionMetadata | undefined) || {}
+}
+
+export async function updatePromotionMetadata(
+  siteService: any,
+  promotionId: string,
+  metadata: PromotionMetadata
+): Promise<PromotionMetadata> {
+  const key = promotionMetadataKey(promotionId)
+  const [rows] = await siteService.listAndCountSiteSettings({ key })
+
+  if (rows?.[0]) {
+    await siteService.updateSiteSettings({ id: rows[0].id, value: metadata })
+  } else {
+    await siteService.createSiteSettings({ key, value: metadata })
+  }
+
+  return metadata
+}

@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react"
+import { useCallback, useState, useEffect } from "react"
 import { useParams, Link } from "react-router-dom"
-import { ArrowLeft, Mail, Phone, Calendar, ShoppingBag, MapPin, UserCircle } from "lucide-react"
+import { ArrowLeft, Mail, Phone, Calendar, ShoppingBag } from "lucide-react"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
 
 export default function CustomerDetail() {
@@ -9,11 +9,7 @@ export default function CustomerDetail() {
   const [customer, setCustomer] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    fetchCustomer()
-  }, [id])
-
-  const fetchCustomer = async () => {
+  const fetchCustomer = useCallback(async () => {
     try {
       setLoading(true)
       const res = await api(`/admin/customers/${id}?fields=*orders,*orders.items`)
@@ -32,7 +28,12 @@ export default function CustomerDetail() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [api, id])
+
+  useEffect(() => {
+    const timer = window.setTimeout(fetchCustomer, 0)
+    return () => window.clearTimeout(timer)
+  }, [fetchCustomer])
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount)

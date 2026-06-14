@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import ProductCard from '../components/ProductCard'
 import { useCatalog, mapProduct } from '../context/CatalogContext'
 import { apiFetch } from '../lib/api'
@@ -23,7 +23,6 @@ export default function Products() {
 
   useEffect(() => {
     let mounted = true
-    setLoading(true)
 
     async function fetchProducts() {
       try {
@@ -52,8 +51,14 @@ export default function Products() {
       }
     }
 
-    fetchProducts()
-    return () => { mounted = false }
+    const timer = window.setTimeout(() => {
+      setLoading(true)
+      fetchProducts()
+    }, 0)
+    return () => {
+      mounted = false
+      window.clearTimeout(timer)
+    }
   }, [page, selectedCategory, sortBy, limit])
 
   const totalPages = Math.ceil(total / limit)

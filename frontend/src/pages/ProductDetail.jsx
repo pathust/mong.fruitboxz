@@ -25,26 +25,28 @@ export default function ProductDetail() {
 
   useEffect(() => {
     let mounted = true
-    setLoading(true)
-    apiFetch(`/store/products?handle=${slug}&fields=id,handle,title,thumbnail,*images,*variants,*variants.prices,*categories,description`)
-      .then((res) => {
-        if (mounted && res.products && res.products.length > 0) {
-          const p = mapProduct(res.products[0])
-          // We also need description since mapProduct drops it in the current version!
-          // Wait, mapProduct in CatalogContext doesn't include description?
-          // I will manually map it here to ensure description is passed.
-          setProduct({ ...p, description: res.products[0].description })
-        } else if (mounted) {
-          setProduct(null)
-        }
-      })
-      .catch(() => {
-        if (mounted) setProduct(null)
-      })
-      .finally(() => {
-        if (mounted) setLoading(false)
-      })
-    return () => { mounted = false }
+    const timer = window.setTimeout(() => {
+      setLoading(true)
+      apiFetch(`/store/products?handle=${slug}&fields=id,handle,title,thumbnail,*images,*variants,*variants.prices,*categories,description`)
+        .then((res) => {
+          if (mounted && res.products && res.products.length > 0) {
+            const p = mapProduct(res.products[0])
+            setProduct({ ...p, description: res.products[0].description })
+          } else if (mounted) {
+            setProduct(null)
+          }
+        })
+        .catch(() => {
+          if (mounted) setProduct(null)
+        })
+        .finally(() => {
+          if (mounted) setLoading(false)
+        })
+    }, 0)
+    return () => {
+      mounted = false
+      window.clearTimeout(timer)
+    }
   }, [slug])
   useEffect(() => {
     if (!product) return

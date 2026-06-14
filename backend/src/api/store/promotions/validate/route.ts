@@ -1,6 +1,7 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { Modules } from "@medusajs/framework/utils"
 import { z } from "zod"
+import { getPromotionMetadata } from "../../../../lib/promotion-metadata"
 
 const ValidateSchema = z.object({
   code: z.string().min(1, "Mã giảm giá không hợp lệ"),
@@ -36,6 +37,8 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
   }
 
   const promotion = promotions[0] as any
+  const siteService = req.scope.resolve("site")
+  const promotionMetadata = await getPromotionMetadata(siteService, promotion.id)
 
   // Validate limits and dates from campaign
   if (promotion.campaign) {
@@ -57,10 +60,11 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
         const query = req.scope.resolve("query")
         const { data } = await query.graph({
           entity: "order",
-          fields: ["id"],
-          filters: { metadata: { $contains: { promotion_code: promotion.code } } }
+          fields: ["id", "metadata"],
         })
-        usedCount = data ? data.length : 0
+        usedCount = (data as Array<{ metadata?: Record<string, unknown> | null }>)
+          .filter((order) => order.metadata?.promotion_code === promotion.code)
+          .length
         if (usedCount >= limit) {
           return res.status(400).json({ message: "Mã giảm giá đã hết lượt sử dụng" })
         }
@@ -74,7 +78,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
   }
 
   // 3. Validate Minimum Order Value
-  const minOrderValue = Number(promotion.metadata?.min_order_value || 0)
+  const minOrderValue = Number(promotionMetadata.min_order_value || 0)
   if (minOrderValue > 0 && subtotal < minOrderValue) {
     return res.status(400).json({
       message: `Mã giảm giá yêu cầu đơn hàng tối thiểu ${new Intl.NumberFormat('vi-VN').format(minOrderValue)}đ`
@@ -87,7 +91,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
   }
 
   let discountAmount = 0
-  const maxDiscount = Number(promotion.metadata?.max_discount || 0)
+  const maxDiscount = Number(promotionMetadata.max_discount || 0)
 
   if (appMethod.type === "fixed") {
     discountAmount = Number(appMethod.value)

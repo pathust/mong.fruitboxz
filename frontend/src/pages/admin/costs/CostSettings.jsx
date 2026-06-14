@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useCallback, useState, useEffect } from "react"
 import { Calculator, Save, AlertCircle } from "lucide-react"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
 
@@ -20,11 +20,7 @@ export default function CostSettings() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState("")
 
-  useEffect(() => {
-    fetchSettings()
-  }, [])
-
-  const fetchSettings = async () => {
+  const fetchSettings = useCallback(async () => {
     try {
       const res = await api("/admin/custom?mode=settings")
       if (res?.settings) {
@@ -35,7 +31,12 @@ export default function CostSettings() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [api])
+
+  useEffect(() => {
+    const timer = window.setTimeout(fetchSettings, 0)
+    return () => window.clearTimeout(timer)
+  }, [fetchSettings])
 
   const handleSave = async (e) => {
     e.preventDefault()

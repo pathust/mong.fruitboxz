@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useCallback, useState, useEffect } from "react"
 import { Plus, Edit2, Trash2, Leaf } from "lucide-react"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
 
@@ -33,11 +33,7 @@ export default function IngredientsList() {
     category: "Fruit",
   })
 
-  useEffect(() => {
-    fetchIngredients()
-  }, [])
-
-  const fetchIngredients = async () => {
+  const fetchIngredients = useCallback(async () => {
     try {
       const res = await api("/admin/inventory-items?limit=500")
       if (res?.inventory_items) {
@@ -57,7 +53,12 @@ export default function IngredientsList() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [api])
+
+  useEffect(() => {
+    const timer = window.setTimeout(fetchIngredients, 0)
+    return () => window.clearTimeout(timer)
+  }, [fetchIngredients])
 
   const handleSave = async (e) => {
     e.preventDefault()

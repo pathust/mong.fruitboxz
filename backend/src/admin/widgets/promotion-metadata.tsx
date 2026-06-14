@@ -1,18 +1,26 @@
 import { defineWidgetConfig } from "@medusajs/admin-sdk"
 import { Container, Heading, Text, Input, Button, Label, toast } from "@medusajs/ui"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 const PromotionMetadataWidget = ({ data }: any) => {
   const [minOrderValue, setMinOrderValue] = useState(data?.metadata?.min_order_value || "")
   const [maxDiscount, setMaxDiscount] = useState(data?.metadata?.max_discount || "")
   const [isLoading, setIsLoading] = useState(false)
 
+  useEffect(() => {
+    fetch(`/admin/promotions/${data.id}/metadata`)
+      .then((res) => res.ok ? res.json() : Promise.reject(new Error("Failed to load metadata")))
+      .then((result) => {
+        setMinOrderValue(result.metadata?.min_order_value || "")
+        setMaxDiscount(result.metadata?.max_discount || "")
+      })
+      .catch((error) => console.error(error))
+  }, [data.id])
+
   const handleSave = async () => {
     setIsLoading(true)
     try {
-      // In Medusa v2 admin, widgets can call /admin/promotions/:id directly.
-      // The session cookie handles auth.
-      const res = await fetch(`/admin/promotions/${data.id}`, {
+      const res = await fetch(`/admin/promotions/${data.id}/metadata`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

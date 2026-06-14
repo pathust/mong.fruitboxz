@@ -19,13 +19,12 @@ export default function CategoryDetail() {
   const limit = viewMode === 'grid' ? 16 : 12
 
   useEffect(() => {
-    // Reset page when category changes
-    setPage(1)
+    const timer = window.setTimeout(() => setPage(1), 0)
+    return () => window.clearTimeout(timer)
   }, [categorySlug])
 
   useEffect(() => {
     let mounted = true
-    setLoading(true)
 
     async function fetchProducts() {
       if (!category) {
@@ -67,8 +66,14 @@ export default function CategoryDetail() {
       }
     }
 
-    fetchProducts()
-    return () => { mounted = false }
+    const timer = window.setTimeout(() => {
+      setLoading(true)
+      fetchProducts()
+    }, 0)
+    return () => {
+      mounted = false
+      window.clearTimeout(timer)
+    }
   }, [categorySlug, page, category, limit])
 
   const totalPages = Math.ceil(total / limit)

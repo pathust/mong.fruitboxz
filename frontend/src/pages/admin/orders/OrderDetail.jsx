@@ -47,10 +47,14 @@ export default function OrderDetail() {
   // Sync edit states when order data loads/changes
   useEffect(() => {
     if (order) {
-      setEditStatus(order.status || "pending")
-      setEditPayment(order.metadata?.payment_status || "not_paid")
-      setEditFulfillment(order.metadata?.fulfillment_status || "not_fulfilled")
+      const timer = window.setTimeout(() => {
+        setEditStatus(order.status || "pending")
+        setEditPayment(order.metadata?.payment_status || "not_paid")
+        setEditFulfillment(order.metadata?.fulfillment_status || "not_fulfilled")
+      }, 0)
+      return () => window.clearTimeout(timer)
     }
+    return undefined
   }, [order])
 
   const currentStatus = order?.status || "pending"
@@ -110,9 +114,6 @@ export default function OrderDetail() {
 
   if (loading) return <div className="text-center py-12 text-secondary-light">Loading...</div>
   if (!order) return <div className="text-center py-12 text-red-500">Order not found</div>
-
-  const paymentStatus = order.metadata?.payment_status || "not_paid"
-  const fulfillmentStatus = order.metadata?.fulfillment_status || "not_fulfilled"
 
   let orderCost = 0
   const defaultCostPercent = Number(settings.default_cost_percent ?? 50) / 100

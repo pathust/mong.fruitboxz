@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useCallback, useState, useEffect } from "react"
 import { Plus, Trash2, Calculator } from "lucide-react"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
 
@@ -10,13 +10,7 @@ export default function RecipeManager({ productId, variantId }) {
   const [saving, setSaving] = useState(false)
   const [globalCosts, setGlobalCosts] = useState({ packaging_cost: 0, labor_cost_per_order: 0 })
 
-  useEffect(() => {
-    if (productId && variantId) {
-      fetchData()
-    }
-  }, [productId, variantId])
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const [resIng, resGlobal, resProduct] = await Promise.all([
         api("/admin/inventory-items?limit=500"),
@@ -51,12 +45,17 @@ export default function RecipeManager({ productId, variantId }) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [api, productId, variantId])
+
+  useEffect(() => {
+    if (!productId || !variantId) return undefined
+    const timer = window.setTimeout(fetchData, 0)
+    return () => window.clearTimeout(timer)
+  }, [fetchData, productId, variantId])
 
   const handleSave = async () => {
     setSaving(true)
     try {
-      let successCount = 0;
       let errorMsgs = [];
 
       for (const item of items) {
@@ -68,7 +67,6 @@ export default function RecipeManager({ productId, variantId }) {
               required_quantity: Number(item.required_quantity)
             })
           })
-          successCount++;
         } catch (err) {
           errorMsgs.push(`Nguyên liệu ${item.inventory_item_id}: ${err.message || JSON.stringify(err)}`);
         }

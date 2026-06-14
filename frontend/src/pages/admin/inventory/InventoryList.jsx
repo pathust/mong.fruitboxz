@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useCallback, useState, useEffect } from "react"
 import { Package, Search, Save, AlertCircle } from "lucide-react"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
 
@@ -9,11 +9,7 @@ export default function InventoryList() {
   const [searchTerm, setSearchTerm] = useState("")
   const [updates, setUpdates] = useState({})
 
-  useEffect(() => {
-    fetchInventory()
-  }, [])
-
-  const fetchInventory = async () => {
+  const fetchInventory = useCallback(async () => {
     try {
       setLoading(true)
       const res = await api("/admin/custom/inventory")
@@ -25,7 +21,12 @@ export default function InventoryList() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [api])
+
+  useEffect(() => {
+    const timer = window.setTimeout(fetchInventory, 0)
+    return () => window.clearTimeout(timer)
+  }, [fetchInventory])
 
   const handleStockChange = (inventoryItemId, locationId, value) => {
     setUpdates({

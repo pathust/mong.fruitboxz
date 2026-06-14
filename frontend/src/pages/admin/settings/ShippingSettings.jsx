@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react"
-import { Truck, Save, AlertCircle, MapPin, Map } from "lucide-react"
+import { useCallback, useState, useEffect } from "react"
+import { Truck, Save, AlertCircle, MapPin } from "lucide-react"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
 
 export default function ShippingSettings() {
@@ -40,7 +40,7 @@ export default function ShippingSettings() {
             shipping_origin_lng: lng,
             shipping_origin_address: data?.display_name?.replace(/, Việt Nam$/i, "").trim() || ""
           }))
-        } catch (err) {
+        } catch {
           setSettings(prev => ({
             ...prev,
             shipping_origin_lat: lat,
@@ -83,11 +83,7 @@ export default function ShippingSettings() {
     }
   }
 
-  useEffect(() => {
-    fetchSettings()
-  }, [])
-
-  const fetchSettings = async () => {
+  const fetchSettings = useCallback(async () => {
     try {
       setLoading(true)
       const res = await api("/admin/custom?mode=settings")
@@ -111,7 +107,12 @@ export default function ShippingSettings() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [api])
+
+  useEffect(() => {
+    const timer = window.setTimeout(fetchSettings, 0)
+    return () => window.clearTimeout(timer)
+  }, [fetchSettings])
 
   const handleSave = async () => {
     try {
