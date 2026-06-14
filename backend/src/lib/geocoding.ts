@@ -113,6 +113,153 @@ export function suggestLocations(query: string, limit = 6) {
   return suggestions
 }
 
+async function fetchJson(url: string, headers?: Record<string, string>) {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), 6000)
+
+  try {
+    const response = await fetch(url, {
+      headers,
+      signal: controller.signal,
+    })
+    if (!response.ok) return null
+    return await response.json()
+  } catch {
+    return null
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
+function cleanAddressLabel(raw?: string) {
+  return (raw || "")
+    .replace(/,\s*\d{5,6}(?=,|$)/g, "")
+    .replace(/,\s*Việt Nam$/i, "")
+    .replace(/\s*,\s*,+/g, ", ")
+    .trim()
+}
+
+function joinUniqueAddressParts(parts: unknown[]) {
+  const seen = new Set<string>()
+  return parts
+    .filter((part): part is string => typeof part === "string" && Boolean(part.trim()))
+    .map((part) => part.trim())
+    .filter((part) => {
+      const normalized = normalizeAddress(part)
+      if (!normalized || seen.has(normalized)) return false
+      seen.add(normalized)
+      return true
+    })
+    .join(", ")
+}
+
+function nearestDistrict(lat: number, lng: number) {
+  return HANOI_DISTRICTS
+    .map((record) => ({ record, distance: haversineKm(lat, lng, record.lat, record.lng) }))
+    .sort((a, b) => a.distance - b.distance)[0]?.record || null
+}
+
+function vietnameseDistrictName(record: DistrictRecord) {
+  const accentedAlias = record.aliases.find((alias) =>
+    /[^\u0000-\u007f]/.test(alias) && !alias.toLowerCase().startsWith("quận ")
+  )
+  const name = accentedAlias || record.district
+  return name.charAt(0).toLocaleUpperCase("vi-VN") + name.slice(1)
+}
+
+export async function reverseGeocodeLocation(lat: number, lng: number) {
+  const cacheKey = `reverse:${lat.toFixed(5)}:${lng.toFixed(5)}`
+  if (memoryCache.has(cacheKey)) {
+    return memoryCache.get(cacheKey)
+  }
+
+  const nominatimUrl = new URL("https://nominatim.openstreetmap.org/reverse")
+  nominatimUrl.searchParams.set("lat", lat.toString())
+  nominatimUrl.searchParams.set("lon", lng.toString())
+  nominatimUrl.searchParams.set("format", "jsonv2")
+  nominatimUrl.searchParams.set("addressdetails", "1")
+  nominatimUrl.searchParams.set("zoom", "18")
+  nominatimUrl.searchParams.set("accept-language", "vi")
+
+  const bigDataCloudUrl = new URL("https://api.bigdatacloud.net/data/reverse-geocode-client")
+  bigDataCloudUrl.searchParams.set("latitude", lat.toString())
+  bigDataCloudUrl.searchParams.set("longitude", lng.toString())
+  bigDataCloudUrl.searchParams.set("localityLanguage", "vi")
+
+  const [nominatimResult, bigDataCloudResult] = await Promise.all([
+    fetchJson(nominatimUrl.toString(), {
+      "Accept-Language": "vi",
+      "User-Agent": "mong-fruitboxz/1.0",
+    }),
+    fetchJson(bigDataCloudUrl.toString()),
+  ])
+
+  if (nominatimResult?.address || nominatimResult?.display_name) {
+    const details = nominatimResult.address || {}
+    const district =
+      details.city_district ||
+      details.district ||
+      details.county ||
+      details.town ||
+      details.suburb ||
+      ""
+    const city = details.city || details.municipality || details.state || ""
+    const componentAddress = joinUniqueAddressParts([
+      details.house_number,
+      details.road,
+      details.neighbourhood,
+      details.quarter,
+      details.suburb,
+      district,
+      city,
+    ])
+    const result = {
+      address: cleanAddressLabel(nominatimResult.display_name) || componentAddress,
+      city,
+      district,
+      provider: "nominatim",
+      precision: "address",
+    }
+    memoryCache.set(cacheKey, result)
+    return result
+  }
+
+  if (bigDataCloudResult?.locality || bigDataCloudResult?.city || bigDataCloudResult?.principalSubdivision) {
+    const district =
+      bigDataCloudResult.locality ||
+      bigDataCloudResult.localityInfo?.administrative?.[0]?.name ||
+      ""
+    const city = bigDataCloudResult.city || bigDataCloudResult.principalSubdivision || ""
+    const result = {
+      address: joinUniqueAddressParts([
+        bigDataCloudResult.locality,
+        bigDataCloudResult.city,
+        bigDataCloudResult.principalSubdivision,
+      ]),
+      city,
+      district,
+      provider: "bigdatacloud",
+      precision: "area",
+    }
+    memoryCache.set(cacheKey, result)
+    return result
+  }
+
+  const nearbyDistrict = nearestDistrict(lat, lng)
+  const result = {
+    address: null,
+    city: nearbyDistrict?.city || "",
+    district: nearbyDistrict?.district || "",
+    area_label: nearbyDistrict
+      ? `Khu vực ${vietnameseDistrictName(nearbyDistrict)}, Hà Nội`
+      : "Khu vực vị trí hiện tại",
+    provider: "local-area",
+    precision: "area",
+  }
+  memoryCache.set(cacheKey, result)
+  return result
+}
+
 export function resolveShippingQuote(
   input: { address?: string; city?: string; district?: string; lat?: number; lng?: number },
   settings: Record<string, any>

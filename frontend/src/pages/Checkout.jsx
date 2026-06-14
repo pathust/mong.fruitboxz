@@ -104,6 +104,7 @@ export default function Checkout() {
   const [matchedLocation, setMatchedLocation] = useState(null)
   const [shippingLoading, setShippingLoading] = useState(false)
   const [locating, setLocating] = useState(false)
+  const [locationFeedback, setLocationFeedback] = useState(null)
   const [promoCode, setPromoCode] = useState('')
   const [applyingPromo, setApplyingPromo] = useState(false)
   const [promoError, setPromoError] = useState('')
@@ -136,59 +137,49 @@ export default function Checkout() {
 
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
-      alert("Trình duyệt của bạn không hỗ trợ định vị.")
+      setLocationFeedback({ type: 'error', message: 'Trình duyệt của bạn không hỗ trợ định vị.' })
       return
     }
 
     setLocating(true)
+    setLocationFeedback(null)
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords
         try {
-          const [nomRes, bdcRes] = await Promise.all([
-            fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=vi`),
-            fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=vi`)
-          ]).catch(() => [null, null])
+          const location = await apiFetch(`/store/geocode/reverse?lat=${latitude}&lng=${longitude}`)
+          const resolvedAddress = location.address?.trim()
 
-          const data = nomRes ? await nomRes.json().catch(() => null) : null
-          const bdcData = bdcRes ? await bdcRes.json().catch(() => null) : null
+          setForm(prev => ({
+            ...prev,
+            ...(resolvedAddress ? { address: resolvedAddress } : {}),
+            lat: latitude,
+            lng: longitude
+          }))
 
-          if (data && data.address) {
-            const addressObj = data.address
-            const house = addressObj.house_number || ""
-            const road = addressObj.road || ""
-            const suburb = addressObj.suburb || addressObj.quarter || ""
-            const district = addressObj.city_district || addressObj.district || addressObj.county || addressObj.town || ""
-            const city = addressObj.city || addressObj.state || ""
+          const matched = findLocalDistrict(location.district, resolvedAddress || location.area_label || '')
+          if (matched) {
+            setMatchedLocation(districtToLocation(matched))
+          }
 
-            let fullStreet = [house, road, suburb, district, city].filter(Boolean).join(", ")
-
-            // Fallback to display_name if components are empty
-            if (!fullStreet && data.display_name) {
-              fullStreet = data.display_name.replace(/, Việt Nam$/i, "").trim()
-            }
-
-            setForm(prev => ({
-              ...prev,
-              address: fullStreet,
-              lat: latitude,
-              lng: longitude
-            }))
-
-            const matched = findLocalDistrict(district, fullStreet)
-            if (matched) {
-              setMatchedLocation(districtToLocation(matched))
-            }
-          } else if (bdcData && (bdcData.locality || bdcData.city)) {
-            const fullStreet = [bdcData.locality, bdcData.city, bdcData.principalSubdivision].filter(Boolean).join(", ")
-            setForm(prev => ({ ...prev, address: fullStreet, lat: latitude, lng: longitude }))
+          if (resolvedAddress) {
+            setLocationFeedback({
+              type: 'info',
+              message: 'Đã điền địa chỉ từ vị trí hiện tại. Vui lòng kiểm tra và bổ sung số nhà nếu cần.'
+            })
           } else {
-            // Fallback: hiển thị tọa độ để user biết vị trí đã được lấy
-            setForm(prev => ({ ...prev, address: `Vị trí: ${latitude.toFixed(5)}, ${longitude.toFixed(5)}`, lat: latitude, lng: longitude }))
+            setLocationFeedback({
+              type: 'info',
+              message: `${location.area_label || 'Đã xác định khu vực hiện tại'}. Vui lòng nhập thêm số nhà và tên đường.`
+            })
           }
         } catch (err) {
           console.error("Geocoding failed:", err)
           setForm(prev => ({ ...prev, lat: latitude, lng: longitude }))
+          setLocationFeedback({
+            type: 'error',
+            message: 'Đã lấy được vị trí nhưng chưa xác định được địa chỉ. Vui lòng nhập số nhà, tên đường và khu vực.'
+          })
         } finally {
           setLocating(false)
         }
@@ -196,9 +187,9 @@ export default function Checkout() {
       (err) => {
         setLocating(false)
         if (err.code === 1) {
-          alert("Bạn đã từ chối quyền truy cập vị trí. Vui lòng nhập địa chỉ thủ công.")
+          setLocationFeedback({ type: 'error', message: 'Bạn đã từ chối quyền truy cập vị trí. Vui lòng nhập địa chỉ thủ công.' })
         } else {
-          alert("Không thể lấy vị trí hiện tại. Vui lòng thử lại hoặc nhập tay.")
+          setLocationFeedback({ type: 'error', message: 'Không thể lấy vị trí hiện tại. Vui lòng thử lại hoặc nhập thủ công.' })
         }
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
@@ -407,10 +398,20 @@ export default function Checkout() {
                     </button>
                   </div>
                   <input type="text" required minLength={5} value={form.address}
-                    onChange={e => setForm({ ...form, address: e.target.value })}
+                    onChange={e => {
+                      setForm({ ...form, address: e.target.value })
+                      setLocationFeedback(null)
+                    }}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm"
                     placeholder="Số nhà, tên đường, phường/xã" />
-
+                  {locationFeedback && (
+                    <p
+                      role={locationFeedback.type === 'error' ? 'alert' : 'status'}
+                      className={`mt-2 text-xs ${locationFeedback.type === 'error' ? 'text-red-500' : 'text-blue-700'}`}
+                    >
+                      {locationFeedback.message}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="product-meta block text-sm text-secondary font-medium mb-1.5">Ghi chú (không bắt buộc)</label>
