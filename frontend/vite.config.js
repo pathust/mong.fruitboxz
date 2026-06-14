@@ -11,7 +11,15 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': { target: 'http://127.0.0.1:9000', changeOrigin: true },
-      '/auth': { target: 'http://127.0.0.1:9000', changeOrigin: true },
+      '/auth': {
+        target: 'http://127.0.0.1:9000',
+        changeOrigin: true,
+        bypass: (req) => {
+          if (req.headers.accept?.includes('text/html')) {
+            return '/index.html'
+          }
+        },
+      },
       '/media': { target: 'http://127.0.0.1:9000', changeOrigin: true },
       '/admin': {
         target: 'http://127.0.0.1:9000',

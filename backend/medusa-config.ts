@@ -2,10 +2,16 @@ import { loadEnv, defineConfig, Modules } from '@medusajs/framework/utils'
 
 loadEnv(process.env.NODE_ENV || 'development', process.cwd())
 
+const redisUrl = process.env.REDIS_URL
+const useRedis = Boolean(redisUrl) && (
+  process.env.NODE_ENV === "production" ||
+  process.env.MEDUSA_USE_REDIS === "true"
+)
+
 module.exports = defineConfig({
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
-    redisUrl: process.env.REDIS_URL,
+    redisUrl: useRedis ? redisUrl : undefined,
     http: {
       storeCors: process.env.STORE_CORS!,
       adminCors: process.env.ADMIN_CORS!,
@@ -15,13 +21,13 @@ module.exports = defineConfig({
     }
   },
   modules: [
-    {
+    ...(useRedis ? [{
       resolve: "@medusajs/event-bus-redis",
       key: Modules.EVENT_BUS,
       options: {
-        redisUrl: process.env.REDIS_URL,
+        redisUrl,
       },
-    },
+    }] : []),
     {
       resolve: "@medusajs/file",
       options: {

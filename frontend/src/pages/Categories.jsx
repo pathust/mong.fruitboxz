@@ -30,7 +30,7 @@ export default function Categories() {
               </div>
               <div className="p-3">
                 <h3 className="text-sm md:text-[15px] font-medium text-[#393631] line-clamp-1">{cat.displayName || cat.name}</h3>
-                <Link to={`/categories/${cat.slug}`} className="text-xs text-primary mt-1 hover:underline">Xem sản phẩm →</Link>
+                <span className="block text-xs text-primary mt-1 group-hover:underline">Xem sản phẩm →</span>
               </div>
             </Link>
           ))}
