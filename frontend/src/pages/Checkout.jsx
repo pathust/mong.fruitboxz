@@ -550,7 +550,7 @@ export default function Checkout() {
               </button>
 
               <p className="text-xs text-gray-400 text-center mt-4">
-                Bằng cách đặt hàng, bạn đồng ý với <Link to="#" className="text-primary hover:underline">Điều khoản</Link> của chúng tôi
+                Bằng cách đặt hàng, bạn đồng ý với <Link to="/payment-policy" className="text-primary hover:underline">chính sách thanh toán</Link> của chúng tôi
               </p>
             </div>
           </div>
