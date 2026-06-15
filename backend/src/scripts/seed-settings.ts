@@ -30,7 +30,7 @@ export default async function seedSettings({ container }: ExecArgs) {
       { title: "Giao hàng siêu tốc", description: "Cam kết giao hàng đúng hẹn", icon: "delivery" }
     ]),
     custom_box_types_json: JSON.stringify([
-      { slug: "hop-qua-co-ban", name: "Hộp Quà Cơ Bản", description: "Hộp gồm 3-4 loại trái cây tự chọn", base_price: 50000, max_items: 4 },
+      { slug: "hop-qua-trai-cay-tu-chon", name: "Hộp Quà Cơ Bản", description: "Hộp gồm 3-4 loại trái cây tự chọn", base_price: 50000, max_items: 4 },
       { slug: "hop-qua-cao-cap", name: "Hộp Quà Cao Cấp", description: "Hộp sang trọng gồm 5-7 loại trái cây tự chọn", base_price: 150000, max_items: 7 }
     ]),
     custom_box_product_handles: "",
