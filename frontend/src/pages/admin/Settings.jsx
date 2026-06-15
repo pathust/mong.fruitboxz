@@ -10,12 +10,28 @@ export default function Settings() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState("")
   const [form, setForm] = useState({
-    site_name: "Mọng | Trái cây gọt sẵn",
-    tagline: "Tươi ngon mỗi ngày",
-    email: "contact@mongfruitbox.com",
-    phone: "0945.204.432",
-    address: "Phương Liệt, Thanh Xuân, Hà Nội",
-    instagram: "https://www.instagram.com/mong.fruitboxz",
+    site_name: "",
+    tagline: "",
+    footer_about: "",
+    email: "",
+    phone: "",
+    address: "",
+    opening_hours: "",
+    facebook: "",
+    instagram: "",
+    tiktok: "",
+    contact_title: "",
+    contact_intro: "",
+    about_title: "",
+    about_intro: "",
+    about_image: "",
+    about_story_title: "",
+    about_story: "",
+    about_story_secondary: "",
+    about_reasons_title: "",
+    about_reasons_json: "",
+    custom_box_types_json: "",
+    custom_box_product_handles: "",
     about_us: "",
     delivery_info: "",
     shipping_policy_text: "Mọng giao hàng trong Hà Nội theo khu vực. Phí ship được hiển thị trước khi đặt hàng và có thể thay đổi theo khoảng cách thực tế.",
@@ -70,6 +86,10 @@ export default function Settings() {
             <label className="block text-sm font-medium text-secondary mb-1">Tagline</label>
             <input value={form.tagline} onChange={e => setForm({ ...form, tagline: e.target.value })} className="admin-input w-full px-4 py-2.5" />
           </div>
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-secondary mb-1">Footer About</label>
+            <textarea value={form.footer_about} onChange={e => setForm({ ...form, footer_about: e.target.value })} rows={3} className="admin-input w-full px-4 py-2.5" />
+          </div>
         </div>
 
         <h2 className="section-title border-b border-[#efe4d4] pb-3 pt-4 text-[20px]">Contact</h2>
@@ -87,12 +107,66 @@ export default function Settings() {
             <input value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} className="admin-input w-full px-4 py-2.5" />
           </div>
           <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-secondary mb-1">Opening Hours</label>
+            <input value={form.opening_hours} onChange={e => setForm({ ...form, opening_hours: e.target.value })} className="admin-input w-full px-4 py-2.5" />
+          </div>
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-secondary mb-1">Facebook URL</label>
+            <input value={form.facebook} onChange={e => setForm({ ...form, facebook: e.target.value })} className="admin-input w-full px-4 py-2.5" />
+          </div>
+          <div className="md:col-span-2">
             <label className="block text-sm font-medium text-secondary mb-1">Instagram URL</label>
             <input value={form.instagram} onChange={e => setForm({ ...form, instagram: e.target.value })} className="admin-input w-full px-4 py-2.5" />
+          </div>
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-secondary mb-1">TikTok URL</label>
+            <input value={form.tiktok} onChange={e => setForm({ ...form, tiktok: e.target.value })} className="admin-input w-full px-4 py-2.5" />
           </div>
         </div>
 
         <h2 className="section-title border-b border-[#efe4d4] pb-3 pt-4 text-[20px]">Content</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-secondary mb-1">Contact Title</label>
+            <input value={form.contact_title} onChange={e => setForm({ ...form, contact_title: e.target.value })} className="admin-input w-full px-4 py-2.5" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-secondary mb-1">Contact Intro</label>
+            <input value={form.contact_intro} onChange={e => setForm({ ...form, contact_intro: e.target.value })} className="admin-input w-full px-4 py-2.5" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-secondary mb-1">About Title</label>
+            <input value={form.about_title} onChange={e => setForm({ ...form, about_title: e.target.value })} className="admin-input w-full px-4 py-2.5" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-secondary mb-1">About Story Title</label>
+            <input value={form.about_story_title} onChange={e => setForm({ ...form, about_story_title: e.target.value })} className="admin-input w-full px-4 py-2.5" />
+          </div>
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-secondary mb-1">About Intro</label>
+            <textarea value={form.about_intro} onChange={e => setForm({ ...form, about_intro: e.target.value })} rows={3} className="admin-input w-full px-4 py-2.5" />
+          </div>
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-secondary mb-1">About Image URL</label>
+            <input value={form.about_image} onChange={e => setForm({ ...form, about_image: e.target.value })} className="admin-input w-full px-4 py-2.5" />
+          </div>
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-secondary mb-1">About Story</label>
+            <textarea value={form.about_story} onChange={e => setForm({ ...form, about_story: e.target.value })} rows={4} className="admin-input w-full px-4 py-2.5" />
+          </div>
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-secondary mb-1">About Story Secondary</label>
+            <textarea value={form.about_story_secondary} onChange={e => setForm({ ...form, about_story_secondary: e.target.value })} rows={4} className="admin-input w-full px-4 py-2.5" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-secondary mb-1">Reasons Title</label>
+            <input value={form.about_reasons_title} onChange={e => setForm({ ...form, about_reasons_title: e.target.value })} className="admin-input w-full px-4 py-2.5" />
+          </div>
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-secondary mb-1">Reasons JSON</label>
+            <textarea value={form.about_reasons_json} onChange={e => setForm({ ...form, about_reasons_json: e.target.value })} rows={6} className="admin-input w-full px-4 py-2.5 font-mono text-xs" />
+          </div>
+        </div>
         <div>
           <label className="block text-sm font-medium text-secondary mb-1">About Us</label>
           <textarea value={form.about_us} onChange={e => setForm({ ...form, about_us: e.target.value })} rows={5} className="admin-input w-full px-4 py-2.5" />
@@ -100,6 +174,16 @@ export default function Settings() {
         <div>
           <label className="block text-sm font-medium text-secondary mb-1">Delivery Info</label>
           <textarea value={form.delivery_info} onChange={e => setForm({ ...form, delivery_info: e.target.value })} rows={5} className="admin-input w-full px-4 py-2.5" />
+        </div>
+
+        <h2 className="section-title border-b border-[#efe4d4] pb-3 pt-4 text-[20px]">Custom Box</h2>
+        <div>
+          <label className="block text-sm font-medium text-secondary mb-1">Box Types JSON</label>
+          <textarea value={form.custom_box_types_json} onChange={e => setForm({ ...form, custom_box_types_json: e.target.value })} rows={8} className="admin-input w-full px-4 py-2.5 font-mono text-xs" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-secondary mb-1">Allowed Product Handles</label>
+          <textarea value={form.custom_box_product_handles} onChange={e => setForm({ ...form, custom_box_product_handles: e.target.value })} rows={4} className="admin-input w-full px-4 py-2.5" />
         </div>
 
         <h2 className="section-title border-b border-[#efe4d4] pb-3 pt-4 text-[20px]">Policies</h2>

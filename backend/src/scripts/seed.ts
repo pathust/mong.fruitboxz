@@ -24,11 +24,11 @@ import {
   linkSalesChannelsToStockLocationWorkflow,
   updateStoresStep,
   updateStoresWorkflow,
-  uploadFilesWorkflow,
 } from "@medusajs/medusa/core-flows";
 import fs from "fs";
 import path from "path";
 import { ApiKey } from "../../.medusa/types/query-entry-points";
+import { resolveLocalProductImages } from "../lib/product-images";
 
 const withTimeout = <T>(promise: Promise<T>, ms: number, message: string): Promise<T> => {
   return new Promise((resolve, reject) => {
@@ -72,8 +72,6 @@ const updateStoreCurrencies = createWorkflow(
 );
 
 const dataDir = path.resolve(process.cwd(), "../frontend/src/data");
-const imageDir = path.resolve(process.cwd(), "../frontend/public");
-
 let categories: any[] = [];
 let products: any[] = [];
 
@@ -268,56 +266,6 @@ export default async function seedDemoData({ container }: ExecArgs) {
     input: { id: publishableApiKey.id, add: [defaultSalesChannel[0].id] },
   });
 
-  logger.info("Uploading images to storage...");
-  const uploadedImageMap = new Map<string, string>();
-  const allImages = new Set<string>();
-  for (const p of products) {
-    if (p.images) {
-      for (const img of p.images) allImages.add(img);
-    }
-  }
-
-  const filesToUpload: any[] = [];
-  for (const img of allImages) {
-    try {
-      const localPath = path.join(imageDir, img);
-      if (fs.existsSync(localPath)) {
-        const fileContent = fs.readFileSync(localPath);
-        const mimeType = img.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
-        filesToUpload.push({
-          filename: path.basename(img),
-          mimeType,
-          content: fileContent.toString("base64"),
-          access: "public",
-          _originalPath: img,
-        });
-      }
-    } catch (e: any) {
-      logger.warn(`Failed to read image ${img}: ${e.message}`);
-    }
-  }
-
-  if (filesToUpload.length > 0) {
-    try {
-      // Split into chunks to avoid payload too large errors
-      const chunkSize = 20;
-      for (let i = 0; i < filesToUpload.length; i += chunkSize) {
-        const chunk = filesToUpload.slice(i, i + chunkSize);
-        logger.info(`Uploading chunk ${i / chunkSize + 1} of ${Math.ceil(filesToUpload.length / chunkSize)}...`);
-        const { result: uploadedFiles } = await withTimeout(
-          uploadFilesWorkflow(container).run({ input: { files: chunk } }),
-          30000,
-          "uploadFilesWorkflow chunk timeout"
-        );
-        for (let j = 0; j < uploadedFiles.length; j++) {
-          uploadedImageMap.set(chunk[j]._originalPath, uploadedFiles[j].url);
-        }
-      }
-    } catch (e: any) {
-      logger.error(`Failed to upload images: ${e.message}`);
-    }
-  }
-
   logger.info("Seeding product data...");
   const { result: categoryResult } = await createProductCategoriesWorkflow(container).run({
     input: {
@@ -360,9 +308,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
       });
     }
 
-    const imagesToAssign = p.images
-      ?.map((img: string) => uploadedImageMap.get(img) ? { url: uploadedImageMap.get(img)! } : null)
-      .filter(Boolean) || [];
+    const imagesToAssign = resolveLocalProductImages(p).map((url) => ({ url }));
 
     return {
       title: cleanTitle,
@@ -371,6 +317,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
       weight: 500,
       status: ProductStatus.PUBLISHED,
       shipping_profile_id: shippingProfile.id,
+      thumbnail: imagesToAssign[0]?.url,
       images: imagesToAssign,
       category_ids: category ? [category.id] : [],
       options: [{ title: "Size", values: mappedVariants.map((v: any) => v.title) }],

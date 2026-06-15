@@ -211,17 +211,32 @@ export async function getSearchStatus() {
   }
 }
 
+import { ContainerRegistrationKeys } from "@medusajs/framework/utils"
+
 export async function listProductsForSearch(scope: any) {
-  const productModuleService = scope.resolve(Modules.PRODUCT)
+  const query = scope.resolve(ContainerRegistrationKeys.QUERY)
   const products: any[] = []
   const take = 200
   let skip = 0
 
   while (true) {
-    const page = await productModuleService.listProducts({}, {
-      relations: ["variants", "variants.prices", "categories", "images"],
-      take,
-      skip,
+    const { data: page } = await query.graph({
+      entity: "product",
+      fields: [
+        "id",
+        "handle",
+        "title",
+        "description",
+        "thumbnail",
+        "status",
+        "updated_at",
+        "categories.name",
+        "categories.handle",
+        "variants.prices.amount",
+        "variants.prices.currency_code",
+        "images.url"
+      ],
+      pagination: { skip, take },
     })
     products.push(...(page || []))
     if (!page || page.length < take) break

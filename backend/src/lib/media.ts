@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto"
-import { CreateBucketCommand, DeleteObjectCommand, GetObjectCommand, HeadBucketCommand, ListObjectsV2Command, PutObjectCommand, S3Client } from "@aws-sdk/client-s3"
+import { CreateBucketCommand, DeleteObjectCommand, GetObjectCommand, HeadBucketCommand, HeadObjectCommand, ListObjectsV2Command, PutObjectCommand, S3Client } from "@aws-sdk/client-s3"
 import * as fs from "fs"
 import * as path from "path"
 
@@ -113,6 +113,48 @@ export async function uploadMediaObject({ filename, data }: { filename?: string;
     public_url: `/images/${objectKey}`,
     provider: "local",
     size: buffer.byteLength,
+  }
+}
+
+export async function importLocalMediaObject(filename: string) {
+  if (!filename || !isAllowedExtension(path.extname(filename))) {
+    throw new Error("Invalid local media object")
+  }
+
+  const filePath = path.join(LOCAL_IMAGES_DIR, filename)
+  if (!fs.existsSync(filePath)) {
+    throw new Error(`Local media object not found: ${filename}`)
+  }
+
+  const client = getMinioClient()
+  if (!client) {
+    return {
+      key: filename,
+      url: `/images/${filename}`,
+      provider: "local",
+    }
+  }
+
+  await ensureBucket(client)
+  const bucket = getBucket()
+  const exists = await client.send(new HeadObjectCommand({
+    Bucket: bucket,
+    Key: filename,
+  })).then(() => true).catch(() => false)
+
+  if (!exists) {
+    await client.send(new PutObjectCommand({
+      Bucket: bucket,
+      Key: filename,
+      Body: fs.createReadStream(filePath),
+      ContentType: getContentType(filename),
+    }))
+  }
+
+  return {
+    key: filename,
+    url: `/media/${encodeURIComponent(filename)}`,
+    provider: "minio",
   }
 }
 

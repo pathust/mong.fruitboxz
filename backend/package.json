@@ -17,6 +17,7 @@
     "build": "medusa build",
     "preseed": "node ./scripts/check-node-version.js",
     "seed": "medusa exec ./src/scripts/seed.ts",
+    "sync:product-images": "medusa exec ./src/scripts/sync-product-images.ts",
     "premigrate:site-data": "node ./scripts/check-node-version.js",
     "migrate:site-data": "medusa exec ./src/scripts/migrate-site-data.ts",
     "presearch:reindex": "node ./scripts/check-node-version.js",

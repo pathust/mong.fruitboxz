@@ -31,7 +31,7 @@ function buildLocalReply(message) {
   if (/(ban chay|hot|goi y|san pham)/.test(text)) {
     return 'Bạn có thể xem các sản phẩm nổi bật trên trang chủ hoặc tìm trực tiếp theo tên trái cây. Khi backend hoạt động, mình sẽ gợi ý sản phẩm cụ thể kèm ảnh và giá.'
   }
-  return 'Mình có thể hỗ trợ về sản phẩm, hộp quà, trái cây cắt sẵn và phí giao hàng. Backend hiện chưa phản hồi, nhưng bạn vẫn có thể gọi hotline 0945.204.432 nếu cần xử lý nhanh.'
+  return 'Mình có thể hỗ trợ về sản phẩm, hộp quà, trái cây cắt sẵn và phí giao hàng. Backend hiện chưa phản hồi, bạn vui lòng thử lại sau.'
 }
 
 export default function ChatbotWidget() {
