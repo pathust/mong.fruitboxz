@@ -8,7 +8,18 @@ const CART_KEY = 'mong_fruitbox_cart'
 function loadCart() {
   try {
     const saved = localStorage.getItem(CART_KEY)
-    return saved ? JSON.parse(saved) : { items: [], count: 0 }
+    if (!saved) return { items: [], count: 0 }
+    const parsed = JSON.parse(saved)
+
+    // Migration: strip items that have old external image URLs (pre-media-migration)
+    const cleanItems = (parsed.items || []).map(item => {
+      if (item.image && item.image.startsWith('http') && !item.image.startsWith(window.location.origin)) {
+        return { ...item, image: null }
+      }
+      return item
+    })
+    const totalCount = cleanItems.reduce((sum, i) => sum + (i.quantity || 1), 0)
+    return { items: cleanItems, count: totalCount }
   } catch {
     return { items: [], count: 0 }
   }
