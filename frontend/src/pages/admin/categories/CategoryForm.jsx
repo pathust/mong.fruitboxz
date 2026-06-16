@@ -68,15 +68,15 @@ export default function CategoryForm() {
 
   return (
     <div className="max-w-2xl">
-      <h1 className="text-2xl font-bold text-secondary mb-6">{isNew ? "Add Category" : "Edit Category"}</h1>
+      <h1 className="text-2xl font-bold text-secondary mb-6">{isNew ? "Thêm danh mục" : "Chỉnh sửa danh mục"}</h1>
       <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
         <div>
-          <label className="block text-sm font-medium text-secondary mb-1">Name</label>
+          <label className="block text-sm font-medium text-secondary mb-1">Tên danh mục</label>
           <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" required />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-secondary mb-1">Thumbnail Image</label>
+          <label className="block text-sm font-medium text-secondary mb-1">Ảnh đại diện</label>
           <div className="flex items-center gap-4">
             {form.image && (
               <img src={form.image} alt="Thumbnail" className="h-16 w-16 rounded-xl object-cover border border-gray-200" />
@@ -105,12 +105,13 @@ export default function CategoryForm() {
           <input value={form.slug} onChange={e => setForm({ ...form, slug: slugify(e.target.value) })} placeholder="hop-qua-trai-cay" className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-secondary mb-1">Description</label>
-          <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
+          <label className="block text-sm font-medium text-secondary mb-1">Mô tả danh mục</label>
+          <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={4} placeholder="Giới thiệu ngắn về danh mục — sẽ hiển thị trên trang Danh mục của website..." className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
+          <p className="text-xs text-gray-400 mt-1">Mô tả này sẽ hiển thị công khai trên trang danh mục sản phẩm của website.</p>
         </div>
         <div className="flex gap-3 pt-2">
-          <button type="submit" disabled={saving} className="bg-primary text-white px-6 py-2.5 rounded-xl font-medium hover:bg-primary-dark disabled:opacity-50">{saving ? "Saving..." : isNew ? "Create Category" : "Save Changes"}</button>
-          <button type="button" onClick={() => navigate("/admin/categories")} className="px-6 py-2.5 border border-gray-200 rounded-xl font-medium hover:bg-gray-50">Cancel</button>
+          <button type="submit" disabled={saving} className="bg-primary text-white px-6 py-2.5 rounded-xl font-medium hover:bg-primary-dark disabled:opacity-50">{saving ? "Đang lưu..." : isNew ? "Tạo danh mục" : "Lưu thay đổi"}</button>
+          <button type="button" onClick={() => navigate("/admin/categories")} className="px-6 py-2.5 border border-gray-200 rounded-xl font-medium hover:bg-gray-50">Huỷ</button>
         </div>
       </form>
 

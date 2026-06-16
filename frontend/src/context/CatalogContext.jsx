@@ -91,6 +91,7 @@ export function CatalogProvider({ children }) {
             name: c.name,
             slug,
             displayName: c.name,
+            description: c.description || c.metadata?.description || '',
             image,
           }
         }))
