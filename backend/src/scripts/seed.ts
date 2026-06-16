@@ -310,9 +310,19 @@ export default async function seedDemoData({ container }: ExecArgs) {
 
     const imagesToAssign = resolveLocalProductImages(p).map((url) => ({ url }));
 
+function slugify(str: string) {
+  return str
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
     return {
       title: cleanTitle,
-      handle: p.handle || p.id || `handle-${idx}`,
+      handle: p.handle || slugify(cleanTitle) || `handle-${idx}`,
       description: cleanTitle,
       weight: 500,
       status: ProductStatus.PUBLISHED,
