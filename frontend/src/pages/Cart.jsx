@@ -1,10 +1,46 @@
-import { Link } from 'react-router-dom'
+import { useState, useMemo } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 
 export default function Cart() {
   const { cart, removeItem, updateQuantity } = useCart()
+  const navigate = useNavigate()
 
-  const subtotal = cart.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  // selected: Set of item ids
+  const [selected, setSelected] = useState(() => new Set(cart.items.map(i => i.id)))
+
+  const allChecked = cart.items.length > 0 && selected.size === cart.items.length
+  const someChecked = selected.size > 0 && selected.size < cart.items.length
+
+  const toggleAll = () => {
+    if (allChecked) setSelected(new Set())
+    else setSelected(new Set(cart.items.map(i => i.id)))
+  }
+
+  const toggleItem = (id) => {
+    setSelected(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const selectedItems = useMemo(
+    () => cart.items.filter(i => selected.has(i.id)),
+    [cart.items, selected]
+  )
+
+  const subtotal = useMemo(
+    () => selectedItems.reduce((sum, i) => sum + i.price * i.quantity, 0),
+    [selectedItems]
+  )
+
+  const selectedCount = selectedItems.reduce((sum, i) => sum + i.quantity, 0)
+
+  const handleCheckout = () => {
+    navigate('/checkout', { state: { selectedItems } })
+  }
 
   if (cart.items.length === 0) {
     return (
@@ -34,39 +70,101 @@ export default function Cart() {
       <h1 className="page-title text-[32px] md:text-[42px] mb-8 text-secondary">Giỏ hàng của bạn</h1>
 
       <div className="lg:grid lg:grid-cols-12 lg:gap-10">
-        <div className="lg:col-span-8 space-y-4 mb-8 lg:mb-0">
-          <div className="bg-white rounded-2xl border border-[#efe7dc] overflow-hidden">
-            {cart.items.map((item, index) => (
-              <div key={item.id} className={`p-5 flex items-center gap-5 ${index !== cart.items.length - 1 ? 'border-b border-[#efe7dc]/60' : ''}`}>
-                <img
-                  src={item.image || '/mong_logo-removebg.png'}
-                  alt={item.title}
-                  className="w-24 h-24 object-cover rounded-xl border border-gray-100"
-                  onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = '/mong_logo-removebg.png' }}
-                />
-                <div className="flex-1 min-w-0">
-                  <Link to={`/products/${item.id}`} className="product-title text-[18px] text-secondary hover:text-primary line-clamp-2 leading-snug mb-1 transition-colors">
-                    {item.title}
+        {/* Item list */}
+        <div className="lg:col-span-8 space-y-3 mb-8 lg:mb-0">
+
+          {/* Select-all bar */}
+          <div className="flex items-center gap-3 px-5 py-3 bg-[#fffaf4] rounded-2xl border border-[#efe7dc]">
+            <button
+              type="button"
+              onClick={toggleAll}
+              className="flex items-center justify-center w-5 h-5 rounded-md border-2 transition-all shrink-0"
+              style={{
+                borderColor: allChecked ? '#ea5a2a' : someChecked ? '#ea5a2a' : '#d4c4b0',
+                background: allChecked ? '#ea5a2a' : 'white',
+              }}
+              aria-label="Chọn tất cả"
+            >
+              {allChecked && (
+                <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                </svg>
+              )}
+              {someChecked && !allChecked && (
+                <div className="w-2 h-0.5 bg-primary rounded-full" />
+              )}
+            </button>
+            <span className="product-meta text-sm text-secondary font-medium">
+              Chọn tất cả ({cart.items.length} sản phẩm)
+            </span>
+            {selected.size > 0 && (
+              <span className="ml-auto text-xs text-primary font-semibold">
+                Đã chọn {selected.size} sản phẩm
+              </span>
+            )}
+          </div>
+
+          {/* Items */}
+          <div className="bg-white rounded-2xl border border-[#efe7dc] overflow-hidden divide-y divide-[#efe7dc]/60">
+            {cart.items.map((item) => {
+              const isSelected = selected.has(item.id)
+              return (
+                <div
+                  key={item.id}
+                  className={`p-5 flex items-center gap-4 transition-colors duration-150 ${isSelected ? 'bg-white' : 'bg-gray-50/60'}`}
+                >
+                  {/* Checkbox */}
+                  <button
+                    type="button"
+                    onClick={() => toggleItem(item.id)}
+                    className="flex items-center justify-center w-5 h-5 rounded-md border-2 transition-all shrink-0"
+                    style={{
+                      borderColor: isSelected ? '#ea5a2a' : '#d4c4b0',
+                      background: isSelected ? '#ea5a2a' : 'white',
+                    }}
+                    aria-label={`Chọn ${item.title}`}
+                  >
+                    {isSelected && (
+                      <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </button>
+
+                  {/* Image */}
+                  <Link to={`/products/${item.slug || item.id}`} className={`shrink-0 transition-opacity ${isSelected ? 'opacity-100' : 'opacity-50'}`}>
+                    <img
+                      src={item.image || '/mong_logo-removebg.png'}
+                      alt={item.title}
+                      className="w-20 h-20 object-cover rounded-xl border border-gray-100"
+                      onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = '/mong_logo-removebg.png' }}
+                    />
                   </Link>
-                  <div className="product-price text-primary text-[16px] mb-3">
-                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price)}
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center border border-gray-200 rounded-lg h-9 bg-gray-50">
+
+                  {/* Info */}
+                  <div className={`flex-1 min-w-0 transition-opacity ${isSelected ? 'opacity-100' : 'opacity-50'}`}>
+                    <Link to={`/products/${item.slug || item.id}`} className="product-title text-[16px] text-secondary hover:text-primary line-clamp-2 leading-snug mb-1 transition-colors">
+                      {item.title}
+                    </Link>
+                    {item.variantLabel && (
+                      <p className="text-xs text-gray-400 mb-1">{item.variantLabel}</p>
+                    )}
+                    <div className="product-price text-primary text-[15px] mb-2">
+                      {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price)}
+                    </div>
+                    <div className="flex items-center border border-gray-200 rounded-lg h-8 bg-gray-50 w-fit">
                       <button
                         onClick={() => item.quantity > 1 && updateQuantity(item.id, item.quantity - 1)}
-                        className="px-3 h-full text-secondary hover:text-primary transition-colors flex items-center justify-center"
+                        className="px-2.5 h-full text-secondary hover:text-primary transition-colors flex items-center"
                       >
                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
                         </svg>
                       </button>
-                      <span className="product-meta px-2 text-secondary min-w-[2.5rem] text-center text-sm font-medium">
-                        {item.quantity}
-                      </span>
+                      <span className="product-meta px-2 text-secondary min-w-[2rem] text-center text-sm font-medium">{item.quantity}</span>
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        className="px-3 h-full text-secondary hover:text-primary transition-colors flex items-center justify-center"
+                        className="px-2.5 h-full text-secondary hover:text-primary transition-colors flex items-center"
                       >
                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -74,40 +172,47 @@ export default function Cart() {
                       </button>
                     </div>
                   </div>
-                </div>
-                <div className="flex flex-col items-end justify-between h-24 py-1">
-                  <button
-                    onClick={() => removeItem(item.id)}
-                    className="text-gray-400 hover:text-red-500 transition-colors bg-gray-50 hover:bg-red-50 rounded-full p-2"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
-                  <div className="product-price text-secondary text-[16px] font-semibold">
-                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price * item.quantity)}
+
+                  {/* Price + delete */}
+                  <div className="flex flex-col items-end justify-between h-20 py-0.5 shrink-0">
+                    <button
+                      onClick={() => { removeItem(item.id); setSelected(prev => { const n = new Set(prev); n.delete(item.id); return n }) }}
+                      className="text-gray-400 hover:text-red-500 transition-colors bg-gray-50 hover:bg-red-50 rounded-full p-2"
+                      aria-label={`Xóa ${item.title}`}
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                    <div className={`product-price text-[15px] font-semibold transition-opacity ${isSelected ? 'text-secondary' : 'text-gray-400'}`}>
+                      {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price * item.quantity)}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
 
+        {/* Summary */}
         <div className="lg:col-span-4">
           <div className="bg-[#fffaf4] rounded-2xl p-6 border border-[#efe7dc] sticky top-24">
             <h2 className="section-title text-[22px] mb-5">Tóm tắt đơn hàng</h2>
 
-            <div className="space-y-4 text-sm text-gray-600 border-b border-[#efe7dc] pb-5 mb-5">
+            <div className="space-y-3 text-sm text-gray-600 border-b border-[#efe7dc] pb-5 mb-5">
               <div className="flex justify-between items-center">
-                <span>Tổng số lượng</span>
-                <span className="font-medium text-secondary">{cart.count} sản phẩm</span>
+                <span>Sản phẩm đã chọn</span>
+                <span className="font-medium text-secondary">{selectedCount} sản phẩm</span>
               </div>
-              <div className="flex justify-between items-center">
-                <span>Tạm tính</span>
-                <span className="font-medium text-secondary">
-                  {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(subtotal)}
-                </span>
-              </div>
+              {selectedItems.map(item => (
+                <div key={item.id} className="flex justify-between items-center text-xs text-gray-400">
+                  <span className="truncate max-w-[160px]">{item.title} ×{item.quantity}</span>
+                  <span className="shrink-0 ml-2">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price * item.quantity)}</span>
+                </div>
+              ))}
+              {selectedItems.length === 0 && (
+                <p className="text-xs text-gray-400 italic">Chưa chọn sản phẩm nào</p>
+              )}
             </div>
 
             <div className="flex justify-between items-end mb-6">
@@ -119,12 +224,20 @@ export default function Cart() {
 
             <p className="text-[#8b7b68] text-xs mb-6 text-center">Phí vận chuyển sẽ được tính trong bước thanh toán</p>
 
-            <Link
-              to="/checkout"
-              className="w-full flex items-center justify-center gap-2 bg-primary text-white py-4 rounded-xl font-semibold hover:bg-primary-dark transition-all hover:shadow-lg hover:-translate-y-0.5"
+            <button
+              onClick={handleCheckout}
+              disabled={selected.size === 0}
+              className="w-full flex items-center justify-center gap-2 py-4 rounded-xl font-semibold transition-all
+                disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-y-0
+                bg-primary text-white hover:bg-primary-dark hover:shadow-lg hover:-translate-y-0.5"
             >
               Tiến hành thanh toán
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+            </button>
+
+            <Link to="/products" className="mt-4 flex items-center justify-center gap-1.5 text-sm text-[#8b7b68] hover:text-primary transition-colors">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16l-4-4m0 0l4-4m-4 4h18" /></svg>
+              Tiếp tục mua sắm
             </Link>
           </div>
         </div>

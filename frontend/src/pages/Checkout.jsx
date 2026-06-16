@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { Sparkles, Navigation } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 import { apiFetch } from '../lib/api'
@@ -89,6 +89,9 @@ function districtToLocation(record) {
 
 export default function Checkout() {
   const { cart, clearCart } = useCart()
+  const location = useLocation()
+  // Use only the items the user selected in Cart; fall back to all items
+  const checkoutItems = location.state?.selectedItems || cart.items
   const [form, setForm] = useState({
     name: '',
     phone: '',
@@ -111,7 +114,7 @@ export default function Checkout() {
   const [promoError, setPromoError] = useState('')
   const [discountData, setDiscountData] = useState(null)
 
-  const subtotal = cart.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const subtotal = checkoutItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const [shipping, setShipping] = useState(30000)
   const { address, lat, lng } = form
 
@@ -258,7 +261,7 @@ export default function Checkout() {
         method: 'POST',
         token,
         body: JSON.stringify({
-          items: cart.items.map(item => ({
+          items: checkoutItems.map(item => ({
             title: item.title,
             quantity: item.quantity,
             price: item.price,
@@ -294,7 +297,7 @@ export default function Checkout() {
     }
   }
 
-  if (cart.items.length === 0 && !submitted) {
+  if (checkoutItems.length === 0 && !submitted) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-16 text-center">
         <div className="text-6xl mb-4">🛒</div>
@@ -432,7 +435,7 @@ export default function Checkout() {
                 Đơn hàng của bạn
               </h2>
               <div className="space-y-4 mb-6 max-h-[300px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200">
-                {cart.items.map(item => (
+                {checkoutItems.map(item => (
                   <div key={item.id} className="flex items-center gap-4 bg-white p-3 rounded-xl border border-[#efe7dc]/60">
                     <div className="relative">
                       <img src={item.image || '/mong_logo-removebg.png'} alt={item.title} className="w-16 h-16 object-cover rounded-lg border border-gray-100" onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = '/mong_logo-removebg.png' }} />
