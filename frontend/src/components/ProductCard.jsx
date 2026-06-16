@@ -40,7 +40,7 @@ export default function ProductCard({ product, viewMode = 'grid' }) {
 
   if (viewMode === 'list') {
     return (
-      <article className="group rounded-2xl glass-panel p-3 hover-lift transition-all flex flex-row h-full">
+      <article className="group rounded-2xl glass-panel p-3 hover-card transition-all flex flex-row h-full">
         <Link to={`/products/${productSlug}`} className="w-1/3 md:w-1/4 shrink-0 rounded-xl overflow-hidden relative bg-gradient-to-br from-[#f8f4ed] to-[#fffaf3]">
           <div className="relative h-full aspect-square md:aspect-auto">
             <img src={image} alt={product.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
@@ -97,7 +97,7 @@ export default function ProductCard({ product, viewMode = 'grid' }) {
   }
 
   return (
-    <article className="group rounded-2xl glass-panel p-3 hover-lift transition-all flex flex-col h-full bg-white/60">
+    <article className="group rounded-2xl glass-panel p-3 hover-card transition-all flex flex-col h-full bg-white/60">
       <Link to={`/products/${productSlug}`} className="block relative overflow-hidden rounded-xl aspect-[4/5] bg-gradient-to-br from-[#f8f4ed] to-[#fffaf3]">
         <img src={image} alt={product.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
         {discount > 0 && <span className="absolute left-2 top-2 text-[10px] font-bold gradient-badge px-2.5 py-1 rounded-full shadow-sm">-{discount}%</span>}

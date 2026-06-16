@@ -139,17 +139,17 @@ export default function Header() {
               </button>
             </div>
             <button onClick={() => setLang(lang === 'vi' ? 'en' : 'vi')} className="lg:hidden h-8 px-2.5 text-xs border border-[#e1d6c6] rounded-md hover:bg-white/60 font-bold">{lang.toUpperCase()}</button>
-            <button onClick={() => setSearchOpen(!searchOpen)} className="h-10 w-10 rounded-full hover:bg-white/60 flex items-center justify-center transition-all hover-lift" aria-label="search">
+            <button onClick={() => setSearchOpen(!searchOpen)} className="h-10 w-10 rounded-full hover:bg-white/60 flex items-center justify-center transition-all hover-card" aria-label="search">
               <Search className="h-5 w-5" />
             </button>
             <div className="h-6 w-[1px] bg-[#e6ded1] mx-1 hidden sm:block"></div>
             {displayUser ? (
-              <Link to={customer ? "/account" : "/admin"} className="hidden sm:flex h-10 items-center gap-2 rounded-full border border-[#eadfcd] bg-[#fffaf4] px-4 text-sm font-bold text-[#5f5548] shadow-[0_10px_24px_-20px_rgba(76,47,22,0.65)] transition-all hover:border-primary/45 hover:bg-white hover:text-primary hover-lift" aria-label="account">
+              <Link to={customer ? "/account" : "/admin"} className="hidden sm:flex h-10 items-center gap-2 rounded-full border border-[#eadfcd] bg-[#fffaf4] px-4 text-sm font-bold text-[#5f5548] shadow-[0_10px_24px_-20px_rgba(76,47,22,0.65)] transition-all hover:border-primary/45 hover:bg-white hover:text-primary hover-card" aria-label="account">
                 <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                 <span className="max-w-[100px] truncate">{displayUser.email?.split('@')[0] || 'Tài khoản'}</span>
               </Link>
             ) : (
-              <Link to="/auth/login" className="hidden h-10 w-10 items-center justify-center rounded-full border border-[#eadfcd] bg-[#fffaf4] text-[#5f5548] shadow-[0_10px_24px_-20px_rgba(76,47,22,0.65)] transition-all hover:border-primary/45 hover:bg-white hover:text-primary hover-lift sm:flex" aria-label="account">
+              <Link to="/auth/login" className="hidden h-10 w-10 items-center justify-center rounded-full border border-[#eadfcd] bg-[#fffaf4] text-[#5f5548] shadow-[0_10px_24px_-20px_rgba(76,47,22,0.65)] transition-all hover:border-primary/45 hover:bg-white hover:text-primary hover-card sm:flex" aria-label="account">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
               </Link>
             )}
@@ -162,7 +162,7 @@ export default function Header() {
 
                 }
                 window.location.reload();
-              }} className="hidden h-10 w-10 items-center justify-center rounded-full border border-[#eadfcd] bg-[#fffaf4] text-red-500/80 shadow-[0_10px_24px_-20px_rgba(76,47,22,0.65)] transition-all hover:border-red-200 hover:bg-white hover:text-red-600 hover-lift sm:flex" aria-label="logout" title={t('logout')}>
+              }} className="hidden h-10 w-10 items-center justify-center rounded-full border border-[#eadfcd] bg-[#fffaf4] text-red-500/80 shadow-[0_10px_24px_-20px_rgba(76,47,22,0.65)] transition-all hover:border-red-200 hover:bg-white hover:text-red-600 hover-card sm:flex" aria-label="logout" title={t('logout')}>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
               </button>
             )}
@@ -177,7 +177,7 @@ export default function Header() {
             >
               <Link
                 to="/cart"
-                className="relative h-10 w-10 rounded-full bg-gradient-to-br from-[#ea5a2a] to-[#d44a1e] text-white flex items-center justify-center transition-all hover-lift shadow-lg shadow-primary/30"
+                className="relative h-10 w-10 rounded-full bg-gradient-to-br from-[#ea5a2a] to-[#d44a1e] text-white flex items-center justify-center transition-all hover-card shadow-lg shadow-primary/30"
                 aria-label={`Giỏ hàng với ${cart.count} sản phẩm`}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17" /></svg>

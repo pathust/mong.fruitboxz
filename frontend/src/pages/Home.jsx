@@ -16,7 +16,7 @@ function HomeMiniCard({ product, onAdd }) {
   const productSlug = product.slug || product.id
 
   return (
-    <article className="group glass-panel rounded-2xl p-3 transition-all hover-lift flex flex-col h-full bg-white/60">
+    <article className="group glass-panel rounded-2xl p-3 transition-all hover-card flex flex-col h-full bg-white/60">
       <Link to={`/products/${productSlug}`} className="block relative overflow-hidden rounded-xl aspect-[4/5] bg-gradient-to-br from-[#f8f4ed] to-[#fffaf3]">
         <img src={image} alt={product.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
         {discount > 0 && <span className="absolute left-2 top-2 text-[10px] font-bold gradient-badge px-2.5 py-1 rounded-full shadow-sm">-{discount}%</span>}
