@@ -1,25 +1,25 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useReducer, useEffect, useState } from 'react'
+import { createContext, useContext, useReducer, useEffect, useState, useCallback } from 'react'
+import { apiFetch } from '../lib/api'
 
 const CartContext = createContext()
 
 const CART_KEY = 'mong_fruitbox_cart'
 
+function isExternalImage(url) {
+  if (!url) return false
+  try {
+    const parsed = new URL(url)
+    return parsed.origin !== window.location.origin
+  } catch {
+    return false
+  }
+}
+
 function loadCart() {
   try {
     const saved = localStorage.getItem(CART_KEY)
-    if (!saved) return { items: [], count: 0 }
-    const parsed = JSON.parse(saved)
-
-    // Migration: strip items that have old external image URLs (pre-media-migration)
-    const cleanItems = (parsed.items || []).map(item => {
-      if (item.image && item.image.startsWith('http') && !item.image.startsWith(window.location.origin)) {
-        return { ...item, image: null }
-      }
-      return item
-    })
-    const totalCount = cleanItems.reduce((sum, i) => sum + (i.quantity || 1), 0)
-    return { items: cleanItems, count: totalCount }
+    return saved ? JSON.parse(saved) : { items: [], count: 0 }
   } catch {
     return { items: [], count: 0 }
   }
@@ -63,6 +63,16 @@ function cartReducer(state, action) {
       }
       break
     }
+    case 'PATCH_IMAGE':
+      // Patch a single item's image without touching count; persist immediately
+      newState = {
+        ...state,
+        items: state.items.map(i =>
+          i.id === action.payload.id ? { ...i, image: action.payload.image } : i
+        ),
+      }
+      localStorage.setItem(CART_KEY, JSON.stringify(newState))
+      return newState
     case 'CLEAR_CART':
       newState = { items: [], count: 0 }
       break
@@ -81,14 +91,39 @@ export function CartProvider({ children }) {
     localStorage.setItem(CART_KEY, JSON.stringify(cart))
   }, [cart])
 
-  const addItem = (item) => {
+  // On mount: for any cart item that still has an old external image URL,
+  // fetch the correct thumbnail from the local Medusa store API and patch it.
+  useEffect(() => {
+    const brokenItems = cart.items.filter(i => isExternalImage(i.image))
+    if (brokenItems.length === 0) return
+
+    brokenItems.forEach(async (item) => {
+      try {
+        const slug = item.slug || item.id
+        const data = await apiFetch(
+          `/store/products?handle=${encodeURIComponent(slug)}&fields=thumbnail,*images`,
+          { timeoutMs: 8000 }
+        )
+        const product = data?.products?.[0]
+        const freshImage = product?.thumbnail || product?.images?.[0]?.url || null
+        if (freshImage) {
+          dispatch({ type: 'PATCH_IMAGE', payload: { id: item.id, image: freshImage } })
+        }
+      } catch {
+        // Silently ignore – onError fallback in the UI handles the display
+      }
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // run once on mount only
+
+  const addItem = useCallback((item) => {
     dispatch({ type: 'ADD_ITEM', payload: item })
     setToast(`Đã thêm "${item.title}" vào giỏ hàng`)
     setTimeout(() => setToast(null), 3000)
-  }
-  const removeItem = (id) => dispatch({ type: 'REMOVE_ITEM', payload: id })
-  const updateQuantity = (id, quantity) => dispatch({ type: 'UPDATE_QUANTITY', payload: { id, quantity } })
-  const clearCart = () => dispatch({ type: 'CLEAR_CART' })
+  }, [])
+  const removeItem = useCallback((id) => dispatch({ type: 'REMOVE_ITEM', payload: id }), [])
+  const updateQuantity = useCallback((id, quantity) => dispatch({ type: 'UPDATE_QUANTITY', payload: { id, quantity } }), [])
+  const clearCart = useCallback(() => dispatch({ type: 'CLEAR_CART' }), [])
 
   return (
     <CartContext.Provider value={{ cart, addItem, removeItem, updateQuantity, clearCart }}>
