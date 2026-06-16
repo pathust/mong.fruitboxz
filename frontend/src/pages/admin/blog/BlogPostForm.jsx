@@ -51,12 +51,10 @@ export default function BlogPostForm() {
         })
         .finally(() => setLoading(false))
     }
-    // Load all existing categories from blog posts
-    api('/admin/blog-posts?limit=500')
+    // Load all existing categories from the new category API
+    api('/admin/blog-categories')
       .then(data => {
-        const cats = [...new Set(
-          (data.blog_posts || []).map(p => p.category).filter(Boolean)
-        )].sort()
+        const cats = (data.blog_categories || []).map(c => c.name).sort()
         setExistingCategories(cats)
       })
       .catch(() => {})
@@ -148,7 +146,21 @@ export default function BlogPostForm() {
                 {catInput.trim() && !existingCategories.some(c => c.toLowerCase() === catInput.trim().toLowerCase()) && (
                   <button
                     type="button"
-                    onMouseDown={() => { setField('category', catInput.trim()); setCatOpen(false) }}
+                    onMouseDown={async () => {
+                      const newCatName = catInput.trim()
+                      try {
+                        const res = await api('/admin/blog-categories', {
+                          method: 'POST',
+                          body: JSON.stringify({ name: newCatName, slug: slugify(newCatName) })
+                        })
+                        setExistingCategories(prev => [...prev, res.blog_category.name].sort())
+                        setField('category', res.blog_category.name)
+                        pushToast("Đã tạo danh mục mới", "success")
+                      } catch (err) {
+                        pushToast("Lỗi tạo danh mục: " + err.message, "error")
+                      }
+                      setCatOpen(false)
+                    }}
                     className="w-full text-left px-4 py-2.5 text-sm text-primary font-bold hover:bg-[#fff8f0] border-t border-[#f1e7da] transition-colors flex items-center gap-2"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>

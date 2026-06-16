@@ -30,7 +30,8 @@ const navGroups = [
   {
     label: "Content",
     items: [
-      { label: "Blog", path: "/admin/blog", icon: FileText, permission: "settings.read" },
+      { label: "Bài viết Blog", path: "/admin/blog", icon: FileText, permission: "settings.read" },
+      { label: "Danh mục Blog", path: "/admin/blog-categories", icon: FolderKanban, permission: "settings.read" },
       { label: "Về chúng tôi", path: "/admin/content/about", icon: Info, permission: "settings.read" },
       { label: "Liên hệ", path: "/admin/content/contact", icon: Mail, permission: "settings.read" },
       { label: "Hộp tự chọn", path: "/admin/content/custom-box", icon: Gift, permission: "settings.read" },
