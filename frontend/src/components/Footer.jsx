@@ -17,7 +17,6 @@ export default function Footer() {
               <img src="/mong_logo-removebg.png" alt="Mọng" className="h-14 w-auto object-contain" />
               <div>
                 <span className="text-lg font-bold text-white">{siteSettings.site_name}</span>
-                {siteSettings.tagline && <span className="text-lg text-gray-300 ml-1">| {siteSettings.tagline}</span>}
               </div>
             </Link>
             <p className="text-gray-400 text-sm leading-relaxed mb-4">
