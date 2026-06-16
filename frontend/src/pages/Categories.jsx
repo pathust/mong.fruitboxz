@@ -70,22 +70,12 @@ export default function Categories() {
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = '/mong_logo-removebg.png' }}
                   />
-                  {/* Number badge */}
-                  <div className="absolute top-4 left-4 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-md">
-                    <span className="text-sm font-bold text-primary">{String(index + 1).padStart(2, '0')}</span>
-                  </div>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/25 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl" />
                 </Link>
 
                 {/* Text side */}
                 <div className="flex-1 flex flex-col justify-center">
-                  {/* Decorative label */}
-                  <div className={`inline-flex items-center gap-2 self-start px-3 py-1.5 rounded-full ${theme.accent} mb-4`}>
-                    <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block" />
-                    <span className="text-xs font-bold tracking-widest text-primary uppercase opacity-80">
-                      Danh mục {String(index + 1).padStart(2, '0')}
-                    </span>
-                  </div>
+
 
                   <h2 className="section-title text-[28px] md:text-[38px] leading-tight text-secondary mb-4">
                     {cat.displayName || cat.name}
