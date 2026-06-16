@@ -1,4 +1,4 @@
-import { startTransition, useDeferredValue, useEffect, useMemo, useState } from 'react'
+import { startTransition, useDeferredValue, useEffect, useMemo, useState, useRef } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { LoaderCircle, Minus, Plus, Search, Trash2, X } from 'lucide-react'
 import { useCart } from '../context/CartContext'
@@ -11,6 +11,38 @@ export default function Header() {
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [showCategories, setShowCategories] = useState(false)
+  const catTimeoutRef = useRef(null)
+  const cartTimeoutRef = useRef(null)
+
+  const handleCatEnter = () => {
+    if (catTimeoutRef.current) clearTimeout(catTimeoutRef.current)
+    setShowCategories(true)
+  }
+
+  const handleCatLeave = () => {
+    catTimeoutRef.current = setTimeout(() => setShowCategories(false), 300)
+  }
+
+  const handleCartEnter = () => {
+    if (cartTimeoutRef.current) clearTimeout(cartTimeoutRef.current)
+    setCartPreviewOpen(true)
+  }
+
+  const handleCartLeave = () => {
+    cartTimeoutRef.current = setTimeout(() => setCartPreviewOpen(false), 300)
+  }
+
+  const handleCartFocus = () => {
+    if (cartTimeoutRef.current) clearTimeout(cartTimeoutRef.current)
+    setCartPreviewOpen(true)
+  }
+
+  useEffect(() => {
+    return () => {
+      if (catTimeoutRef.current) clearTimeout(catTimeoutRef.current)
+      if (cartTimeoutRef.current) clearTimeout(cartTimeoutRef.current)
+    }
+  }, [])
   const [searchLoading, setSearchLoading] = useState(false)
   const [searchHits, setSearchHits] = useState([])
   const [cartPreviewOpen, setCartPreviewOpen] = useState(false)
@@ -97,7 +129,7 @@ export default function Header() {
             <Link to="/" className={navLinkClass('/')}>
               {t('home')}
             </Link>
-            <div className="relative" onMouseEnter={() => setShowCategories(true)} onMouseLeave={() => setShowCategories(false)}>
+            <div className="relative" onMouseEnter={handleCatEnter} onMouseLeave={handleCatLeave}>
               <Link to="/products" className={`${navLinkClass('/products')} inline-flex items-center gap-1.5`}>
                 {t('products')}
                 <span className={`text-xs transition-transform duration-300 ${showCategories ? 'rotate-180' : ''}`}>▾</span>
@@ -168,11 +200,11 @@ export default function Header() {
             )}
             <div
               className="group/cart relative"
-              onMouseEnter={() => setCartPreviewOpen(true)}
-              onMouseLeave={() => setCartPreviewOpen(false)}
-              onFocusCapture={() => setCartPreviewOpen(true)}
+              onMouseEnter={handleCartEnter}
+              onMouseLeave={handleCartLeave}
+              onFocusCapture={handleCartFocus}
               onBlurCapture={(event) => {
-                if (!event.currentTarget.contains(event.relatedTarget)) setCartPreviewOpen(false)
+                if (!event.currentTarget.contains(event.relatedTarget)) handleCartLeave()
               }}
             >
               <Link
@@ -188,7 +220,7 @@ export default function Header() {
                 )}
               </Link>
 
-              <div className={`absolute right-0 top-[calc(100%+12px)] z-50 hidden w-[380px] origin-top-right rounded-3xl border border-[#eadfcd] bg-white shadow-[0_24px_70px_-34px_rgba(64,42,22,0.55)] transition-all duration-200 group-hover/cart:pointer-events-auto group-hover/cart:translate-y-0 group-hover/cart:opacity-100 group-focus-within/cart:pointer-events-auto group-focus-within/cart:translate-y-0 group-focus-within/cart:opacity-100 lg:block ${cartPreviewOpen ? 'pointer-events-auto translate-y-0 opacity-100' : 'pointer-events-none -translate-y-2 opacity-0'}`} role="dialog" aria-label="Xem nhanh giỏ hàng">
+              <div className={`absolute right-0 top-[calc(100%+12px)] z-50 hidden w-[380px] origin-top-right rounded-3xl border border-[#eadfcd] bg-white shadow-[0_24px_70px_-34px_rgba(64,42,22,0.55)] transition-all duration-200 lg:block ${cartPreviewOpen ? 'pointer-events-auto translate-y-0 opacity-100' : 'pointer-events-none -translate-y-2 opacity-0'}`} role="dialog" aria-label="Xem nhanh giỏ hàng">
                 <div className="absolute -top-2 right-5 h-4 w-4 rotate-45 border-l border-t border-[#eadfcd] bg-white" aria-hidden="true" />
                 <div className="relative overflow-hidden rounded-3xl">
                   <div className="flex items-center justify-between border-b border-[#f1e7da] bg-[#fffaf4] px-5 py-4">
