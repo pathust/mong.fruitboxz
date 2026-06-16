@@ -50,7 +50,7 @@ function scoreFaqMatch(message: string, faq: any) {
 function mapHitToSuggestion(hit: any) {
   return {
     id: hit.id,
-    handle: hit.handle,
+    slug: hit.slug,
     title: hit.title,
     thumbnail: hit.thumbnail,
     price: hit.price_min,

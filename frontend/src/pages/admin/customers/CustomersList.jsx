@@ -1,13 +1,16 @@
-import { useCallback, useState, useEffect } from "react"
+import { useCallback, useMemo, useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
-import { Users, Search, MoreVertical, Mail, Phone, Calendar } from "lucide-react"
+import { Users, MoreVertical, Mail, Phone, Calendar } from "lucide-react"
+import { AdminListFilters, filterBySearch } from "../../../components/admin/AdminListFilters"
 
 export default function CustomersList() {
   const { api } = useAdminAuth()
   const [customers, setCustomers] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
+  const [orderFilter, setOrderFilter] = useState("all")
+  const [spendFilter, setSpendFilter] = useState("all")
 
   const fetchCustomers = useCallback(async () => {
     try {
@@ -47,11 +50,27 @@ export default function CustomersList() {
     return new Date(dateString).toLocaleDateString("vi-VN")
   }
 
-  const filteredCustomers = customers.filter(c =>
-    (c.first_name + " " + c.last_name).toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (c.email || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (c.phone || "").includes(searchTerm)
-  )
+  const filteredCustomers = useMemo(() => {
+    return customers.filter((customer) => {
+      const passesSearch = filterBySearch(customer, searchTerm, [
+        "email",
+        "phone",
+        (item) => `${item.first_name || ""} ${item.last_name || ""}`,
+      ])
+      const passesOrders =
+        orderFilter === "all" ||
+        (orderFilter === "none" && customer.total_orders === 0) ||
+        (orderFilter === "has_orders" && customer.total_orders > 0) ||
+        (orderFilter === "repeat" && customer.total_orders >= 2)
+      const passesSpend =
+        spendFilter === "all" ||
+        (spendFilter === "zero" && customer.total_spent === 0) ||
+        (spendFilter === "under_500k" && customer.total_spent > 0 && customer.total_spent < 500000) ||
+        (spendFilter === "over_500k" && customer.total_spent >= 500000)
+
+      return passesSearch && passesOrders && passesSpend
+    })
+  }, [customers, searchTerm, orderFilter, spendFilter])
 
   return (
     <div className="space-y-6">
@@ -69,16 +88,42 @@ export default function CustomersList() {
 
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
         <div className="p-4 border-b border-gray-100 dark:border-gray-700">
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Tìm kiếm theo tên, email, sđt..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-            />
-          </div>
+          <AdminListFilters
+            search={searchTerm}
+            onSearchChange={setSearchTerm}
+            searchPlaceholder="Tìm theo tên, email, SĐT..."
+            showing={filteredCustomers.length}
+            total={customers.length}
+            onReset={() => {
+              setSearchTerm("")
+              setOrderFilter("all")
+              setSpendFilter("all")
+            }}
+            filters={[
+              {
+                label: "Số đơn",
+                value: orderFilter,
+                onChange: setOrderFilter,
+                options: [
+                  { value: "all", label: "Tất cả số đơn" },
+                  { value: "none", label: "Chưa mua" },
+                  { value: "has_orders", label: "Đã mua" },
+                  { value: "repeat", label: "Mua lặp lại" },
+                ],
+              },
+              {
+                label: "Chi tiêu",
+                value: spendFilter,
+                onChange: setSpendFilter,
+                options: [
+                  { value: "all", label: "Tất cả chi tiêu" },
+                  { value: "zero", label: "0đ" },
+                  { value: "under_500k", label: "Dưới 500k" },
+                  { value: "over_500k", label: "Từ 500k" },
+                ],
+              },
+            ]}
+          />
         </div>
 
         <div className="overflow-x-auto">

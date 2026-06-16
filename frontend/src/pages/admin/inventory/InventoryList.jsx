@@ -1,12 +1,23 @@
-import { useCallback, useState, useEffect } from "react"
-import { Package, Search, Save, AlertCircle } from "lucide-react"
+import { useCallback, useMemo, useState, useEffect } from "react"
+import { Package, Save, AlertCircle } from "lucide-react"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
+import { AdminListFilters, filterBySearch } from "../../../components/admin/AdminListFilters"
+
+function getVariantStock(variant) {
+  const inventoryItem = variant.inventory_items?.[0]?.inventory
+  const locationLevel = inventoryItem?.location_levels?.[0]
+  return {
+    linked: Boolean(inventoryItem?.id),
+    stock: Number(locationLevel?.stocked_quantity || 0),
+  }
+}
 
 export default function InventoryList() {
   const { api } = useAdminAuth()
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
+  const [stockFilter, setStockFilter] = useState("all")
   const [updates, setUpdates] = useState({})
 
   const fetchInventory = useCallback(async () => {
@@ -59,9 +70,29 @@ export default function InventoryList() {
     }
   }
 
-  const filteredProducts = products.filter(p =>
-    p.title.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const filteredProducts = useMemo(() => {
+    return products
+      .map((product) => ({
+        ...product,
+        variants: (product.variants || []).filter((variant) => {
+          const inventory = getVariantStock(variant)
+          const passesSearch = filterBySearch(
+            { ...variant, product_title: product.title },
+            searchTerm,
+            ["title", "sku", "product_title"]
+          )
+          const passesStock =
+            stockFilter === "all" ||
+            (stockFilter === "out" && inventory.linked && inventory.stock <= 0) ||
+            (stockFilter === "low" && inventory.linked && inventory.stock > 0 && inventory.stock <= 5) ||
+            (stockFilter === "available" && inventory.linked && inventory.stock > 5) ||
+            (stockFilter === "unlinked" && !inventory.linked)
+
+          return passesSearch && passesStock
+        }),
+      }))
+      .filter((product) => product.variants.length > 0)
+  }, [products, searchTerm, stockFilter])
 
   return (
     <div className="space-y-6">
@@ -79,16 +110,31 @@ export default function InventoryList() {
 
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
         <div className="p-4 border-b border-gray-100 dark:border-gray-700">
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Tìm kiếm sản phẩm..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-            />
-          </div>
+          <AdminListFilters
+            search={searchTerm}
+            onSearchChange={setSearchTerm}
+            searchPlaceholder="Tìm theo sản phẩm, variant, SKU..."
+            showing={filteredProducts.reduce((sum, product) => sum + product.variants.length, 0)}
+            total={products.reduce((sum, product) => sum + (product.variants || []).length, 0)}
+            onReset={() => {
+              setSearchTerm("")
+              setStockFilter("all")
+            }}
+            filters={[
+              {
+                label: "Tồn kho",
+                value: stockFilter,
+                onChange: setStockFilter,
+                options: [
+                  { value: "all", label: "Tất cả tồn kho" },
+                  { value: "available", label: "Còn hàng" },
+                  { value: "low", label: "Sắp hết" },
+                  { value: "out", label: "Hết hàng" },
+                  { value: "unlinked", label: "Chưa liên kết" },
+                ],
+              },
+            ]}
+          />
         </div>
 
         <div className="overflow-x-auto">

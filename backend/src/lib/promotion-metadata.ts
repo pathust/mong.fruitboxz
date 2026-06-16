@@ -1,6 +1,9 @@
 export type PromotionMetadata = {
   min_order_value?: number | null
   max_discount?: number | null
+  usage_limit?: number | null
+  starts_at?: string | null
+  ends_at?: string | null
   [key: string]: unknown
 }
 

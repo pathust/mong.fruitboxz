@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { apiFetch } from '../lib/api'
+import { getOrderCode } from '../lib/orderCodes'
 
 const statusMap = {
   pending: { label: 'Chờ xác nhận', color: 'text-orange-500 bg-orange-50' },
@@ -63,7 +64,7 @@ export default function OrderHistory() {
               <div key={order.id} className="bg-white rounded-xl p-6 shadow-sm">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <span className="font-semibold text-secondary">#{order.display_id || order.id.slice(0, 8)}</span>
+                    <span className="font-semibold text-secondary">{getOrderCode(order)}</span>
                     <span className="text-gray-400 text-sm ml-3">
                       {new Date(order.created_at).toLocaleDateString('vi-VN')}
                     </span>

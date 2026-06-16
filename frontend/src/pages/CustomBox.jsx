@@ -32,9 +32,9 @@ export default function CustomBox() {
     () => parseJson(settings?.custom_box_types_json, []),
     [settings?.custom_box_types_json]
   )
-  const allowedHandles = useMemo(
-    () => (settings?.custom_box_product_handles || '').split(',').map((item) => item.trim()).filter(Boolean),
-    [settings?.custom_box_product_handles]
+  const allowedSlugs = useMemo(
+    () => (settings?.custom_box_product_slugs || settings?.custom_box_product_handles || '').split(',').map((item) => item.trim()).filter(Boolean),
+    [settings?.custom_box_product_handles, settings?.custom_box_product_slugs]
   )
   const box = boxTypes.find((item) => item.slug === slug)
 
@@ -45,7 +45,7 @@ export default function CustomBox() {
         if (!mounted) return
         const mapped = (data?.products || [])
           .map(mapProduct)
-          .filter((product) => product.price && (!allowedHandles.length || allowedHandles.includes(product.handle)))
+          .filter((product) => product.price && (!allowedSlugs.length || allowedSlugs.includes(product.slug)))
         setProducts(mapped)
       })
       .catch((err) => {
@@ -56,7 +56,7 @@ export default function CustomBox() {
       })
 
     return () => { mounted = false }
-  }, [allowedHandles])
+  }, [allowedSlugs])
 
   const total = Number(box?.base_price || 0) + selected.reduce((sum, id) => {
     const product = products.find((item) => item.medusa_id === id)

@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { Copy, ImagePlus, LoaderCircle, Search, Trash2 } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Copy, ImagePlus, LoaderCircle, Trash2 } from 'lucide-react'
 import { useAdminAuth } from '../../context/AdminAuthContext'
 import { useToast } from '../../components/ui/ToastProvider'
 import { AdminEmpty, AdminError, AdminImage, AdminLoading } from '../../components/admin/AdminStates'
+import { AdminListFilters } from '../../components/admin/AdminListFilters'
 
 export default function MediaLibrary() {
   const { api } = useAdminAuth()
@@ -13,6 +14,7 @@ export default function MediaLibrary() {
   const [error, setError] = useState('')
   const [uploading, setUploading] = useState(false)
   const [query, setQuery] = useState('')
+  const [sizeFilter, setSizeFilter] = useState('all')
   const [objectStorage, setObjectStorage] = useState(false)
 
   const readFileAsDataUrl = (file) => new Promise((resolve, reject) => {
@@ -81,6 +83,19 @@ export default function MediaLibrary() {
     }
   }
 
+  const filteredItems = useMemo(() => {
+    return items.filter((item) => {
+      const size = Number(item.size || 0)
+      return (
+        sizeFilter === 'all' ||
+        (sizeFilter === 'small' && size > 0 && size < 250 * 1024) ||
+        (sizeFilter === 'medium' && size >= 250 * 1024 && size < 1024 * 1024) ||
+        (sizeFilter === 'large' && size >= 1024 * 1024) ||
+        (sizeFilter === 'unknown' && !size)
+      )
+    })
+  }, [items, sizeFilter])
+
   return (
     <div className="space-y-6">
       <div className="admin-panel flex flex-col gap-4 px-6 py-6 lg:flex-row lg:items-end lg:justify-between">
@@ -91,15 +106,6 @@ export default function MediaLibrary() {
           </p>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row">
-          <div className="admin-input flex items-center gap-2 px-4 py-3">
-            <Search className="h-4 w-4 text-[#8b7966]" />
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Tìm theo tên file..."
-              className="w-full min-w-[220px] bg-transparent text-sm text-[#4c4238] focus:outline-none"
-            />
-          </div>
           <input ref={fileRef} type="file" accept="image/*" onChange={handleUpload} className="hidden" />
           <button type="button" onClick={() => fileRef.current?.click()} className="admin-button-primary px-5 py-3 text-sm">
             {uploading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <ImagePlus className="h-4 w-4" />}
@@ -116,8 +122,34 @@ export default function MediaLibrary() {
           loadMedia(query).finally(() => setLoading(false))
         }} />
       ) : (
+        <>
+        <AdminListFilters
+          search={query}
+          onSearchChange={setQuery}
+          searchPlaceholder="Tìm theo tên file..."
+          showing={filteredItems.length}
+          total={items.length}
+          onReset={() => {
+            setQuery('')
+            setSizeFilter('all')
+          }}
+          filters={[
+            {
+              label: 'Dung lượng',
+              value: sizeFilter,
+              onChange: setSizeFilter,
+              options: [
+                { value: 'all', label: 'Tất cả dung lượng' },
+                { value: 'small', label: '< 250KB' },
+                { value: 'medium', label: '250KB - 1MB' },
+                { value: 'large', label: '>= 1MB' },
+                { value: 'unknown', label: 'Không rõ size' },
+              ],
+            },
+          ]}
+        />
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">
-          {items.map((item) => (
+          {filteredItems.map((item) => (
             <article key={item.key} className="admin-card group overflow-hidden">
               <div className="aspect-square overflow-hidden bg-[#faf3e9]">
                 <AdminImage src={item.url} alt={item.filename} className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" fallbackClassName="h-full w-full" />
@@ -153,12 +185,13 @@ export default function MediaLibrary() {
             </article>
           ))}
 
-          {!items.length && (
+          {!filteredItems.length && (
             <div className="col-span-full">
               <AdminEmpty title="Chưa có ảnh nào phù hợp" message="Thử tải ảnh mới hoặc tìm với từ khóa khác." />
             </div>
           )}
         </div>
+        </>
       )}
     </div>
   )

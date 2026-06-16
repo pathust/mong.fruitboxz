@@ -57,6 +57,10 @@ export default defineMiddlewares({
       matcher: "/admin/banners*",
       middlewares: [authenticate("user", ["bearer", "session"]), rbacMiddleware],
     },
+    {
+      matcher: "/admin/blog-posts*",
+      middlewares: [authenticate("user", ["bearer", "session"]), rbacMiddleware],
+    },
     // Fix: Các route admin bị thiếu middleware bảo vệ
     {
       matcher: "/admin/promotions*",

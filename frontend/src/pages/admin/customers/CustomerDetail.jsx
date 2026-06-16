@@ -2,6 +2,7 @@ import { useCallback, useState, useEffect } from "react"
 import { useParams, Link } from "react-router-dom"
 import { ArrowLeft, Mail, Phone, Calendar, ShoppingBag } from "lucide-react"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
+import { getOrderCode } from "../../../lib/orderCodes"
 
 export default function CustomerDetail() {
   const { id } = useParams()
@@ -136,7 +137,7 @@ export default function CustomerDetail() {
                       <div className="flex justify-between items-start mb-4">
                         <div>
                           <Link to={`/admin/orders/${order.id}`} className="font-bold text-blue-600 hover:underline">
-                            #{order.display_id || order.id.slice(-6)}
+                            {getOrderCode(order)}
                           </Link>
                           <div className="text-sm text-gray-500 mt-1 flex items-center gap-1">
                             <Calendar className="w-3 h-3" />

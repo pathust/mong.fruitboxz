@@ -31,7 +31,7 @@ export default function Settings() {
     about_reasons_title: "",
     about_reasons_json: "",
     custom_box_types_json: "",
-    custom_box_product_handles: "",
+    custom_box_product_slugs: "",
     about_us: "",
     delivery_info: "",
     shipping_policy_text: "Mọng giao hàng trong Hà Nội theo khu vực. Phí ship được hiển thị trước khi đặt hàng và có thể thay đổi theo khoảng cách thực tế.",
@@ -44,7 +44,11 @@ export default function Settings() {
     api("/admin/settings")
       .then(d => {
         if (d.settings && Object.keys(d.settings).length > 0) {
-          setForm(prev => ({ ...prev, ...d.settings }))
+          setForm(prev => ({
+            ...prev,
+            ...d.settings,
+            custom_box_product_slugs: d.settings.custom_box_product_slugs || d.settings.custom_box_product_handles || "",
+          }))
         }
       })
       .catch((err) => setError(err?.message || "Không tải được settings."))
@@ -182,8 +186,8 @@ export default function Settings() {
           <textarea value={form.custom_box_types_json} onChange={e => setForm({ ...form, custom_box_types_json: e.target.value })} rows={8} className="admin-input w-full px-4 py-2.5 font-mono text-xs" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-secondary mb-1">Allowed Product Handles</label>
-          <textarea value={form.custom_box_product_handles} onChange={e => setForm({ ...form, custom_box_product_handles: e.target.value })} rows={4} className="admin-input w-full px-4 py-2.5" />
+          <label className="block text-sm font-medium text-secondary mb-1">Allowed Product Slugs</label>
+          <textarea value={form.custom_box_product_slugs} onChange={e => setForm({ ...form, custom_box_product_slugs: e.target.value })} rows={4} className="admin-input w-full px-4 py-2.5" />
         </div>
 
         <h2 className="section-title border-b border-[#efe4d4] pb-3 pt-4 text-[20px]">Policies</h2>

@@ -40,7 +40,7 @@ export default function CategoryDetail() {
         } else {
           // Fallback: fetch categories first to find ID
           const catRes = await apiFetch('/store/product-categories')
-          const found = (catRes.product_categories || []).find(c => c.handle === categorySlug)
+          const found = (catRes.product_categories || []).find(c => (c.slug || c.handle) === categorySlug)
           if (found) {
             url += `&category_id[]=${found.id}`
           } else {

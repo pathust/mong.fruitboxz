@@ -1,6 +1,7 @@
-import { useCallback, useState, useEffect } from "react"
+import { useCallback, useMemo, useState, useEffect } from "react"
 import { Plus, Edit2, Trash2, Leaf } from "lucide-react"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
+import { AdminListFilters, filterBySearch } from "../../../components/admin/AdminListFilters"
 
 // Simple inline modal to avoid missing imports
 function Modal({ isOpen, onClose, title, children }) {
@@ -24,6 +25,9 @@ export default function IngredientsList() {
   const [loading, setLoading] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingItem, setEditingItem] = useState(null)
+  const [query, setQuery] = useState("")
+  const [categoryFilter, setCategoryFilter] = useState("all")
+  const [unitFilter, setUnitFilter] = useState("all")
 
   const [form, setForm] = useState({
     title: "",
@@ -141,6 +145,32 @@ export default function IngredientsList() {
     setIsModalOpen(true)
   }
 
+  const categoryOptions = useMemo(() => {
+    const categories = [...new Set(ingredients.map((item) => item.category).filter(Boolean))]
+    return [
+      { value: "all", label: "Tất cả phân loại" },
+      ...categories.map((category) => ({ value: category, label: category })),
+    ]
+  }, [ingredients])
+
+  const unitOptions = useMemo(() => {
+    const units = [...new Set(ingredients.map((item) => item.unit).filter(Boolean))]
+    return [
+      { value: "all", label: "Tất cả đơn vị" },
+      ...units.map((unit) => ({ value: unit, label: unit })),
+    ]
+  }, [ingredients])
+
+  const filteredIngredients = useMemo(() => {
+    return ingredients.filter((item) => {
+      return (
+        filterBySearch(item, query, ["title", "sku", "category", "unit"]) &&
+        (categoryFilter === "all" || item.category === categoryFilter) &&
+        (unitFilter === "all" || item.unit === unitFilter)
+      )
+    })
+  }, [ingredients, query, categoryFilter, unitFilter])
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -156,6 +186,24 @@ export default function IngredientsList() {
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-[#eadfcd] overflow-hidden">
+        <div className="p-4 border-b border-[#eadfcd]">
+          <AdminListFilters
+            search={query}
+            onSearchChange={setQuery}
+            searchPlaceholder="Tìm theo tên, SKU, phân loại..."
+            showing={filteredIngredients.length}
+            total={ingredients.length}
+            onReset={() => {
+              setQuery("")
+              setCategoryFilter("all")
+              setUnitFilter("all")
+            }}
+            filters={[
+              { label: "Phân loại", value: categoryFilter, onChange: setCategoryFilter, options: categoryOptions },
+              { label: "Đơn vị", value: unitFilter, onChange: setUnitFilter, options: unitOptions },
+            ]}
+          />
+        </div>
         <table className="w-full text-left text-sm">
           <thead className="bg-[#fffaf3] text-[#766957] font-bold border-b border-[#eadfcd]">
             <tr>
@@ -170,10 +218,10 @@ export default function IngredientsList() {
           <tbody className="divide-y divide-[#eadfcd]">
             {loading ? (
               <tr><td colSpan="6" className="text-center py-6 text-gray-500">Đang tải...</td></tr>
-            ) : ingredients.length === 0 ? (
+            ) : filteredIngredients.length === 0 ? (
               <tr><td colSpan="6" className="text-center py-6 text-gray-500">Chưa có nguyên liệu nào.</td></tr>
             ) : (
-              ingredients.map(item => (
+              filteredIngredients.map(item => (
                 <tr key={item.id} className="hover:bg-[#fffcf8]">
                   <td className="px-4 py-3 font-semibold text-primary">{item.title}</td>
                   <td className="px-4 py-3 text-gray-500 font-mono text-xs">{item.sku}</td>

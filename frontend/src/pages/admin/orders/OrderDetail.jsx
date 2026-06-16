@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { useParams, Link } from "react-router-dom"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
+import { getOrderCode } from "../../../lib/orderCodes"
 
 // Transition guards: chỉ cho phép các chuyển trạng thái hợp lệ
 const VALID_ORDER_TRANSITIONS = {
@@ -136,7 +137,7 @@ export default function OrderDetail() {
     <div>
       <Link to="/admin/orders" className="text-primary hover:text-primary-dark text-sm mb-4 inline-block">&larr; Back to Orders</Link>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-secondary">Order #{order.display_id || order.id?.slice(-8)}</h1>
+        <h1 className="text-2xl font-bold text-secondary">Order {getOrderCode(order)}</h1>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">

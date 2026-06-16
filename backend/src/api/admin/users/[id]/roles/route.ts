@@ -3,14 +3,15 @@ import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 export async function POST(req: MedusaRequest, res: MedusaResponse) {
   const userService = req.scope.resolve("user") as any
   const { id } = req.params
-  const { role_ids } = req.body as { role_ids: string[] }
+  const { role_ids, roles } = req.body as { role_ids?: string[]; roles?: string[] }
+  const requestedRoles = roles || role_ids
 
-  if (!Array.isArray(role_ids)) {
-    return res.status(400).json({ error: "role_ids must be an array" })
+  if (!Array.isArray(requestedRoles)) {
+    return res.status(400).json({ error: "roles must be an array" })
   }
 
   const user = await userService.retrieveUser(id)
-  const nextRoles = [...new Set(role_ids)]
+  const nextRoles = [...new Set(requestedRoles)]
 
   const updated = await userService.updateUsers({
     id,

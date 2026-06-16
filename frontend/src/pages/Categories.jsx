@@ -23,7 +23,7 @@ export default function Categories() {
             >
               <div className="aspect-square overflow-hidden">
                 <img
-                  src={cat.image || '/images/58645746-dfac-4e9f-8914-649ea9576caf.jpeg'}
+                  src={cat.image || '/media/58645746-dfac-4e9f-8914-649ea9576caf.jpeg'}
                   alt={cat.displayName || cat.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />

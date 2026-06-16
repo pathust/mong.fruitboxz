@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { AlertTriangle, ArrowUpRight, BadgeDollarSign, BarChart3, Download, PieChart, TrendingUp, WalletCards } from "lucide-react"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
+import { getOrderCode } from "../../../lib/orderCodes"
 
 function formatVnd(n) {
   return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(Number(n) || 0)
@@ -344,7 +345,7 @@ export default function FinanceDashboard() {
                 <div key={order.id} className="flex items-center justify-between rounded-2xl bg-[#fffaf4] p-3 transition-colors hover:border-[#eadfcd]">
                   <div className="min-w-0 pr-3">
                     <Link to={`/admin/orders/${order.id}`} className="block truncate text-sm font-bold text-[#43382b] hover:text-primary">
-                      #{order.id.split("-")[0]}
+                      {getOrderCode(order)}
                     </Link>
                     <p className="truncate text-xs text-[#8a7a67]">{new Date(order.created_at).toLocaleDateString("vi-VN")}</p>
                   </div>

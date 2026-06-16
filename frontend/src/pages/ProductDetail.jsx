@@ -50,11 +50,12 @@ export default function ProductDetail() {
   }, [slug])
   useEffect(() => {
     if (!product) return
-    apiFetch(`/store/ingredients/${product.handle || product.id}`)
+    const productSlug = product.slug || product.id
+    apiFetch(`/store/ingredients/${productSlug}`)
       .then((data) => setIngredients(data.ingredients || []))
       .catch(() => setIngredients([]))
 
-    apiFetch(`/store/reviews/${product.handle || product.id}`)
+    apiFetch(`/store/reviews/${productSlug}`)
       .then((data) => {
         setReviews(data.reviews || [])
         setReviewSummary(data.summary || { count: 0, average: 0 })
@@ -130,6 +131,7 @@ export default function ProductDetail() {
       price,
       image: currentImage || product.thumbnail,
       quantity: quantity,
+      slug: product.slug || product.id,
       variantId: currentVariant?.id || null,
       productId: product.medusa_id || null,
     })
@@ -146,7 +148,8 @@ export default function ProductDetail() {
         setReviewError('Vui lòng đăng nhập để đánh giá')
         return
       }
-      await apiFetch(`/store/reviews/${product.handle || product.id}`, {
+      const productSlug = product.slug || product.id
+      await apiFetch(`/store/reviews/${productSlug}`, {
         method: 'POST',
         token,
         body: JSON.stringify({
@@ -156,7 +159,7 @@ export default function ProductDetail() {
           product_title: product.title,
         }),
       })
-      const latest = await apiFetch(`/store/reviews/${product.handle || product.id}`)
+      const latest = await apiFetch(`/store/reviews/${productSlug}`)
       setReviews(latest.reviews || [])
       setReviewSummary(latest.summary || { count: 0, average: 0 })
       setReviewForm({ rating: 5, comment: '' })

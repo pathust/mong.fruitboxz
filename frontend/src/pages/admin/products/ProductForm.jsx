@@ -5,6 +5,20 @@ import ImagePicker from "../../../components/admin/ImagePicker"
 import RecipeManager from "./RecipeManager"
 import { Plus, Trash2 } from "lucide-react"
 
+function slugify(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/đ/g, "d")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+}
+
+function buildVariantSku(baseSlug, variant, index) {
+  return slugify(variant.sku || `${baseSlug}-${variant.title || `variant-${index + 1}`}`)
+}
+
 export default function ProductForm() {
   const { api } = useAdminAuth()
   const navigate = useNavigate()
@@ -17,7 +31,7 @@ export default function ProductForm() {
   const [showPicker, setShowPicker] = useState(false)
   const [pickerTarget, setPickerTarget] = useState(null)
   const [form, setForm] = useState({
-    title: "", handle: "", description: "", status: "draft",
+    title: "", slug: "", description: "", status: "draft",
     category_ids: [], images: [], thumbnail: "",
     variants: [{ title: "Standard", price: 0, cost_price: 0, sku: "", id: null }]
   })
@@ -38,14 +52,14 @@ export default function ProductForm() {
           const loadedVariants = p.variants?.map(v => ({
             id: v.id,
             title: v.title || "Standard",
-            sku: v.sku || "",
+            sku: slugify(v.sku || ""),
             price: Number(v.calculated_price?.calculated_amount ?? v.prices?.[0]?.amount ?? 0),
             cost_price: Number(v.metadata?.cost_price ?? 0)
           })) || [{ title: "Standard", price: 0, cost_price: 0, sku: "", id: null }]
 
           setForm({
             title: p.title || "",
-            handle: p.handle || "",
+            slug: slugify(p.handle || p.title || ""),
             description: p.description || "",
             status: p.status || "draft",
             category_ids: p.categories?.map(c => c.id) || [],
@@ -78,6 +92,14 @@ export default function ProductForm() {
     setForm({ ...form, variants: newVariants })
   }
 
+  const updateTitle = (value) => {
+    setForm((current) => ({
+      ...current,
+      title: value,
+      slug: current.slug ? current.slug : slugify(value),
+    }))
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (form.variants.length === 0) {
@@ -86,14 +108,19 @@ export default function ProductForm() {
     }
     setSaving(true)
     try {
-      const baseHandle = form.handle || form.title.toLowerCase().replace(/\s+/g, "-")
+      const baseSlug = slugify(form.slug || form.title)
+      if (!baseSlug) {
+        alert("Slug không hợp lệ. Vui lòng nhập tên sản phẩm hoặc slug.")
+        setSaving(false)
+        return
+      }
 
       if (isNew) {
         await api("/admin/products", {
           method: "POST",
           body: JSON.stringify({
             title: form.title,
-            handle: baseHandle,
+            handle: baseSlug,
             description: form.description,
             status: form.status,
             category_ids: form.category_ids,
@@ -102,7 +129,7 @@ export default function ProductForm() {
             options: [{ title: "Default", values: form.variants.map((v, i) => v.title || `Variant ${i+1}`) }],
             variants: form.variants.map((v, i) => ({
               title: v.title || `Variant ${i+1}`,
-              sku: v.sku || `${baseHandle}-${i}`,
+              sku: buildVariantSku(baseSlug, v, i),
               options: { Default: v.title || `Variant ${i+1}` },
               prices: [{ amount: Number(v.price) || 0, currency_code: "vnd" }],
               metadata: { cost_price: v.cost_price || 0 },
@@ -117,7 +144,7 @@ export default function ProductForm() {
           method: "PATCH",
           body: JSON.stringify({
             title: form.title,
-            handle: form.handle,
+            handle: baseSlug,
             description: form.description,
             status: form.status,
             images: form.images.map(url => ({ url })),
@@ -144,7 +171,7 @@ export default function ProductForm() {
               method: "POST",
               body: JSON.stringify({
                 title: vTitle,
-                sku: v.sku,
+                sku: buildVariantSku(baseSlug, v, i),
                 prices: pricesData,
                 metadata: { cost_price: v.cost_price || 0 },
               }),
@@ -155,7 +182,7 @@ export default function ProductForm() {
               method: "POST",
               body: JSON.stringify({
                 title: vTitle,
-                sku: v.sku || `${baseHandle}-${Math.floor(Math.random()*1000)}`,
+                sku: buildVariantSku(baseSlug, v, i),
                 prices: [{ amount: Number(v.price) || 0, currency_code: "vnd" }],
                 metadata: { cost_price: v.cost_price || 0 },
                 options: { Default: vTitle }
@@ -189,11 +216,12 @@ export default function ProductForm() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-secondary mb-1">Tên sản phẩm</label>
-            <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" required />
+            <input value={form.title} onChange={e => updateTitle(e.target.value)} className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" required />
           </div>
           <div>
-            <label className="block text-sm font-medium text-secondary mb-1">Handle (đường dẫn)</label>
-            <input value={form.handle} onChange={e => setForm({ ...form, handle: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
+            <label className="block text-sm font-medium text-secondary mb-1">Slug (đường dẫn)</label>
+            <input value={form.slug} onChange={e => setForm({ ...form, slug: slugify(e.target.value) })} placeholder="ten-san-pham" className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
+            <p className="mt-1 text-xs text-gray-500">Slug sẽ được tự chuẩn hóa, ví dụ: hop-trai-cay-tuoi.</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-secondary mb-1">Trạng thái</label>
@@ -252,8 +280,9 @@ export default function ProductForm() {
                     <input type="number" min={0} value={v.cost_price} onChange={e => updateVariant(i, 'cost_price', Number(e.target.value) || 0)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                   </div>
                   <div className="flex-1 min-w-[100px]">
-                    <label className="block text-xs font-medium text-gray-500 mb-1">Mã SKU</label>
-                    <input value={v.sku} onChange={e => updateVariant(i, 'sku', e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" placeholder="Tự tạo nếu trống" />
+                    <label className="block text-xs font-medium text-gray-500 mb-1">SKU (mã tồn kho)</label>
+                    <input value={v.sku} onChange={e => updateVariant(i, 'sku', slugify(e.target.value))} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" placeholder="Tự tạo nếu trống" />
+                    <p className="mt-1 text-[11px] text-gray-400">Tự chuẩn hóa như slug.</p>
                   </div>
 
                   {form.variants.length > 1 && (

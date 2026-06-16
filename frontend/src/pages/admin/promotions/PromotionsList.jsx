@@ -1,6 +1,7 @@
-import { useCallback, useState, useEffect } from "react"
+import { useCallback, useMemo, useState, useEffect } from "react"
 import { Tag, Plus, Edit2, Trash2 } from "lucide-react"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
+import { AdminListFilters, filterBySearch } from "../../../components/admin/AdminListFilters"
 
 // Simple inline modal
 function Modal({ isOpen, onClose, title, children }) {
@@ -18,12 +19,39 @@ function Modal({ isOpen, onClose, title, children }) {
   )
 }
 
+function toDateTimeLocal(value) {
+  if (!value) return ""
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return ""
+  const offset = date.getTimezoneOffset() * 60000
+  return new Date(date.getTime() - offset).toISOString().slice(0, 16)
+}
+
+function getUsageLimit(promo) {
+  return Number(promo.metadata?.usage_limit || promo.campaign?.budget?.limit || 0)
+}
+
+function getUsageCount(promo) {
+  return Number(promo.metadata?.usage_count || promo.campaign?.budget?.used || 0)
+}
+
+function getStartsAt(promo) {
+  return promo.metadata?.starts_at || promo.campaign?.starts_at || ""
+}
+
+function getEndsAt(promo) {
+  return promo.metadata?.ends_at || promo.campaign?.ends_at || ""
+}
+
 export default function PromotionsList() {
   const { api } = useAdminAuth()
   const [promotions, setPromotions] = useState([])
   const [loading, setLoading] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingId, setEditingId] = useState(null)
+  const [query, setQuery] = useState("")
+  const [typeFilter, setTypeFilter] = useState("all")
+  const [conditionFilter, setConditionFilter] = useState("all")
 
   const [form, setForm] = useState({
     code: "",
@@ -69,8 +97,17 @@ export default function PromotionsList() {
 
   const handleSave = async (e) => {
     e.preventDefault()
-    if (!form.code || form.value <= 0) {
+    const normalizedCode = form.code.trim().toUpperCase()
+    const duplicate = promotions.some((promo) => promo.code?.toUpperCase() === normalizedCode && promo.id !== editingId)
+
+    if (!normalizedCode || form.value <= 0) {
       return alert("Vui lòng nhập mã hợp lệ và giá trị lớn hơn 0")
+    }
+    if (duplicate) {
+      return alert("Mã giảm giá đã tồn tại. Vui lòng chọn mã khác.")
+    }
+    if (form.hasExpiry && form.startsAt && form.endsAt && new Date(form.startsAt) >= new Date(form.endsAt)) {
+      return alert("Ngày bắt đầu phải nhỏ hơn ngày hết hạn.")
     }
 
     try {
@@ -81,9 +118,13 @@ export default function PromotionsList() {
       if (form.discountType === "percentage" && form.maxDiscount > 0) metadata.max_discount = Number(form.maxDiscount);
       else metadata.max_discount = null;
 
+      metadata.usage_limit = form.hasUsageLimit && form.usageLimit > 0 ? Number(form.usageLimit) : null;
+      metadata.starts_at = form.hasExpiry && form.startsAt ? new Date(form.startsAt).toISOString() : null;
+      metadata.ends_at = form.hasExpiry && form.endsAt ? new Date(form.endsAt).toISOString() : null;
+
       if (editingId) {
         const updatePayload = {
-          code: form.code.toUpperCase(),
+          code: normalizedCode,
         };
 
         await api(`/admin/promotions/${editingId}`, {
@@ -140,7 +181,7 @@ export default function PromotionsList() {
       }
 
       const payload = {
-        code: form.code.toUpperCase(),
+        code: normalizedCode,
         type: "standard",
         is_automatic: false,
         application_method
@@ -200,21 +241,46 @@ export default function PromotionsList() {
 
   const openEdit = (promo) => {
     const method = promo.application_method
+    const usageLimit = getUsageLimit(promo)
+    const startsAt = getStartsAt(promo)
+    const endsAt = getEndsAt(promo)
     setForm({
       code: promo.code,
       discountType: method?.type || "percentage",
       value: method?.value || "",
-      hasUsageLimit: false,
-      usageLimit: 100,
-      hasExpiry: false,
-      startsAt: "",
-      endsAt: "",
+      hasUsageLimit: usageLimit > 0,
+      usageLimit: usageLimit || "",
+      hasExpiry: Boolean(startsAt || endsAt),
+      startsAt: toDateTimeLocal(startsAt),
+      endsAt: toDateTimeLocal(endsAt),
       minOrderValue: promo.metadata?.min_order_value || "",
       maxDiscount: promo.metadata?.max_discount || ""
     })
     setEditingId(promo.id)
     setIsModalOpen(true)
   }
+
+  const filteredPromotions = useMemo(() => {
+    return promotions.filter((promo) => {
+      const methodType = promo.application_method?.type || "percentage"
+      const hasMinOrder = Number(promo.metadata?.min_order_value || 0) > 0
+      const hasMaxDiscount = Number(promo.metadata?.max_discount || 0) > 0
+      const hasLimit = getUsageLimit(promo) > 0
+      const hasExpiry = Boolean(getEndsAt(promo))
+      const passesCondition =
+        conditionFilter === "all" ||
+        (conditionFilter === "no_conditions" && !hasMinOrder && !hasMaxDiscount && !hasLimit && !hasExpiry) ||
+        (conditionFilter === "min_order" && hasMinOrder) ||
+        (conditionFilter === "usage_limit" && hasLimit) ||
+        (conditionFilter === "expiry" && hasExpiry)
+
+      return (
+        filterBySearch(promo, query, ["code", (item) => item.application_method?.type]) &&
+        (typeFilter === "all" || methodType === typeFilter) &&
+        passesCondition
+      )
+    })
+  }, [promotions, query, typeFilter, conditionFilter])
 
   return (
     <div>
@@ -237,6 +303,44 @@ export default function PromotionsList() {
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-[#eadfcd] overflow-hidden">
+        <div className="p-4 border-b border-[#eadfcd]">
+          <AdminListFilters
+            search={query}
+            onSearchChange={setQuery}
+            searchPlaceholder="Tìm theo mã giảm giá..."
+            showing={filteredPromotions.length}
+            total={promotions.length}
+            onReset={() => {
+              setQuery("")
+              setTypeFilter("all")
+              setConditionFilter("all")
+            }}
+            filters={[
+              {
+                label: "Kiểu giảm",
+                value: typeFilter,
+                onChange: setTypeFilter,
+                options: [
+                  { value: "all", label: "Tất cả kiểu giảm" },
+                  { value: "percentage", label: "Phần trăm" },
+                  { value: "fixed", label: "Số tiền" },
+                ],
+              },
+              {
+                label: "Điều kiện",
+                value: conditionFilter,
+                onChange: setConditionFilter,
+                options: [
+                  { value: "all", label: "Tất cả điều kiện" },
+                  { value: "no_conditions", label: "Không điều kiện" },
+                  { value: "min_order", label: "Có đơn tối thiểu" },
+                  { value: "usage_limit", label: "Có giới hạn lượt" },
+                  { value: "expiry", label: "Có hạn dùng" },
+                ],
+              },
+            ]}
+          />
+        </div>
         <table className="w-full text-left text-sm">
           <thead className="bg-[#fffaf3] text-[#766957] font-bold border-b border-[#eadfcd]">
             <tr>
@@ -252,13 +356,18 @@ export default function PromotionsList() {
               <tr>
                 <td colSpan="5" className="px-4 py-8 text-center text-gray-500">Đang tải...</td>
               </tr>
-            ) : promotions.length === 0 ? (
+            ) : filteredPromotions.length === 0 ? (
               <tr>
                 <td colSpan="5" className="px-4 py-8 text-center text-gray-500">Chưa có mã giảm giá nào</td>
               </tr>
             ) : (
-              promotions.map((promo) => {
+              filteredPromotions.map((promo) => {
                 const method = promo.application_method
+                const usageLimit = getUsageLimit(promo)
+                const usageCount = getUsageCount(promo)
+                const startsAt = getStartsAt(promo)
+                const endsAt = getEndsAt(promo)
+                const isExpired = endsAt && new Date(endsAt) < new Date()
                 return (
                   <tr key={promo.id} className="hover:bg-[#fffcf8]">
                     <td className="px-4 py-3">
@@ -281,13 +390,16 @@ export default function PromotionsList() {
                       {promo.metadata?.max_discount > 0 && method?.type === "percentage" && (
                         <div>Giảm tối đa: <span className="font-semibold text-gray-900">{Number(promo.metadata.max_discount).toLocaleString('vi-VN')} ₫</span></div>
                       )}
-                      {promo.campaign?.budget?.limit > 0 && (
-                        <div>Đã dùng: <span className="font-semibold text-gray-900">{promo.campaign.budget.used || 0} / {promo.campaign.budget.limit}</span> lượt</div>
+                      {usageLimit > 0 && (
+                        <div>Đã dùng: <span className="font-semibold text-gray-900">{usageCount} / {usageLimit}</span> lượt</div>
                       )}
-                      {promo.campaign?.ends_at && (
-                        <div>HSD: <span className="font-semibold text-gray-900">{new Date(promo.campaign.ends_at).toLocaleString('vi-VN')}</span></div>
+                      {startsAt && (
+                        <div>Bắt đầu: <span className="font-semibold text-gray-900">{new Date(startsAt).toLocaleString('vi-VN')}</span></div>
                       )}
-                      {(!promo.metadata?.min_order_value && !promo.metadata?.max_discount && !promo.campaign?.budget?.limit && !promo.campaign?.ends_at) && (
+                      {endsAt && (
+                        <div>HSD: <span className={`font-semibold ${isExpired ? "text-red-600" : "text-gray-900"}`}>{new Date(endsAt).toLocaleString('vi-VN')}</span></div>
+                      )}
+                      {(!promo.metadata?.min_order_value && !promo.metadata?.max_discount && !usageLimit && !endsAt) && (
                         <span className="text-gray-400 italic">Không có điều kiện</span>
                       )}
                     </td>
@@ -375,36 +487,34 @@ export default function PromotionsList() {
             )}
           </div>
 
-          {!editingId && (
-            <div className="space-y-3 pt-2 mt-4">
-              <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-primary">
-                <input type="checkbox" checked={form.hasUsageLimit} onChange={e => setForm({...form, hasUsageLimit: e.target.checked})} className="rounded border-gray-300 text-primary focus:ring-primary" />
-                Giới hạn số lần sử dụng
-              </label>
-              {form.hasUsageLimit && (
-                <div className="pl-6">
-                  <input type="number" min={1} value={form.usageLimit} onChange={e => setForm({...form, usageLimit: e.target.value === "" ? "" : Number(e.target.value)})} className="admin-input w-full px-4 py-2" placeholder="Số lần sử dụng tối đa, ví dụ: 100" />
-                </div>
-              )}
+          <div className="space-y-3 pt-2 mt-4">
+            <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-primary">
+              <input type="checkbox" checked={form.hasUsageLimit} onChange={e => setForm({...form, hasUsageLimit: e.target.checked})} className="rounded border-gray-300 text-primary focus:ring-primary" />
+              Giới hạn số lần sử dụng
+            </label>
+            {form.hasUsageLimit && (
+              <div className="pl-6">
+                <input type="number" min={1} value={form.usageLimit} onChange={e => setForm({...form, usageLimit: e.target.value === "" ? "" : Number(e.target.value)})} className="admin-input w-full px-4 py-2" placeholder="Số lần sử dụng tối đa, ví dụ: 100" />
+              </div>
+            )}
 
-              <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-primary mt-3">
-                <input type="checkbox" checked={form.hasExpiry} onChange={e => setForm({...form, hasExpiry: e.target.checked})} className="rounded border-gray-300 text-primary focus:ring-primary" />
-                Có thời hạn sử dụng
-              </label>
-              {form.hasExpiry && (
-                <div className="pl-6 grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">Từ ngày</label>
-                    <input type="datetime-local" value={form.startsAt} onChange={e => setForm({...form, startsAt: e.target.value})} className="admin-input w-full px-4 py-2 text-sm" />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">Đến ngày</label>
-                    <input type="datetime-local" value={form.endsAt} onChange={e => setForm({...form, endsAt: e.target.value})} className="admin-input w-full px-4 py-2 text-sm" />
-                  </div>
+            <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-primary mt-3">
+              <input type="checkbox" checked={form.hasExpiry} onChange={e => setForm({...form, hasExpiry: e.target.checked})} className="rounded border-gray-300 text-primary focus:ring-primary" />
+              Có thời hạn sử dụng
+            </label>
+            {form.hasExpiry && (
+              <div className="pl-6 grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Từ ngày</label>
+                  <input type="datetime-local" value={form.startsAt} onChange={e => setForm({...form, startsAt: e.target.value})} className="admin-input w-full px-4 py-2 text-sm" />
                 </div>
-              )}
-            </div>
-          )}
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Đến ngày</label>
+                  <input type="datetime-local" value={form.endsAt} onChange={e => setForm({...form, endsAt: e.target.value})} className="admin-input w-full px-4 py-2 text-sm" />
+                </div>
+              </div>
+            )}
+          </div>
 
           <div className="pt-4 flex justify-end gap-3 border-t border-[#eadfcd]">
             <button type="button" onClick={() => setIsModalOpen(false)} className="admin-button-secondary px-4 py-2 text-sm">Hủy</button>

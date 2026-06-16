@@ -146,9 +146,9 @@ export default function ChatbotWidget() {
                     {message.suggestions?.length > 0 && (
                       <div className="mt-3 grid gap-2">
                         {message.suggestions.map((item) => (
-                          <a key={item.id} href={`/products/${item.handle}`} className="flex items-center gap-3 rounded-2xl border border-[#f2e8db] bg-[#fffaf5] p-2 transition hover:border-primary">
+                          <a key={item.id} href={`/products/${item.slug || item.handle || item.id}`} className="flex items-center gap-3 rounded-2xl border border-[#f2e8db] bg-[#fffaf5] p-2 transition hover:border-primary">
                             <div className="h-14 w-14 overflow-hidden rounded-2xl bg-[#f7f0e6]">
-                              <img src={item.thumbnail || '/images/placeholder.svg'} alt={item.title} className="h-full w-full object-cover" />
+                              <img src={item.thumbnail || '/media/placeholder.svg'} alt={item.title} className="h-full w-full object-cover" />
                             </div>
                             <div className="min-w-0 flex-1">
                               <p className="truncate text-sm font-semibold text-[#3c352d]">{item.title}</p>

@@ -3,7 +3,7 @@
     "name": "Hop Trái Cây Cắt Sẵn",
     "slug": "hop-trai-cay-cat-san",
     "url": "https://umefruits.com/products/category/hop-trai-cay-cat-san",
-    "image": "/images/4cf278e7-d649-453e-8d51-f0bedca98652.jpg",
+    "image": "/media/4cf278e7-d649-453e-8d51-f0bedca98652.jpg",
     "productCount": 98,
     "productIds": [
       "69e60476923c4781a3e37a22",
@@ -110,7 +110,7 @@
     "name": "Hoa Quả Dam",
     "slug": "hoa-qua-dam",
     "url": "https://umefruits.com/products/category/hoa-qua-dam",
-    "image": "/images/b280dd40-f3bf-4ed9-aaa2-253fcdf85ddb.jpeg",
+    "image": "/media/b280dd40-f3bf-4ed9-aaa2-253fcdf85ddb.jpeg",
     "productCount": 13,
     "productIds": [
       "689ddaf76b5d9750c4aa42c7",
@@ -132,7 +132,7 @@
     "name": "Hop Mix Cắt Sẵn Gợi Ý",
     "slug": "hop-mix-cat-san-goi-y",
     "url": "https://umefruits.com/products/category/hop-mix-cat-san-goi-y",
-    "image": "/images/f097b0d2-817c-4694-ab2f-23b05eff07db.jpg",
+    "image": "/media/f097b0d2-817c-4694-ab2f-23b05eff07db.jpg",
     "productCount": 44,
     "productIds": [
       "68b019c8326e275db396c80f",
@@ -185,7 +185,7 @@
     "name": "Sữa Chua Hy Lạp",
     "slug": "sua-chua-hy-lap",
     "url": "https://umefruits.com/products/category/sua-chua-hy-lap",
-    "image": "/images/8c923776-a2ae-4d53-81f5-9e225cd29909.png",
+    "image": "/media/8c923776-a2ae-4d53-81f5-9e225cd29909.png",
     "productCount": 41,
     "productIds": [
       "69d5a10b923c4781a3d7bcb7",
@@ -235,7 +235,7 @@
     "name": "Hop Qua 4 Ngăn",
     "slug": "hop-qua-4-ngan",
     "url": "https://umefruits.com/products/category/hop-qua-4-ngan",
-    "image": "/images/48de0426-c637-42d9-a637-af8008fe31ff.jpg",
+    "image": "/media/48de0426-c637-42d9-a637-af8008fe31ff.jpg",
     "productCount": 74,
     "productIds": [
       "68a2c8f76b5d9750c4aa732d",
@@ -318,7 +318,7 @@
     "name": "Hop Qua 6 Ngăn",
     "slug": "hop-qua-6-ngan",
     "url": "https://umefruits.com/products/category/hop-qua-6-ngan",
-    "image": "/images/2f57b032-2888-499e-9eaa-eea90becc1b6.jpeg",
+    "image": "/media/2f57b032-2888-499e-9eaa-eea90becc1b6.jpeg",
     "productCount": 17,
     "productIds": [
       "68a3f24265cd9d3fc4242811",
@@ -344,7 +344,7 @@
     "name": "Hop Qua 9 Ngăn",
     "slug": "hop-qua-9-ngan",
     "url": "https://umefruits.com/products/category/hop-qua-9-ngan",
-    "image": "/images/d2f2ed0e-aee7-4741-8d34-49c38e78dc63.jpg",
+    "image": "/media/d2f2ed0e-aee7-4741-8d34-49c38e78dc63.jpg",
     "productCount": 5,
     "productIds": [
       "68a9730d65cd9d3fc4252693",
@@ -358,7 +358,7 @@
     "name": "Nước Ép Smoothie",
     "slug": "nuoc-ep-smoothie",
     "url": "https://umefruits.com/products/category/nuoc-ep-smoothie",
-    "image": "/images/4794856d-7811-4c01-9bc2-23a3a4e9dcbf.jpg",
+    "image": "/media/4794856d-7811-4c01-9bc2-23a3a4e9dcbf.jpg",
     "productCount": 8,
     "productIds": [
       "6854901947cc80bfa1dcd99b",
@@ -375,7 +375,7 @@
     "name": "Trái Cây Nguyên Quả",
     "slug": "trai-cay-nguyen-qua",
     "url": "https://umefruits.com/products/category/trai-cay-nguyen-qua",
-    "image": "/images/e744843b-c601-4e3f-91cd-d357dc329443.jpeg",
+    "image": "/media/e744843b-c601-4e3f-91cd-d357dc329443.jpeg",
     "productCount": 65,
     "productIds": [
       "682178d1ca619fce354f2f75",
@@ -449,7 +449,7 @@
     "name": "Hop Qua 2 Tầng",
     "slug": "hop-qua-2-tang",
     "url": "https://umefruits.com/products/category/hop-qua-2-tang",
-    "image": "/images/e3f0c449-ebdf-4f82-bde6-223a8e31e92a.jpeg",
+    "image": "/media/e3f0c449-ebdf-4f82-bde6-223a8e31e92a.jpeg",
     "productCount": 11,
     "productIds": [
       "68a7f7db65cd9d3fc424be1d",
@@ -469,7 +469,7 @@
     "name": "Hop Qua Picnic",
     "slug": "hop-qua-picnic",
     "url": "https://umefruits.com/products/category/hop-qua-picnic",
-    "image": "/images/58645746-dfac-4e9f-8914-649ea9576caf.jpeg",
+    "image": "/media/58645746-dfac-4e9f-8914-649ea9576caf.jpeg",
     "productCount": 3,
     "productIds": [
       "68ac06fe65cd9d3fc4258d59",

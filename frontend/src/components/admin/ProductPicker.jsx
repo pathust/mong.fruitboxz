@@ -76,7 +76,6 @@ export default function ProductPicker({ onClose, onSelect }) {
                   </div>
                   <div className="p-3">
                     <p className="text-sm font-semibold line-clamp-2 leading-snug group-hover:text-primary transition-colors">{p.title}</p>
-                    <p className="text-xs text-gray-500 mt-1">{p.handle}</p>
                   </div>
                 </button>
               ))}

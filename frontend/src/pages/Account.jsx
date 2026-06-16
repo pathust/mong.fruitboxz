@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { apiFetch } from '../lib/api'
+import { getOrderCode } from '../lib/orderCodes'
 
 function calcOrderTotal(order) {
   if (order?.total && Number(order.total) > 0) return Number(order.total)
@@ -111,7 +112,7 @@ export default function Account() {
               {orders.slice(0, 3).map(order => (
                 <div key={order.id} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
                   <div>
-                    <p className="font-medium text-sm text-secondary">#{order.display_id || order.id.slice(0, 8)}</p>
+                    <p className="font-medium text-sm text-secondary">{getOrderCode(order)}</p>
                     <p className="text-xs text-gray-400">{new Date(order.created_at).toLocaleDateString('vi-VN')}</p>
                   </div>
                   <div className="text-right">

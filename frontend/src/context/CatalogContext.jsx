@@ -25,20 +25,21 @@ export function mapProduct(p) {
   const mappedVariants = (p?.variants || []).map(mapVariant)
   const firstCategory = p?.categories?.[0]
   const allCategories = p?.categories || []
-  const categorySlugs = allCategories.map(c => c.handle).filter(Boolean)
+  const categorySlugs = allCategories.map(c => c.slug || c.handle).filter(Boolean)
   const categoryNames = allCategories.map(c => c.name).filter(Boolean)
-  const handle = p?.handle || p?.id
+  const slug = p?.slug || p?.handle || p?.id
   const images = (p?.images || []).map((img) => img?.url).filter(Boolean)
   const rawThumb = p?.thumbnail || ""
   const isPlaceholder = !rawThumb || rawThumb.includes("placeholder")
   const thumbnail = isPlaceholder ? (images[0] || rawThumb) : rawThumb
   const fallbackPrice = mappedVariants[0]?.price ?? null
   return {
-    id: handle,
+    id: slug,
     medusa_id: p?.id || null,
-    handle,
+    slug,
+    handle: slug,
     title: p?.title || "Sản phẩm",
-    category: firstCategory?.handle || "",
+    category: firstCategory?.slug || firstCategory?.handle || "",
     categoryDisplay: firstCategory?.name || "",
     categorySlugs,
     categoryNames,
@@ -84,7 +85,7 @@ export function CatalogProvider({ children }) {
             }
           }
 
-          const slug = c.handle || c.id
+          const slug = c.slug || c.handle || c.id
           return {
             id: c.id,
             name: c.name,

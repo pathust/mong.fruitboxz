@@ -1,11 +1,14 @@
-import { useState, useEffect } from "react"
+import { useMemo, useState, useEffect } from "react"
 import { useAdminAuth } from "../../context/AdminAuthContext"
+import { AdminListFilters, filterBySearch } from "../../components/admin/AdminListFilters"
 
 export default function UsersList() {
   const { api } = useAdminAuth()
   const [users, setUsers] = useState([])
   const [roles, setRoles] = useState([])
   const [loading, setLoading] = useState(true)
+  const [query, setQuery] = useState("")
+  const [roleFilter, setRoleFilter] = useState("all")
 
   useEffect(() => {
     Promise.all([
@@ -20,7 +23,7 @@ export default function UsersList() {
   const setUserRoles = async (userId, roleIds) => {
     await api(`/admin/users/${userId}/roles`, {
       method: "POST",
-      body: JSON.stringify({ role_ids: roleIds }),
+      body: { roles: roleIds },
     })
     const update = await api(`/admin/users/${userId}`)
     setUsers(prev => prev.map(u => u.id === userId ? update.user : u))
@@ -41,13 +44,32 @@ export default function UsersList() {
     try {
       const result = await api("/admin/users", {
         method: "POST",
-        body: JSON.stringify({ email }),
+        body: { email },
       })
       setUsers(prev => [...prev, result.user])
     } catch (err) {
       alert(err.message)
     }
   }
+
+  const roleOptions = useMemo(() => {
+    return [
+      { value: "all", label: "Tất cả role" },
+      { value: "none", label: "Chưa có role" },
+      ...roles.map((role) => ({ value: role.id, label: role.name })),
+    ]
+  }, [roles])
+
+  const filteredUsers = useMemo(() => {
+    return users.filter((user) => {
+      const userRoleIds = user.metadata?.roles || []
+      return (
+        filterBySearch(user, query, ["email", "first_name", "last_name"]) &&
+        (roleFilter === "all" ||
+          (roleFilter === "none" ? userRoleIds.length === 0 : userRoleIds.includes(roleFilter)))
+      )
+    })
+  }, [users, query, roleFilter])
 
   if (loading) return <div className="text-center py-12 text-secondary-light">Loading...</div>
 
@@ -57,6 +79,18 @@ export default function UsersList() {
         <h1 className="text-2xl font-bold text-secondary">Users</h1>
         <button onClick={createUser} className="bg-primary text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-primary-dark">+ Add User</button>
       </div>
+      <AdminListFilters
+        search={query}
+        onSearchChange={setQuery}
+        searchPlaceholder="Tìm theo email hoặc tên..."
+        showing={filteredUsers.length}
+        total={users.length}
+        onReset={() => {
+          setQuery("")
+          setRoleFilter("all")
+        }}
+        filters={[{ label: "Role", value: roleFilter, onChange: setRoleFilter, options: roleOptions }]}
+      />
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 text-secondary-light">
@@ -67,7 +101,7 @@ export default function UsersList() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {users.map(u => {
+            {filteredUsers.map(u => {
               const userRoleIds = u.metadata?.roles || []
               return (
                 <tr key={u.id} className="hover:bg-gray-50">

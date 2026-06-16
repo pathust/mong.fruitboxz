@@ -5,16 +5,16 @@ const scrapedMap = {}
 if (scrapedData.products) {
   for (const key of Object.keys(scrapedData.products)) {
     const p = scrapedData.products[key]
-    scrapedMap[p.handle] = p
+    scrapedMap[p.slug || p.handle] = p
   }
 }
 
 const productMap = {}
 for (const p of rawProducts) {
-  productMap[p.handle || p.id] = p
+  productMap[p.slug || p.handle || p.id] = p
 }
 
-const allHandles = [...new Set([...Object.keys(productMap), ...Object.keys(scrapedMap)])]
+const allSlugs = [...new Set([...Object.keys(productMap), ...Object.keys(scrapedMap)])]
 
 function cleanTitle(raw) {
   if (!raw) return 'Sản phẩm'
@@ -79,9 +79,9 @@ function dedupeVariants(rawVariants = []) {
   return result
 }
 
-export const products = allHandles.map(handle => {
-  const fromProducts = productMap[handle]
-  const fromScraped = scrapedMap[handle]
+export const products = allSlugs.map(slug => {
+  const fromProducts = productMap[slug]
+  const fromScraped = scrapedMap[slug]
 
   const variants = dedupeVariants(fromProducts?.variants || fromScraped?.variants || [])
 
@@ -90,8 +90,8 @@ export const products = allHandles.map(handle => {
   const categoryRaw = fromProducts?.category || fromScraped?.category || ''
 
   return {
-    id: handle,
-    handle,
+    id: slug,
+    slug,
     title: cleanTitle(fromProducts?.title || fromScraped?.title || ''),
     category: categoryRaw,
     categoryDisplay: humanizeCategory(categoryRaw),
@@ -110,7 +110,7 @@ export const categories = (scrapedData.categories || []).map(cat => ({
 }))
 
 export function getProduct(id) {
-  return products.find(p => p.id === id || p.handle === id)
+  return products.find(p => p.id === id || p.slug === id)
 }
 
 export function getCategory(slug) {
@@ -128,7 +128,7 @@ export function searchProducts(query) {
   if (!q) return []
   return products.filter(p =>
     p.title.toLowerCase().includes(q) ||
-    p.handle.toLowerCase().includes(q) ||
+    p.slug.toLowerCase().includes(q) ||
     (p.categoryDisplay || '').toLowerCase().includes(q)
   )
 }

@@ -6,7 +6,7 @@
       "name": "Hop Trái Cây Cắt Sẵn",
       "slug": "hop-trai-cay-cat-san",
       "url": "https://umefruits.com/products/category/hop-trai-cay-cat-san",
-      "image": "/images/4cf278e7-d649-453e-8d51-f0bedca98652.jpg",
+      "image": "/media/4cf278e7-d649-453e-8d51-f0bedca98652.jpg",
       "productCount": 98,
       "productIds": [
         "69e60476923c4781a3e37a22",
@@ -113,7 +113,7 @@
       "name": "Hoa Quả Dam",
       "slug": "hoa-qua-dam",
       "url": "https://umefruits.com/products/category/hoa-qua-dam",
-      "image": "/images/b280dd40-f3bf-4ed9-aaa2-253fcdf85ddb.jpeg",
+      "image": "/media/b280dd40-f3bf-4ed9-aaa2-253fcdf85ddb.jpeg",
       "productCount": 13,
       "productIds": [
         "689ddaf76b5d9750c4aa42c7",
@@ -135,7 +135,7 @@
       "name": "Hop Mix Cắt Sẵn Gợi Ý",
       "slug": "hop-mix-cat-san-goi-y",
       "url": "https://umefruits.com/products/category/hop-mix-cat-san-goi-y",
-      "image": "/images/f097b0d2-817c-4694-ab2f-23b05eff07db.jpg",
+      "image": "/media/f097b0d2-817c-4694-ab2f-23b05eff07db.jpg",
       "productCount": 44,
       "productIds": [
         "68b019c8326e275db396c80f",
@@ -188,7 +188,7 @@
       "name": "Sữa Chua Hy Lạp",
       "slug": "sua-chua-hy-lap",
       "url": "https://umefruits.com/products/category/sua-chua-hy-lap",
-      "image": "/images/8c923776-a2ae-4d53-81f5-9e225cd29909.png",
+      "image": "/media/8c923776-a2ae-4d53-81f5-9e225cd29909.png",
       "productCount": 41,
       "productIds": [
         "69d5a10b923c4781a3d7bcb7",
@@ -238,7 +238,7 @@
       "name": "Hop Qua 4 Ngăn",
       "slug": "hop-qua-4-ngan",
       "url": "https://umefruits.com/products/category/hop-qua-4-ngan",
-      "image": "/images/48de0426-c637-42d9-a637-af8008fe31ff.jpg",
+      "image": "/media/48de0426-c637-42d9-a637-af8008fe31ff.jpg",
       "productCount": 74,
       "productIds": [
         "68a2c8f76b5d9750c4aa732d",
@@ -321,7 +321,7 @@
       "name": "Hop Qua 6 Ngăn",
       "slug": "hop-qua-6-ngan",
       "url": "https://umefruits.com/products/category/hop-qua-6-ngan",
-      "image": "/images/2f57b032-2888-499e-9eaa-eea90becc1b6.jpeg",
+      "image": "/media/2f57b032-2888-499e-9eaa-eea90becc1b6.jpeg",
       "productCount": 17,
       "productIds": [
         "68a3f24265cd9d3fc4242811",
@@ -347,7 +347,7 @@
       "name": "Hop Qua 9 Ngăn",
       "slug": "hop-qua-9-ngan",
       "url": "https://umefruits.com/products/category/hop-qua-9-ngan",
-      "image": "/images/d2f2ed0e-aee7-4741-8d34-49c38e78dc63.jpg",
+      "image": "/media/d2f2ed0e-aee7-4741-8d34-49c38e78dc63.jpg",
       "productCount": 5,
       "productIds": [
         "68a9730d65cd9d3fc4252693",
@@ -361,7 +361,7 @@
       "name": "Nước Ép Smoothie",
       "slug": "nuoc-ep-smoothie",
       "url": "https://umefruits.com/products/category/nuoc-ep-smoothie",
-      "image": "/images/4794856d-7811-4c01-9bc2-23a3a4e9dcbf.jpg",
+      "image": "/media/4794856d-7811-4c01-9bc2-23a3a4e9dcbf.jpg",
       "productCount": 8,
       "productIds": [
         "6854901947cc80bfa1dcd99b",
@@ -378,7 +378,7 @@
       "name": "Trái Cây Nguyên Quả",
       "slug": "trai-cay-nguyen-qua",
       "url": "https://umefruits.com/products/category/trai-cay-nguyen-qua",
-      "image": "/images/e744843b-c601-4e3f-91cd-d357dc329443.jpeg",
+      "image": "/media/e744843b-c601-4e3f-91cd-d357dc329443.jpeg",
       "productCount": 65,
       "productIds": [
         "682178d1ca619fce354f2f75",
@@ -452,7 +452,7 @@
       "name": "Hop Qua 2 Tầng",
       "slug": "hop-qua-2-tang",
       "url": "https://umefruits.com/products/category/hop-qua-2-tang",
-      "image": "/images/e3f0c449-ebdf-4f82-bde6-223a8e31e92a.jpeg",
+      "image": "/media/e3f0c449-ebdf-4f82-bde6-223a8e31e92a.jpeg",
       "productCount": 11,
       "productIds": [
         "68a7f7db65cd9d3fc424be1d",
@@ -472,7 +472,7 @@
       "name": "Hop Qua Picnic",
       "slug": "hop-qua-picnic",
       "url": "https://umefruits.com/products/category/hop-qua-picnic",
-      "image": "/images/58645746-dfac-4e9f-8914-649ea9576caf.jpeg",
+      "image": "/media/58645746-dfac-4e9f-8914-649ea9576caf.jpeg",
       "productCount": 3,
       "productIds": [
         "68ac06fe65cd9d3fc4258d59",
@@ -516,9 +516,9 @@
       ],
       "price": 120000,
       "images": [
-        "/images/7d99e018-1fb0-423d-8ffb-e7bece32b97d.jpeg"
+        "/media/7d99e018-1fb0-423d-8ffb-e7bece32b97d.jpeg"
       ],
-      "thumbnail": "/images/7d99e018-1fb0-423d-8ffb-e7bece32b97d.jpeg",
+      "thumbnail": "/media/7d99e018-1fb0-423d-8ffb-e7bece32b97d.jpeg",
       "bodyText": "MENU Cửa hàng Ume Fruits - Phương Mai 🇻🇳 VI Đăng nhập 🔥 Hộp Trái Cây Cắt Sẵn HOT Hoa quả dầm Hộp mix cắt sẵn gợi ý Sữa chua Hy Lạp 🔥 Hộp Quà 4 Ngăn HOT Hộp Quà 6 Ngăn Hộp Quà 9 Ngăn Nước ép - Smoothie Trái Cây Nguyên Quả Hộp Quà 2 Tầng Hộp Quà Picnic Hộp Mix Tự Chọn SẮP RA MẮT Hộp Quà Trái Cây Tự Chọn SẮP RA MẮT Blog Trang chủ Box Bòn bon Thái Lan Box Bòn bon Thái Lan- size S 400gr 120.000₫ /Hộp Chọn loại: size S 400gr 120.000₫ size M 600gr 180.000₫ size L 800gr 240.000₫ Số lượng: Đơn giá: 120.000₫/Hộp Số lượng: 1 Hộp Tổng tiền: 120.000₫ Thêm vào giỏ hàng Giao hàng nhanh chóng Giao hoả tốc nội thành Hà Nội Cam kết chất lượng Trái cây tươi ngon, có chế độ bảo hành Mô tả sản phẩm Xuất xứ: Thái Lan Hương vị: Quả nhỏ, vỏ mỏng vàng nhạt, dễ bóc. Cùi trắng trong, chia múi như nhãn. Ăn vào vị ngọt thanh, chua nhẹ, càng ăn càng ghiền. Một số quả chín kỹ còn có hậu ngọt mát rất rõ. Giá trị dinh dưỡng: Giàu vitamin B1, B2, C, canxi, chất xơ và khoáng chất. Có tác dụng giải nhiệt, hỗ trợ tiêu hoá, tăng đề kháng và chống oxy hoá. Quý khách lưu ý: 1. Trái cây sẽ chỉ được sơ chế sau khi xác nhận đơn để giữ được độ tươi ngon nhất có thể. Thời gian chuẩn bị và giao dao động từ 30 phút đến 1 tiếng tuỳ số lượng và khung giờ. 2. Trái cây cắt sẵn nên dùng ngay sau khi nhận hàng, hoặc bảo quản tủ mát và ăn trong ngày để giữ vị ngon và hạn chế tình trạng chảy nước. 3. Ume nhận phản hồi & hỗ trợ xử lý khiếu nại trong vòng 𝟒 𝐠𝐢𝐨̛̀ kể từ lúc nhận hàng. Nếu đơn hàng có vấn đề, khách vui lòng chụp ảnh hoặc quay video sản phẩm và phản hồi sớm để tụi em hỗ trợ nhanh và tốt nhất. Về Ume Fruits Ume Fruits là thương hiệu trái cây tươi chất lượng cao, với đa dạng sản phẩm phục vụ mọi nhu cầu: đặc sản vùng miền, trái cây nhập khẩu, quà tặng trái cây, và nhiều hơn nữa. Facebook Instagram TikTok Liên kết nhanh Trang chủ Tất cả sản phẩm Hộp Mix Tự Chọn Đơn hàng đặc biệt Blog Hỗ trợ khách hàng Về chúng tôi Chính sách giao hàng Chính sách thanh toán Chính sách bảo mật Liên hệ Liên hệ với chúng tôi Ume Fruits - Phương Mai 165 Phương Mai, Đống Đa, Hà Nội 0869277365 Ume Fruits 23 Ngô Tất Tố 23 Ngô Tất Tố, Đống Đa, Hà Nội 0869277365 ume.fruits@gmail.com Đăng ký nhận thông tin Đăng ký © 2026 Ume Fruits. Tất cả các quyền được bảo lưu.",
       "isHot": true,
       "inStock": true
@@ -557,10 +557,10 @@
       ],
       "price": 400000,
       "images": [
-        "/images/faf78ec5-06de-43c8-b9a0-57ed196a1bd9.jpeg",
-        "/images/3b8de73e-281a-4a1e-8cbd-80a8fc782c7a.jpeg"
+        "/media/faf78ec5-06de-43c8-b9a0-57ed196a1bd9.jpeg",
+        "/media/3b8de73e-281a-4a1e-8cbd-80a8fc782c7a.jpeg"
       ],
-      "thumbnail": "/images/faf78ec5-06de-43c8-b9a0-57ed196a1bd9.jpeg",
+      "thumbnail": "/media/faf78ec5-06de-43c8-b9a0-57ed196a1bd9.jpeg",
       "bodyText": "MENU Cửa hàng Ume Fruits - Phương Mai 🇻🇳 VI Đăng nhập 🔥 Hộp Trái Cây Cắt Sẵn HOT Hoa quả dầm Hộp mix cắt sẵn gợi ý Sữa chua Hy Lạp 🔥 Hộp Quà 4 Ngăn HOT Hộp Quà 6 Ngăn Hộp Quà 9 Ngăn Nước ép - Smoothie Trái Cây Nguyên Quả Hộp Quà 2 Tầng Hộp Quà Picnic Hộp Mix Tự Chọn SẮP RA MẮT Hộp Quà Trái Cây Tự Chọn SẮP RA MẮT Blog Trang chủ Box Cherry đỏ Mỹ Box Cherry đỏ Mỹ- size S 400gr 400.000₫ /Hộp Chọn loại: size S 400gr 400.000₫ size M 600gr 600.000₫ size L 800gr 800.000₫ Số lượng: Đơn giá: 400.000₫/Hộp Số lượng: 1 Hộp Tổng tiền: 400.000₫ Thêm vào giỏ hàng Giao hàng nhanh chóng Giao hoả tốc nội thành Hà Nội Cam kết chất lượng Trái cây tươi ngon, có chế độ bảo hành Mô tả sản phẩm Xuất xứ: Mỹ Hương vị: Vỏ đỏ sẫm căng bóng, thịt giòn mọng nước, vị ngọt đậm xen chút chua nhẹ đặc trưng, ăn một lần là mê. Giá trị dinh dưỡng: Giàu vitamin C, A, kali, chất xơ và anthocyanin – giúp tăng cường hệ miễn dịch, tốt cho tim mạch, cải thiện giấc ngủ và làm đẹp da. Quý khách lưu ý: 1. Trái cây sẽ chỉ được sơ chế sau khi xác nhận đơn để giữ được độ tươi ngon nhất có thể. Thời gian chuẩn bị và giao dao động từ 30 phút đến 1 tiếng tuỳ số lượng và khung giờ. 2. Trái cây cắt sẵn nên dùng ngay sau khi nhận hàng, hoặc bảo quản tủ mát và ăn trong ngày để giữ vị ngon và hạn chế tình trạng chảy nước. 3. Ume nhận phản hồi & hỗ trợ xử lý khiếu nại trong vòng 𝟒 𝐠𝐢𝐨̛̀ kể từ lúc nhận hàng. Nếu đơn hàng có vấn đề, khách vui lòng chụp ảnh hoặc quay video sản phẩm và phản hồi sớm để tụi em hỗ trợ nhanh và tốt nhất. Về Ume Fruits Ume Fruits là thương hiệu trái cây tươi chất lượng cao, với đa dạng sản phẩm phục vụ mọi nhu cầu: đặc sản vùng miền, trái cây nhập khẩu, quà tặng trái cây, và nhiều hơn nữa. Facebook Instagram TikTok Liên kết nhanh Trang chủ Tất cả sản phẩm Hộp Mix Tự Chọn Đơn hàng đặc biệt Blog Hỗ trợ khách hàng Về chúng tôi Chính sách giao hàng Chính sách thanh toán Chính sách bảo mật Liên hệ Liên hệ với chúng tôi Ume Fruits - Phương Mai 165 Phương Mai, Đống Đa, Hà Nội 0869277365 Ume Fruits 23 Ngô Tất Tố 23 Ngô Tất Tố, Đống Đa, Hà Nội 0869277365 ume.fruits@gmail.com Đăng ký nhận thông tin Đăng ký © 2026 Ume Fruits. Tất cả các quyền được bảo lưu.",
       "isHot": true,
       "inStock": true
@@ -579,10 +579,10 @@
       ],
       "price": null,
       "images": [
-        "/images/a83bfaae-34ac-4de6-933d-7dbc5ff47235.jpeg",
-        "/images/57db01ab-37d8-4868-b1d1-fe086f60b190.jpg"
+        "/media/a83bfaae-34ac-4de6-933d-7dbc5ff47235.jpeg",
+        "/media/57db01ab-37d8-4868-b1d1-fe086f60b190.jpg"
       ],
-      "thumbnail": "/images/a83bfaae-34ac-4de6-933d-7dbc5ff47235.jpeg",
+      "thumbnail": "/media/a83bfaae-34ac-4de6-933d-7dbc5ff47235.jpeg",
       "bodyText": "MENU Cửa hàng Ume Fruits - Phương Mai 🇻🇳 VI Đăng nhập 🔥 Hộp Trái Cây Cắt Sẵn HOT Hoa quả dầm Hộp mix cắt sẵn gợi ý Sữa chua Hy Lạp 🔥 Hộp Quà 4 Ngăn HOT Hộp Quà 6 Ngăn Hộp Quà 9 Ngăn Nước ép - Smoothie Trái Cây Nguyên Quả Hộp Quà 2 Tầng Hộp Quà Picnic Hộp Mix Tự Chọn SẮP RA MẮT Hộp Quà Trái Cây Tự Chọn SẮP RA MẮT Blog Trang chủ Box Măng cụt Thái Lan Box Măng cụt Thái Lan- Box Măng cụt Thái Lan 400gr 160.000₫ /Hộp Chọn loại: Box Măng cụt Thái Lan 400gr 160.000₫ Box Măng cụt Thái Lan 600gr 230.000₫ Box Măng cụt Thái Lan 800gr 300.000₫ Box Măng cụt mix việt quất (măng cụt 400gr + 50gr việt quất) 235.000₫ Box Măng cụt mix việt quất (măng cụt 600gr + 50gr việt quất) 295.000₫ Box Măng cụt mix việt quất (măng cụt 800gr + 50gr việt quất) 365.000₫ Số lượng: Đơn giá: 160.000₫/Hộp Số lượng: 1 Hộp Tổng tiền: 160.000₫ Thêm vào giỏ hàng Giao hàng nhanh chóng Giao hoả tốc nội thành Hà Nội Cam kết chất lượng Trái cây tươi ngon, có chế độ bảo hành Mô tả sản phẩm Xuất xứ: Thái Lan Hương vị: Vỏ tím than đặc trưng, múi trắng nõn, vị ngọt thanh xen chua nhẹ, thơm mát – “nữ hoàng trái cây nhiệt đới” Giá trị dinh dưỡng: Giàu chất xơ, vitamin C, nhóm polyphenol chống oxy hoá mạnh (xanthones); tốt cho da, tăng đề kháng và hỗ trợ tiêu hoá Măng cụt ngay sau khi bóc sẽ ngả thâm rất nhanh không đẹp mắt, tuy nhiên không ảnh hưởng tới chất lượng và hương vị. Nhà Ume sẽ không bảo hành với măng cụt bị thâm các bác lưu ý trước khi đặt hàng giúp tụi em nghen Quý khách lưu ý: 1. Trái cây sẽ chỉ được sơ chế sau khi xác nhận đơn để giữ được độ tươi ngon nhất có thể. Thời gian chuẩn bị và giao dao động từ 30 phút đến 1 tiếng tuỳ số lượng và khung giờ. 2. Trái cây cắt sẵn nên dùng ngay sau khi nhận hàng, hoặc bảo quản tủ mát và ăn trong ngày để giữ vị ngon và hạn chế tình trạng chảy nước. 3. Ume nhận phản hồi & hỗ trợ xử lý khiếu nại trong vòng 𝟒 𝐠𝐢𝐨̛̀ kể từ lúc nhận hàng. Nếu đơn hàng có vấn đề, khách vui lòng chụp ảnh hoặc quay video sản phẩm và phản hồi sớm để tụi em hỗ trợ nhanh và tốt nhất. Về Ume Fruits Ume Fruits là thương hiệu trái cây tươi chất lượng cao, với đa dạng sản phẩm phục vụ mọi nhu cầu: đặc sản vùng miền, trái cây nhập khẩu, quà tặng trái cây, và nhiều hơn nữa. Facebook Instagram TikTok Liên kết nhanh Trang chủ Tất cả sản phẩm Hộp Mix Tự Chọn Đơn hàng đặc biệt Blog Hỗ trợ khách hàng Về chúng tôi Chính sách giao hàng Chính sách thanh toán Chính sách bảo mật Liên hệ Liên hệ với chúng tôi Ume Fruits - Phương Mai 165 Phương Mai, Đống Đa, Hà Nội 0869277365 Ume Fruits 23 Ngô Tất Tố 23 Ngô Tất Tố, Đống Đa, Hà Nội 0869277365 ume.fruits@gmail.com Đăng ký nhận thông tin Đăng ký © 2026 Ume Fruits. Tất cả các quyền được bảo lưu.",
       "isHot": true,
       "inStock": true
@@ -621,11 +621,11 @@
       ],
       "price": 200000,
       "images": [
-        "/images/3bf135c0-0ec2-4d3d-990a-ad61ff5f6e73.jpeg",
-        "/images/5a02afea-fcb4-40ea-be8a-3ffa2dbe7f77.jpg",
-        "/images/4f9861b6-6f8f-4708-a737-d06c223a5b09.jpg"
+        "/media/3bf135c0-0ec2-4d3d-990a-ad61ff5f6e73.jpeg",
+        "/media/5a02afea-fcb4-40ea-be8a-3ffa2dbe7f77.jpg",
+        "/media/4f9861b6-6f8f-4708-a737-d06c223a5b09.jpg"
       ],
-      "thumbnail": "/images/3bf135c0-0ec2-4d3d-990a-ad61ff5f6e73.jpeg",
+      "thumbnail": "/media/3bf135c0-0ec2-4d3d-990a-ad61ff5f6e73.jpeg",
       "bodyText": "MENU Cửa hàng Ume Fruits - Phương Mai 🇻🇳 VI Đăng nhập 🔥 Hộp Trái Cây Cắt Sẵn HOT Hoa quả dầm Hộp mix cắt sẵn gợi ý Sữa chua Hy Lạp 🔥 Hộp Quà 4 Ngăn HOT Hộp Quà 6 Ngăn Hộp Quà 9 Ngăn Nước ép - Smoothie Trái Cây Nguyên Quả Hộp Quà 2 Tầng Hộp Quà Picnic Hộp Mix Tự Chọn SẮP RA MẮT Hộp Quà Trái Cây Tự Chọn SẮP RA MẮT Blog Trang chủ Box Nho sữa xanh Box Nho sữa xanh- Size S 400gr 200.000₫ /Cái Chọn loại: Size S 400gr 200.000₫ Size M 600gr 290.000₫ Size L 800gr 380.000₫ Size S 400gr + 50gr việt quất 265.000₫ Size M 600gr + 50gr việt quất 355.000₫ Size L 800gr + 50gr việt quất 445.000₫ Số lượng: Đơn giá: 200.000₫/Cái Số lượng: 1 Cái Tổng tiền: 200.000₫ Thêm vào giỏ hàng Giao hàng nhanh chóng Giao hoả tốc nội thành Hà Nội Cam kết chất lượng Trái cây tươi ngon, có chế độ bảo hành Mô tả sản phẩm Xuất xứ: Trung Quốc Hương vị: Không hạt, thịt giòn mọng, ngọt đậm, hậu vị có chút “sữa” nhẹ đặc trưng Giá trị dinh dưỡng: Cung cấp nhiều vitamin C, K, chất xơ và chất chống oxy hoá; tốt cho tim mạch, hỗ trợ tiêu hoá và làm đẹp da Quý khách lưu ý: 1. Trái cây sẽ chỉ được sơ chế sau khi xác nhận đơn để giữ được độ tươi ngon nhất có thể. Thời gian chuẩn bị và giao dao động từ 30 phút đến 1 tiếng tuỳ số lượng và khung giờ. 2. Trái cây cắt sẵn nên dùng ngay sau khi nhận hàng, hoặc bảo quản tủ mát và ăn trong ngày để giữ vị ngon và hạn chế tình trạng chảy nước. 3. Ume nhận phản hồi & hỗ trợ xử lý khiếu nại trong vòng 𝟒 𝐠𝐢𝐨̛̀ kể từ lúc nhận hàng. Nếu đơn hàng có vấn đề, khách vui lòng chụp ảnh hoặc quay video sản phẩm và phản hồi sớm để tụi em hỗ trợ nhanh và tốt nhất. Về Ume Fruits Ume Fruits là thương hiệu trái cây tươi chất lượng cao, với đa dạng sản phẩm phục vụ mọi nhu cầu: đặc sản vùng miền, trái cây nhập khẩu, quà tặng trái cây, và nhiều hơn nữa. Facebook Instagram TikTok Liên kết nhanh Trang chủ Tất cả sản phẩm Hộp Mix Tự Chọn Đơn hàng đặc biệt Blog Hỗ trợ khách hàng Về chúng tôi Chính sách giao hàng Chính sách thanh toán Chính sách bảo mật Liên hệ Liên hệ với chúng tôi Ume Fruits - Phương Mai 165 Phương Mai, Đống Đa, Hà Nội 0869277365 Ume Fruits 23 Ngô Tất Tố 23 Ngô Tất Tố, Đống Đa, Hà Nội 0869277365 ume.fruits@gmail.com Đăng ký nhận thông tin Đăng ký © 2026 Ume Fruits. Tất cả các quyền được bảo lưu.",
       "isHot": true,
       "inStock": true
@@ -664,9 +664,9 @@
       ],
       "price": 150000,
       "images": [
-        "/images/583a377d-66f0-403e-8633-1534a82102d9.jpeg"
+        "/media/583a377d-66f0-403e-8633-1534a82102d9.jpeg"
       ],
-      "thumbnail": "/images/583a377d-66f0-403e-8633-1534a82102d9.jpeg",
+      "thumbnail": "/media/583a377d-66f0-403e-8633-1534a82102d9.jpeg",
       "bodyText": "MENU Cửa hàng Ume Fruits - Phương Mai 🇻🇳 VI Đăng nhập 🔥 Hộp Trái Cây Cắt Sẵn HOT Hoa quả dầm Hộp mix cắt sẵn gợi ý Sữa chua Hy Lạp 🔥 Hộp Quà 4 Ngăn HOT Hộp Quà 6 Ngăn Hộp Quà 9 Ngăn Nước ép - Smoothie Trái Cây Nguyên Quả Hộp Quà 2 Tầng Hộp Quà Picnic Hộp Mix Tự Chọn SẮP RA MẮT Hộp Quà Trái Cây Tự Chọn SẮP RA MẮT Blog Trang chủ Box Quýt chum chĩnh vàng Box Quýt chum chĩnh vàng- size S 400gr 150.000₫ /Hộp Chọn loại: size S 400gr 150.000₫ size M 600gr 220.000₫ size L 800gr 285.000₫ Số lượng: Đơn giá: 150.000₫/Hộp Số lượng: 1 Hộp Tổng tiền: 150.000₫ Thêm vào giỏ hàng Giao hàng nhanh chóng Giao hoả tốc nội thành Hà Nội Cam kết chất lượng Trái cây tươi ngon, có chế độ bảo hành Mô tả sản phẩm Xuất xứ: Nội địa Trung Quốc Ngoại hình: Quả nhỏ vừa, dáng tròn căng bóng, vỏ mỏng, màu vàng óng ánh như chum vàng mini – nhìn siêu bắt mắt. Hương vị: Ngọt thanh, mọng nước, dễ bóc vỏ, ăn xong mát miệng không gắt. Dinh dưỡng: Cung cấp vitamin C, chất xơ và nhiều khoáng chất tốt cho da, tăng đề kháng, hỗ trợ tiêu hóa. Quý khách lưu ý: 1. Trái cây sẽ chỉ được sơ chế sau khi xác nhận đơn để giữ được độ tươi ngon nhất có thể. Thời gian chuẩn bị và giao dao động từ 30 phút đến 1 tiếng tuỳ số lượng và khung giờ. 2. Trái cây cắt sẵn nên dùng ngay sau khi nhận hàng, hoặc bảo quản tủ mát và ăn trong ngày để giữ vị ngon và hạn chế tình trạng chảy nước. 3. Ume nhận phản hồi & hỗ trợ xử lý khiếu nại trong vòng 𝟒 𝐠𝐢𝐨̛̀ kể từ lúc nhận hàng. Nếu đơn hàng có vấn đề, khách vui lòng chụp ảnh hoặc quay video sản phẩm và phản hồi sớm để tụi em hỗ trợ nhanh và tốt nhất. Về Ume Fruits Ume Fruits là thương hiệu trái cây tươi chất lượng cao, với đa dạng sản phẩm phục vụ mọi nhu cầu: đặc sản vùng miền, trái cây nhập khẩu, quà tặng trái cây, và nhiều hơn nữa. Facebook Instagram TikTok Liên kết nhanh Trang chủ Tất cả sản phẩm Hộp Mix Tự Chọn Đơn hàng đặc biệt Blog Hỗ trợ khách hàng Về chúng tôi Chính sách giao hàng Chính sách thanh toán Chính sách bảo mật Liên hệ Liên hệ với chúng tôi Ume Fruits - Phương Mai 165 Phương Mai, Đống Đa, Hà Nội 0869277365 Ume Fruits 23 Ngô Tất Tố 23 Ngô Tất Tố, Đống Đa, Hà Nội 0869277365 ume.fruits@gmail.com Đăng ký nhận thông tin Đăng ký © 2026 Ume Fruits. Tất cả các quyền được bảo lưu.",
       "isHot": true,
       "inStock": true
@@ -705,10 +705,10 @@
       ],
       "price": 55000,
       "images": [
-        "/images/93e127a5-68f6-4eaf-9c51-1a93d9763d6c.jpg",
-        "/images/d9ab6513-c08d-4f31-a817-2b399af541dc.jpg"
+        "/media/93e127a5-68f6-4eaf-9c51-1a93d9763d6c.jpg",
+        "/media/d9ab6513-c08d-4f31-a817-2b399af541dc.jpg"
       ],
-      "thumbnail": "/images/93e127a5-68f6-4eaf-9c51-1a93d9763d6c.jpg",
+      "thumbnail": "/media/93e127a5-68f6-4eaf-9c51-1a93d9763d6c.jpg",
       "bodyText": "MENU Cửa hàng Ume Fruits - Phương Mai 🇻🇳 VI Đăng nhập 🔥 Hộp Trái Cây Cắt Sẵn HOT Hoa quả dầm Hộp mix cắt sẵn gợi ý Sữa chua Hy Lạp 🔥 Hộp Quà 4 Ngăn HOT Hộp Quà 6 Ngăn Hộp Quà 9 Ngăn Nước ép - Smoothie Trái Cây Nguyên Quả Hộp Quà 2 Tầng Hộp Quà Picnic Hộp Mix Tự Chọn SẮP RA MẮT Hộp Quà Trái Cây Tự Chọn SẮP RA MẮT Blog Trang chủ Box Dứa ngọt Box Dứa ngọt- size S 400gr 55.000₫ /Hộp Chọn loại: size S 400gr 55.000₫ size M 600gr 70.000₫ size L 800gr 90.000₫ Số lượng: Đơn giá: 55.000₫/Hộp Số lượng: 1 Hộp Tổng tiền: 55.000₫ Thêm vào giỏ hàng Giao hàng nhanh chóng Giao hoả tốc nội thành Hà Nội Cam kết chất lượng Trái cây tươi ngon, có chế độ bảo hành Mô tả sản phẩm Xuất xứ: Thanh Hoá Hương vị: Thịt vàng óng, giòn, ngọt thanh, chua nhẹ cực cuốn, không gắt cổ. Dinh dưỡng: Giàu vitamin C, mangan và chất xơ – giúp đẹp da, hỗ trợ tiêu hoá, tăng sức đề kháng. Quý khách lưu ý: 1. Trái cây sẽ chỉ được sơ chế sau khi xác nhận đơn để giữ được độ tươi ngon nhất có thể. Thời gian chuẩn bị và giao dao động từ 30 phút đến 1 tiếng tuỳ số lượng và khung giờ. 2. Trái cây cắt sẵn nên dùng ngay sau khi nhận hàng, hoặc bảo quản tủ mát và ăn trong ngày để giữ vị ngon và hạn chế tình trạng chảy nước. 3. Ume nhận phản hồi & hỗ trợ xử lý khiếu nại trong vòng 𝟒 𝐠𝐢𝐨̛̀ kể từ lúc nhận hàng. Nếu đơn hàng có vấn đề, khách vui lòng chụp ảnh hoặc quay video sản phẩm và phản hồi sớm để tụi em hỗ trợ nhanh và tốt nhất. Về Ume Fruits Ume Fruits là thương hiệu trái cây tươi chất lượng cao, với đa dạng sản phẩm phục vụ mọi nhu cầu: đặc sản vùng miền, trái cây nhập khẩu, quà tặng trái cây, và nhiều hơn nữa. Facebook Instagram TikTok Liên kết nhanh Trang chủ Tất cả sản phẩm Hộp Mix Tự Chọn Đơn hàng đặc biệt Blog Hỗ trợ khách hàng Về chúng tôi Chính sách giao hàng Chính sách thanh toán Chính sách bảo mật Liên hệ Liên hệ với chúng tôi Ume Fruits - Phương Mai 165 Phương Mai, Đống Đa, Hà Nội 0869277365 Ume Fruits 23 Ngô Tất Tố 23 Ngô Tất Tố, Đống Đa, Hà Nội 0869277365 ume.fruits@gmail.com Đăng ký nhận thông tin Đăng ký © 2026 Ume Fruits. Tất cả các quyền được bảo lưu.",
       "isHot": true,
       "inStock": true
@@ -747,13 +747,13 @@
       ],
       "price": 220000,
       "images": [
-        "/images/59228bdf-2a65-42e4-a12a-621dae868925.jpg",
-        "/images/3aa2f3f0-701a-4295-979e-4bef89c5d17f.jpg",
-        "/images/3395e1ca-7aa2-4099-b9ac-d72f4439c792.jpg",
-        "/images/98c1ca6b-fc02-456d-8f2b-9104409d3260.jpg",
-        "/images/cf302e9d-f142-4c5f-a671-a889349e83f3.jpg"
+        "/media/59228bdf-2a65-42e4-a12a-621dae868925.jpg",
+        "/media/3aa2f3f0-701a-4295-979e-4bef89c5d17f.jpg",
+        "/media/3395e1ca-7aa2-4099-b9ac-d72f4439c792.jpg",
+        "/media/98c1ca6b-fc02-456d-8f2b-9104409d3260.jpg",
+        "/media/cf302e9d-f142-4c5f-a671-a889349e83f3.jpg"
       ],
-      "thumbnail": "/images/59228bdf-2a65-42e4-a12a-621dae868925.jpg",
+      "thumbnail": "/media/59228bdf-2a65-42e4-a12a-621dae868925.jpg",
       "bodyText": "MENU Cửa hàng Ume Fruits - Phương Mai 🇻🇳 VI Đăng nhập 🔥 Hộp Trái Cây Cắt Sẵn HOT Hoa quả dầm Hộp mix cắt sẵn gợi ý Sữa chua Hy Lạp 🔥 Hộp Quà 4 Ngăn HOT Hộp Quà 6 Ngăn Hộp Quà 9 Ngăn Nước ép - Smoothie Trái Cây Nguyên Quả Hộp Quà 2 Tầng Hộp Quà Picnic Hộp Mix Tự Chọn SẮP RA MẮT Hộp Quà Trái Cây Tự Chọn SẮP RA MẮT Blog Trang chủ Box Kiwi vàng Zespri New Zealand Box Kiwi vàng Zespri New Zealand- size S 400gr 220.000₫ /Hộp Chọn loại: size S 400gr 220.000₫ size M 600gr 320.000₫ size L 800gr 420.000₫ size S 400gr + 50gr việt quất 285.000₫ size M 600gr + 50gr việt quất 385.000₫ size L 800gr + 50gr việt quất 485.000₫ Số lượng: Đơn giá: 220.000₫/Hộp Số lượng: 1 Hộp Tổng tiền: 220.000₫ Thêm vào giỏ hàng Giao hàng nhanh chóng Giao hoả tốc nội thành Hà Nội Cam kết chất lượng Trái cây tươi ngon, có chế độ bảo hành Mô tả sản phẩm Xuất xứ: New Zealand – thương hiệu Zespri nổi tiếng toàn cầu với quy trình trồng trọt chuẩn quốc tế Hương vị: Vỏ nâu nhẵn, ruột vàng óng, vị ngọt thanh dịu, chua nhẹ cân bằng, thơm mát đặc trưng Giá trị dinh dưỡng: Cực giàu vitamin C (cao gấp nhiều lần cam), cùng vitamin E, kali, chất xơ và chất chống oxy hoá; giúp tăng đề kháng, hỗ trợ tiêu hoá, tốt cho da và tim mạch Quý khách lưu ý: 1. Trái cây sẽ chỉ được sơ chế sau khi xác nhận đơn để giữ được độ tươi ngon nhất có thể. Thời gian chuẩn bị và giao dao động từ 30 phút đến 1 tiếng tuỳ số lượng và khung giờ. 2. Trái cây cắt sẵn nên dùng ngay sau khi nhận hàng, hoặc bảo quản tủ mát và ăn trong ngày để giữ vị ngon và hạn chế tình trạng chảy nước. 3. Ume nhận phản hồi & hỗ trợ xử lý khiếu nại trong vòng 𝟒 𝐠𝐢𝐨̛̀ kể từ lúc nhận hàng. Nếu đơn hàng có vấn đề, khách vui lòng chụp ảnh hoặc quay video sản phẩm và phản hồi sớm để tụi em hỗ trợ nhanh và tốt nhất. Về Ume Fruits Ume Fruits là thương hiệu trái cây tươi chất lượng cao, với đa dạng sản phẩm phục vụ mọi nhu cầu: đặc sản vùng miền, trái cây nhập khẩu, quà tặng trái cây, và nhiều hơn nữa. Facebook Instagram TikTok Liên kết nhanh Trang chủ Tất cả sản phẩm Hộp Mix Tự Chọn Đơn hàng đặc biệt Blog Hỗ trợ khách hàng Về chúng tôi Chính sách giao hàng Chính sách thanh toán Chính sách bảo mật Liên hệ Liên hệ với chúng tôi Ume Fruits - Phương Mai 165 Phương Mai, Đống Đa, Hà Nội 0869277365 Ume Fruits 23 Ngô Tất Tố 23 Ngô Tất Tố, Đống Đa, Hà Nội 0869277365 ume.fruits@gmail.com Đăng ký nhận thông tin Đăng ký © 2026 Ume Fruits. Tất cả các quyền được bảo lưu.",
       "isHot": true,
       "inStock": true
@@ -792,12 +792,12 @@
       ],
       "price": 240000,
       "images": [
-        "/images/6042084e-2350-4ac5-91d4-487500d6c782.jpg",
-        "/images/1632d470-4431-47fc-914e-bae5c2932d1d.jpg",
-        "/images/a957b628-408c-4b35-80c7-201312bb190f.jpg",
-        "/images/23f1f67a-1848-43d5-9655-47fac779a44a.jpg"
+        "/media/6042084e-2350-4ac5-91d4-487500d6c782.jpg",
+        "/media/1632d470-4431-47fc-914e-bae5c2932d1d.jpg",
+        "/media/a957b628-408c-4b35-80c7-201312bb190f.jpg",
+        "/media/23f1f67a-1848-43d5-9655-47fac779a44a.jpg"
       ],
-      "thumbnail": "/images/6042084e-2350-4ac5-91d4-487500d6c782.jpg",
+      "thumbnail": "/media/6042084e-2350-4ac5-91d4-487500d6c782.jpg",
       "bodyText": "MENU Cửa hàng Ume Fruits - Phương Mai 🇻🇳 VI Đăng nhập 🔥 Hộp Trái Cây Cắt Sẵn HOT Hoa quả dầm Hộp mix cắt sẵn gợi ý Sữa chua Hy Lạp 🔥 Hộp Quà 4 Ngăn HOT Hộp Quà 6 Ngăn Hộp Quà 9 Ngăn Nước ép - Smoothie Trái Cây Nguyên Quả Hộp Quà 2 Tầng Hộp Quà Picnic Hộp Mix Tự Chọn SẮP RA MẮT Hộp Quà Trái Cây Tự Chọn SẮP RA MẮT Blog Trang chủ Box Dâu tây Đà Lạt (kèm sữa chấm) Box Dâu tây Đà Lạt (kèm sữa chấm)- size S 400gr 240.000₫ /Hộp Chọn loại: size S 400gr 240.000₫ size M 600gr 360.000₫ size L 800gr 480.000₫ size S 400gr + mix 50gr Việt quất 305.000₫ size M 600gr + mix 50gr Việt quất 425.000₫ size L 800gr + mix 50gr Việt quất 545.000₫ Số lượng: Đơn giá: 240.000₫/Hộp Số lượng: 1 Hộp Tổng tiền: 240.000₫ Thêm vào giỏ hàng Giao hàng nhanh chóng Giao hoả tốc nội thành Hà Nội Cam kết chất lượng Trái cây tươi ngon, có chế độ bảo hành Mô tả sản phẩm Xuất xứ: Đà Lạt Hương vị: Quả mọng nước, thơm. Hương vị chua chua ngọt ngọt, vị chua nhiều hơn khoảng 7/10. Kèm sữa chấm Dinh dưỡng: Giàu vitamin C, mangan, chất xơ và chất chống oxy hóa. Hỗ trợ tăng cường đề kháng, tốt cho tim mạch và giúp da sáng mịn tự nhiên. Quý khách lưu ý: 1. Trái cây sẽ chỉ được sơ chế sau khi xác nhận đơn để giữ được độ tươi ngon nhất có thể. Thời gian chuẩn bị và giao dao động từ 30 phút đến 1 tiếng tuỳ số lượng và khung giờ. 2. Trái cây cắt sẵn nên dùng ngay sau khi nhận hàng, hoặc bảo quản tủ mát và ăn trong ngày để giữ vị ngon và hạn chế tình trạng chảy nước. 3. Ume nhận phản hồi & hỗ trợ xử lý khiếu nại trong vòng 𝟒 𝐠𝐢𝐨̛̀ kể từ lúc nhận hàng. Nếu đơn hàng có vấn đề, khách vui lòng chụp ảnh hoặc quay video sản phẩm và phản hồi sớm để tụi em hỗ trợ nhanh và tốt nhất. Về Ume Fruits Ume Fruits là thương hiệu trái cây tươi chất lượng cao, với đa dạng sản phẩm phục vụ mọi nhu cầu: đặc sản vùng miền, trái cây nhập khẩu, quà tặng trái cây, và nhiều hơn nữa. Facebook Instagram TikTok Liên kết nhanh Trang chủ Tất cả sản phẩm Hộp Mix Tự Chọn Đơn hàng đặc biệt Blog Hỗ trợ khách hàng Về chúng tôi Chính sách giao hàng Chính sách thanh toán Chính sách bảo mật Liên hệ Liên hệ với chúng tôi Ume Fruits - Phương Mai 165 Phương Mai, Đống Đa, Hà Nội 0869277365 Ume Fruits 23 Ngô Tất Tố 23 Ngô Tất Tố, Đống Đa, Hà Nội 0869277365 ume.fruits@gmail.com Đăng ký nhận thông tin Đăng ký © 2026 Ume Fruits. Tất cả các quyền được bảo lưu.",
       "isHot": true,
       "inStock": true
@@ -836,10 +836,10 @@
       ],
       "price": 70000,
       "images": [
-        "/images/dbd00896-3d7f-4c3b-9cca-b1292690b7c1.jpg",
-        "/images/fbf43aba-d4c3-4df3-87b4-70e4537f2c5d.jpg"
+        "/media/dbd00896-3d7f-4c3b-9cca-b1292690b7c1.jpg",
+        "/media/fbf43aba-d4c3-4df3-87b4-70e4537f2c5d.jpg"
       ],
-      "thumbnail": "/images/dbd00896-3d7f-4c3b-9cca-b1292690b7c1.jpg",
+      "thumbnail": "/media/dbd00896-3d7f-4c3b-9cca-b1292690b7c1.jpg",
       "bodyText": "MENU Cửa hàng Ume Fruits - Phương Mai 🇻🇳 VI Đăng nhập 🔥 Hộp Trái Cây Cắt Sẵn HOT Hoa quả dầm Hộp mix cắt sẵn gợi ý Sữa chua Hy Lạp 🔥 Hộp Quà 4 Ngăn HOT Hộp Quà 6 Ngăn Hộp Quà 9 Ngăn Nước ép - Smoothie Trái Cây Nguyên Quả Hộp Quà 2 Tầng Hộp Quà Picnic Hộp Mix Tự Chọn SẮP RA MẮT Hộp Quà Trái Cây Tự Chọn SẮP RA MẮT Blog Trang chủ Box Mít thái da xanh (có bỏ hạt) Box Mít thái da xanh (có bỏ hạt)- size S 400gr 70.000₫ /Hộp Chọn loại: size S 400gr 70.000₫ size M 600gr 100.000₫ size L 800gr 130.000₫ Số lượng: Đơn giá: 70.000₫/Hộp Số lượng: 1 Hộp Tổng tiền: 70.000₫ Thêm vào giỏ hàng Giao hàng nhanh chóng Giao hoả tốc nội thành Hà Nội Cam kết chất lượng Trái cây tươi ngon, có chế độ bảo hành Mô tả sản phẩm Xuất xứ: miền Tây và Đông Nam Bộ Việt Nam. Hương vị: Cơm giòn dai, ngọt, mùi thơm đặc trưng, ít xơ. Dinh dưỡng: Giàu vitamin C, kali, chất xơ; hỗ trợ tiêu hóa, tăng cường miễn dịch, tốt cho tim mạch. Quý khách lưu ý: 1. Trái cây sẽ chỉ được sơ chế sau khi xác nhận đơn để giữ được độ tươi ngon nhất có thể. Thời gian chuẩn bị và giao dao động từ 30 phút đến 1 tiếng tuỳ số lượng và khung giờ. 2. Trái cây cắt sẵn nên dùng ngay sau khi nhận hàng, hoặc bảo quản tủ mát và ăn trong ngày để giữ vị ngon và hạn chế tình trạng chảy nước. 3. Ume nhận phản hồi & hỗ trợ xử lý khiếu nại trong vòng 𝟒 𝐠𝐢𝐨̛̀ kể từ lúc nhận hàng. Nếu đơn hàng có vấn đề, khách vui lòng chụp ảnh hoặc quay video sản phẩm và phản hồi sớm để tụi em hỗ trợ nhanh và tốt nhất. Về Ume Fruits Ume Fruits là thương hiệu trái cây tươi chất lượng cao, với đa dạng sản phẩm phục vụ mọi nhu cầu: đặc sản vùng miền, trái cây nhập khẩu, quà tặng trái cây, và nhiều hơn nữa. Facebook Instagram TikTok Liên kết nhanh Trang chủ Tất cả sản phẩm Hộp Mix Tự Chọn Đơn hàng đặc biệt Blog Hỗ trợ khách hàng Về chúng tôi Chính sách giao hàng Chính sách thanh toán Chính sách bảo mật Liên hệ Liên hệ với chúng tôi Ume Fruits - Phương Mai 165 Phương Mai, Đống Đa, Hà Nội 0869277365 Ume Fruits 23 Ngô Tất Tố 23 Ngô Tất Tố, Đống Đa, Hà Nội 0869277365 ume.fruits@gmail.com Đăng ký nhận thông tin Đăng ký © 2026 Ume Fruits. Tất cả các quyền được bảo lưu.",
       "isHot": true,
       "inStock": true
@@ -858,10 +858,10 @@
       ],
       "price": null,
       "images": [
-        "/images/934b056a-488d-4305-9b75-28bd12bc5915.jpg",
-        "/images/6b599de6-020d-4672-bee9-0b7a23f98f0f.jpg"
+        "/media/934b056a-488d-4305-9b75-28bd12bc5915.jpg",
+        "/media/6b599de6-020d-4672-bee9-0b7a23f98f0f.jpg"
       ],
-      "thumbnail": "/images/934b056a-488d-4305-9b75-28bd12bc5915.jpg",
+      "thumbnail": "/media/934b056a-488d-4305-9b75-28bd12bc5915.jpg",
       "bodyText": "MENU Cửa hàng Ume Fruits - Phương Mai 🇻🇳 VI Đăng nhập 🔥 Hộp Trái Cây Cắt Sẵn HOT Hoa quả dầm Hộp mix cắt sẵn gợi ý Sữa chua Hy Lạp 🔥 Hộp Quà 4 Ngăn HOT Hộp Quà 6 Ngăn Hộp Quà 9 Ngăn Nước ép - Smoothie Trái Cây Nguyên Quả Hộp Quà 2 Tầng Hộp Quà Picnic Hộp Mix Tự Chọn SẮP RA MẮT Hộp Quà Trái Cây Tự Chọn SẮP RA MẮT Blog Trang chủ Box Cóc bao tử dầm bò khô 500gr Box Cóc bao tử dầm bò khô 500gr 80.000₫ /Hộp Số lượng: Đơn giá: 80.000₫/Hộp Số lượng: 1 Hộp Tổng tiền: 80.000₫ Thêm vào giỏ hàng Giao hàng nhanh chóng Giao hoả tốc nội thành Hà Nội Cam kết chất lượng Trái cây tươi ngon, có chế độ bảo hành Mô tả sản phẩm Quý khách có thể note điều chỉnh độ cay/mặn/ngọt Với đơn ship xa hoa quả có thể chảy nước do ngấm gia vị, quý khách có thể yêu cầu để riêng sốt dầm Quý khách lưu ý: 1. Trái cây sẽ chỉ được sơ chế sau khi xác nhận đơn để giữ được độ tươi ngon nhất có thể. Thời gian chuẩn bị và giao dao động từ 30 phút đến 1 tiếng tuỳ số lượng và khung giờ. 2. Trái cây cắt sẵn nên dùng ngay sau khi nhận hàng, hoặc bảo quản tủ mát và ăn trong ngày để giữ vị ngon và hạn chế tình trạng chảy nước. 3. Ume nhận phản hồi & hỗ trợ xử lý khiếu nại trong vòng 𝟒 𝐠𝐢𝐨̛̀ kể từ lúc nhận hàng. Nếu đơn hàng có vấn đề, khách vui lòng chụp ảnh hoặc quay video sản phẩm và phản hồi sớm để tụi em hỗ trợ nhanh và tốt nhất. Về Ume Fruits Ume Fruits là thương hiệu trái cây tươi chất lượng cao, với đa dạng sản phẩm phục vụ mọi nhu cầu: đặc sản vùng miền, trái cây nhập khẩu, quà tặng trái cây, và nhiều hơn nữa. Facebook Instagram TikTok Liên kết nhanh Trang chủ Tất cả sản phẩm Hộp Mix Tự Chọn Đơn hàng đặc biệt Blog Hỗ trợ khách hàng Về chúng tôi Chính sách giao hàng Chính sách thanh toán Chính sách bảo mật Liên hệ Liên hệ với chúng tôi Ume Fruits - Phương Mai 165 Phương Mai, Đống Đa, Hà Nội 0869277365 Ume Fruits 23 Ngô Tất Tố 23 Ngô Tất Tố, Đống Đa, Hà Nội 0869277365 ume.fruits@gmail.com Đăng ký nhận thông tin Đăng ký © 2026 Ume Fruits. Tất cả các quyền được bảo lưu.",
       "isHot": true,
       "inStock": true
@@ -880,9 +880,9 @@
       ],
       "price": null,
       "images": [
-        "/images/61dd12db-afb9-4674-af3a-5111329efe06.jpg"
+        "/media/61dd12db-afb9-4674-af3a-5111329efe06.jpg"
       ],
-      "thumbnail": "/images/61dd12db-afb9-4674-af3a-5111329efe06.jpg",
+      "thumbnail": "/media/61dd12db-afb9-4674-af3a-5111329efe06.jpg",
       "bodyText": "MENU Cửa hàng Ume Fruits - Phương Mai 🇻🇳 VI Đăng nhập 🔥 Hộp Trái Cây Cắt Sẵn HOT Hoa quả dầm Hộp mix cắt sẵn gợi ý Sữa chua Hy Lạp 🔥 Hộp Quà 4 Ngăn HOT Hộp Quà 6 Ngăn Hộp Quà 9 Ngăn Nước ép - Smoothie Trái Cây Nguyên Quả Hộp Quà 2 Tầng Hộp Quà Picnic Hộp Mix Tự Chọn SẮP RA MẮT Hộp Quà Trái Cây Tự Chọn SẮP RA MẮT Blog Trang chủ Box Cóc chín + xoài bao tử dầm bò khô 500gr Box Cóc chín + xoài bao tử dầm bò khô 500gr 135.000₫ /Hộp Số lượng: Đơn giá: 135.000₫/Hộp Số lượng: 1 Hộp Tổng tiền: 135.000₫ Thêm vào giỏ hàng Giao hàng nhanh chóng Giao hoả tốc nội thành Hà Nội Cam kết chất lượng Trái cây tươi ngon, có chế độ bảo hành Mô tả sản phẩm Quý khách có thể note điều chỉnh độ cay/mặn/ngọt Với đơn ship xa hoa quả có thể chảy nước do ngấm gia vị, quý khách có thể yêu cầu để riêng sốt dầm Quý khách lưu ý: 1. Trái cây sẽ chỉ được sơ chế sau khi xác nhận đơn để giữ được độ tươi ngon nhất có thể. Thời gian chuẩn bị và giao dao động từ 30 phút đến 1 tiếng tuỳ số lượng và khung giờ. 2. Trái cây cắt sẵn nên dùng ngay sau khi nhận hàng, hoặc bảo quản tủ mát và ăn trong ngày để giữ vị ngon và hạn chế tình trạng chảy nước. 3. Ume nhận phản hồi & hỗ trợ xử lý khiếu nại trong vòng 𝟒 𝐠𝐢𝐨̛̀ kể từ lúc nhận hàng. Nếu đơn hàng có vấn đề, khách vui lòng chụp ảnh hoặc quay video sản phẩm và phản hồi sớm để tụi em hỗ trợ nhanh và tốt nhất. Về Ume Fruits Ume Fruits là thương hiệu trái cây tươi chất lượng cao, với đa dạng sản phẩm phục vụ mọi nhu cầu: đặc sản vùng miền, trái cây nhập khẩu, quà tặng trái cây, và nhiều hơn nữa. Facebook Instagram TikTok Liên kết nhanh Trang chủ Tất cả sản phẩm Hộp Mix Tự Chọn Đơn hàng đặc biệt Blog Hỗ trợ khách hàng Về chúng tôi Chính sách giao hàng Chính sách thanh toán Chính sách bảo mật Liên hệ Liên hệ với chúng tôi Ume Fruits - Phương Mai 165 Phương Mai, Đống Đa, Hà Nội 0869277365 Ume Fruits 23 Ngô Tất Tố 23 Ngô Tất Tố, Đống Đa, Hà Nội 0869277365 ume.fruits@gmail.com Đăng ký nhận thông tin Đăng ký © 2026 Ume Fruits. Tất cả các quyền được bảo lưu.",
       "isHot": true,
       "inStock": true
@@ -901,11 +901,11 @@
       ],
       "price": null,
       "images": [
-        "/images/eaa6b5f4-a600-4fc5-b97a-acd06cc7588f.jpg",
-        "/images/813d51df-22c9-4fda-a508-faa26db8d4e3.jpg",
-        "/images/ed008602-1843-49ae-b4c3-e206fbac327f.jpg"
+        "/media/eaa6b5f4-a600-4fc5-b97a-acd06cc7588f.jpg",
+        "/media/813d51df-22c9-4fda-a508-faa26db8d4e3.jpg",
+        "/media/ed008602-1843-49ae-b4c3-e206fbac327f.jpg"
       ],
-      "thumbnail": "/images/eaa6b5f4-a600-4fc5-b97a-acd06cc7588f.jpg",
+      "thumbnail": "/media/eaa6b5f4-a600-4fc5-b97a-acd06cc7588f.jpg",
       "bodyText": "MENU Cửa hàng Ume Fruits - Phương Mai 🇻🇳 VI Đăng nhập 🔥 Hộp Trái Cây Cắt Sẵn HOT Hoa quả dầm Hộp mix cắt sẵn gợi ý Sữa chua Hy Lạp 🔥 Hộp Quà 4 Ngăn HOT Hộp Quà 6 Ngăn Hộp Quà 9 Ngăn Nước ép - Smoothie Trái Cây Nguyên Quả Hộp Quà 2 Tầng Hộp Quà Picnic Hộp Mix Tự Chọn SẮP RA MẮT Hộp Quà Trái Cây Tự Chọn SẮP RA MẮT Blog Trang chủ Box Cóc chín dầm bò khô 500gr Box Cóc chín dầm bò khô 500gr 159.000₫ /Hộp Số lượng: Đơn giá: 159.000₫/Hộp Số lượng: 1 Hộp Tổng tiền: 159.000₫ Thêm vào giỏ hàng Giao hàng nhanh chóng Giao hoả tốc nội thành Hà Nội Cam kết chất lượng Trái cây tươi ngon, có chế độ bảo hành Mô tả sản phẩm Quý khách có thể note điều chỉnh độ cay/mặn/ngọt Với đơn ship xa hoa quả có thể chảy nước do ngấm gia vị, quý khách có thể yêu cầu để riêng sốt dầm Quý khách lưu ý: 1. Trái cây sẽ chỉ được sơ chế sau khi xác nhận đơn để giữ được độ tươi ngon nhất có thể. Thời gian chuẩn bị và giao dao động từ 30 phút đến 1 tiếng tuỳ số lượng và khung giờ. 2. Trái cây cắt sẵn nên dùng ngay sau khi nhận hàng, hoặc bảo quản tủ mát và ăn trong ngày để giữ vị ngon và hạn chế tình trạng chảy nước. 3. Ume nhận phản hồi & hỗ trợ xử lý khiếu nại trong vòng 𝟒 𝐠𝐢𝐨̛̀ kể từ lúc nhận hàng. Nếu đơn hàng có vấn đề, khách vui lòng chụp ảnh hoặc quay video sản phẩm và phản hồi sớm để tụi em hỗ trợ nhanh và tốt nhất. Về Ume Fruits Ume Fruits là thương hiệu trái cây tươi chất lượng cao, với đa dạng sản phẩm phục vụ mọi nhu cầu: đặc sản vùng miền, trái cây nhập khẩu, quà tặng trái cây, và nhiều hơn nữa. Facebook Instagram TikTok Liên kết nhanh Trang chủ Tất cả sản phẩm Hộp Mix Tự Chọn Đơn hàng đặc biệt Blog Hỗ trợ khách hàng Về chúng tôi Chính sách giao hàng Chính sách thanh toán Chính sách bảo mật Liên hệ Liên hệ với chúng tôi Ume Fruits - Phương Mai 165 Phương Mai, Đống Đa, Hà Nội 0869277365 Ume Fruits 23 Ngô Tất Tố 23 Ngô Tất Tố, Đống Đa, Hà Nội 0869277365 ume.fruits@gmail.com Đăng ký nhận thông tin Đăng ký © 2026 Ume Fruits. Tất cả các quyền được bảo lưu.",
       "isHot": true,
       "inStock": true
@@ -924,9 +924,9 @@
       ],
       "price": null,
       "images": [
-        "/images/b280dd40-f3bf-4ed9-aaa2-253fcdf85ddb.jpeg"
+        "/media/b280dd40-f3bf-4ed9-aaa2-253fcdf85ddb.jpeg"
       ],
-      "thumbnail": "/images/b280dd40-f3bf-4ed9-aaa2-253fcdf85ddb.jpeg",
+      "thumbnail": "/media/b280dd40-f3bf-4ed9-aaa2-253fcdf85ddb.jpeg",
       "bodyText": "MENU Cửa hàng Ume Fruits - Phương Mai 🇻🇳 VI Đăng nhập 🔥 Hộp Trái Cây Cắt Sẵn HOT Hoa quả dầm Hộp mix cắt sẵn gợi ý Sữa chua Hy Lạp 🔥 Hộp Quà 4 Ngăn HOT Hộp Quà 6 Ngăn Hộp Quà 9 Ngăn Nước ép - Smoothie Trái Cây Nguyên Quả Hộp Quà 2 Tầng Hộp Quà Picnic Hộp Mix Tự Chọn SẮP RA MẮT Hộp Quà Trái Cây Tự Chọn SẮP RA MẮT Blog Trang chủ Box Xoài bao tử dầm bò khô 500gr Box Xoài bao tử dầm bò khô 500gr 95.000₫ /Hộp Số lượng: Đơn giá: 95.000₫/Hộp Số lượng: 1 Hộp Tổng tiền: 95.000₫ Thêm vào giỏ hàng Giao hàng nhanh chóng Giao hoả tốc nội thành Hà Nội Cam kết chất lượng Trái cây tươi ngon, có chế độ bảo hành Mô tả sản phẩm Quý khách có thể note điều chỉnh độ cay/mặn/ngọt Với đơn ship xa hoa quả có thể chảy nước do ngấm gia vị, quý khách có thể yêu cầu để riêng sốt dầm Quý khách lưu ý: 1. Trái cây sẽ chỉ được sơ chế sau khi xác nhận đơn để giữ được độ tươi ngon nhất có thể. Thời gian chuẩn bị và giao dao động từ 30 phút đến 1 tiếng tuỳ số lượng và khung giờ. 2. Trái cây cắt sẵn nên dùng ngay sau khi nhận hàng, hoặc bảo quản tủ mát và ăn trong ngày để giữ vị ngon và hạn chế tình trạng chảy nước. 3. Ume nhận phản hồi & hỗ trợ xử lý khiếu nại trong vòng 𝟒 𝐠𝐢𝐨̛̀ kể từ lúc nhận hàng. Nếu đơn hàng có vấn đề, khách vui lòng chụp ảnh hoặc quay video sản phẩm và phản hồi sớm để tụi em hỗ trợ nhanh và tốt nhất. Về Ume Fruits Ume Fruits là thương hiệu trái cây tươi chất lượng cao, với đa dạng sản phẩm phục vụ mọi nhu cầu: đặc sản vùng miền, trái cây nhập khẩu, quà tặng trái cây, và nhiều hơn nữa. Facebook Instagram TikTok Liên kết nhanh Trang chủ Tất cả sản phẩm Hộp Mix Tự Chọn Đơn hàng đặc biệt Blog Hỗ trợ khách hàng Về chúng tôi Chính sách giao hàng Chính sách thanh toán Chính sách bảo mật Liên hệ Liên hệ với chúng tôi Ume Fruits - Phương Mai 165 Phương Mai, Đống Đa, Hà Nội 0869277365 Ume Fruits 23 Ngô Tất Tố 23 Ngô Tất Tố, Đống Đa, Hà Nội 0869277365 ume.fruits@gmail.com Đăng ký nhận thông tin Đăng ký © 2026 Ume Fruits. Tất cả các quyền được bảo lưu.",
       "isHot": true,
       "inStock": true
@@ -945,9 +945,9 @@
       ],
       "price": null,
       "images": [
-        "/images/0c636b4a-ba60-4680-b241-c2a45ec17955.jpg"
+        "/media/0c636b4a-ba60-4680-b241-c2a45ec17955.jpg"
       ],
-      "thumbnail": "/images/0c636b4a-ba60-4680-b241-c2a45ec17955.jpg",
+      "thumbnail": "/media/0c636b4a-ba60-4680-b241-c2a45ec17955.jpg",
       "bodyText": "MENU Cửa hàng Ume Fruits - Phương Mai 🇻🇳 VI Đăng nhập 🔥 Hộp Trái Cây Cắt Sẵn HOT Hoa quả dầm Hộp mix cắt sẵn gợi ý Sữa chua Hy Lạp 🔥 Hộp Quà 4 Ngăn HOT Hộp Quà 6 Ngăn Hộp Quà 9 Ngăn Nước ép - Smoothie Trái Cây Nguyên Quả Hộp Quà 2 Tầng Hộp Quà Picnic Hộp Mix Tự Chọn SẮP RA MẮT Hộp Quà Trái Cây Tự Chọn SẮP RA MẮT Blog Trang chủ Box Xoài tứ quý dầm 500gr Box Xoài tứ quý dầm 500gr- Dầm chua cay 95.000₫ /Hộp Chọn loại: Dầm chua cay 95.000₫ Dầm bò khô 105.000₫ Số lượng: Đơn giá: 95.000₫/Hộp Số lượng: 1 Hộp Tổng tiền: 95.000₫ Thêm vào giỏ hàng Giao hàng nhanh chóng Giao hoả tốc nội thành Hà Nội Cam kết chất lượng Trái cây tươi ngon, có chế độ bảo hành Mô tả sản phẩm Quý khách có thể note điều chỉnh độ cay/mặn/ngọt Với đơn ship xa hoa quả có thể chảy nước do ngấm gia vị, quý khách có thể yêu cầu để riêng sốt dầm Quý khách lưu ý: 1. Trái cây sẽ chỉ được sơ chế sau khi xác nhận đơn để giữ được độ tươi ngon nhất có thể. Thời gian chuẩn bị và giao dao động từ 30 phút đến 1 tiếng tuỳ số lượng và khung giờ. 2. Trái cây cắt sẵn nên dùng ngay sau khi nhận hàng, hoặc bảo quản tủ mát và ăn trong ngày để giữ vị ngon và hạn chế tình trạng chảy nước. 3. Ume nhận phản hồi & hỗ trợ xử lý khiếu nại trong vòng 𝟒 𝐠𝐢𝐨̛̀ kể từ lúc nhận hàng. Nếu đơn hàng có vấn đề, khách vui lòng chụp ảnh hoặc quay video sản phẩm và phản hồi sớm để tụi em hỗ trợ nhanh và tốt nhất. Về Ume Fruits Ume Fruits là thương hiệu trái cây tươi chất lượng cao, với đa dạng sản phẩm phục vụ mọi nhu cầu: đặc sản vùng miền, trái cây nhập khẩu, quà tặng trái cây, và nhiều hơn nữa. Facebook Instagram TikTok Liên kết nhanh Trang chủ Tất cả sản phẩm Hộp Mix Tự Chọn Đơn hàng đặc biệt Blog Hỗ trợ khách hàng Về chúng tôi Chính sách giao hàng Chính sách thanh toán Chính sách bảo mật Liên hệ Liên hệ với chúng tôi Ume Fruits - Phương Mai 165 Phương Mai, Đống Đa, Hà Nội 0869277365 Ume Fruits 23 Ngô Tất Tố 23 Ngô Tất Tố, Đống Đa, Hà Nội 0869277365 ume.fruits@gmail.com Đăng ký nhận thông tin Đăng ký © 2026 Ume Fruits. Tất cả các quyền được bảo lưu.",
       "isHot": true,
       "inStock": true
@@ -966,12 +966,12 @@
       ],
       "price": null,
       "images": [
-        "/images/ee69e8d9-2a05-477d-9cc4-62aeff202cf1.jpg",
-        "/images/d35af4d5-0b90-4c83-8ac5-c0f823cea97a.jpg",
-        "/images/6cd2d864-2416-4802-800f-dee88aa74628.jpg",
-        "/images/aaa3eaad-9b06-40f2-b783-f2d8ea388a79.jpeg"
+        "/media/ee69e8d9-2a05-477d-9cc4-62aeff202cf1.jpg",
+        "/media/d35af4d5-0b90-4c83-8ac5-c0f823cea97a.jpg",
+        "/media/6cd2d864-2416-4802-800f-dee88aa74628.jpg",
+        "/media/aaa3eaad-9b06-40f2-b783-f2d8ea388a79.jpeg"
       ],
-      "thumbnail": "/images/ee69e8d9-2a05-477d-9cc4-62aeff202cf1.jpg",
+      "thumbnail": "/media/ee69e8d9-2a05-477d-9cc4-62aeff202cf1.jpg",
       "bodyText": "MENU Cửa hàng Ume Fruits - Phương Mai 🇻🇳 VI Đăng nhập 🔥 Hộp Trái Cây Cắt Sẵn HOT Hoa quả dầm Hộp mix cắt sẵn gợi ý Sữa chua Hy Lạp 🔥 Hộp Quà 4 Ngăn HOT Hộp Quà 6 Ngăn Hộp Quà 9 Ngăn Nước ép - Smoothie Trái Cây Nguyên Quả Hộp Quà 2 Tầng Hộp Quà Picnic Hộp Mix Tự Chọn SẮP RA MẮT Hộp Quà Trái Cây Tự Chọn SẮP RA MẮT Blog Trang chủ Box Sấu chín dầm 500gr Hết hàng Box Sấu chín dầm 500gr- Box Sấu chín dầm sốt 500gr Hết hàng 85.000₫ /Hộp Chọn loại: Box Sấu chín dầm sốt 500gr 85.000₫ Box Sấu chín dầm bò khô 500gr 100.000₫ Số lượng: Đơn giá: 85.000₫/Hộp Số lượng: 1 Hộp Tổng tiền: 85.000₫ Hết hàng Giao hàng nhanh chóng Giao hoả tốc nội thành Hà Nội Cam kết chất lượng Trái cây tươi ngon, có chế độ bảo hành Mô tả sản phẩm Quý khách có thể note điều chỉnh độ cay/mặn/ngọt Với đơn ship xa hoa quả có thể chảy nước do ngấm gia vị, quý khách có thể yêu cầu để riêng sốt dầm Quý khách lưu ý: 1. Trái cây sẽ chỉ được sơ chế sau khi xác nhận đơn để giữ được độ tươi ngon nhất có thể. Thời gian chuẩn bị và giao dao động từ 30 phút đến 1 tiếng tuỳ số lượng và khung giờ. 2. Trái cây cắt sẵn nên dùng ngay sau khi nhận hàng, hoặc bảo quản tủ mát và ăn trong ngày để giữ vị ngon và hạn chế tình trạng chảy nước. 3. Ume nhận phản hồi & hỗ trợ xử lý khiếu nại trong vòng 𝟒 𝐠𝐢𝐨̛̀ kể từ lúc nhận hàng. Nếu đơn hàng có vấn đề, khách vui lòng chụp ảnh hoặc quay video sản phẩm và phản hồi sớm để tụi em hỗ trợ nhanh và tốt nhất. Về Ume Fruits Ume Fruits là thương hiệu trái cây tươi chất lượng cao, với đa dạng sản phẩm phục vụ mọi nhu cầu: đặc sản vùng miền, trái cây nhập khẩu, quà tặng trái cây, và nhiều hơn nữa. Facebook Instagram TikTok Liên kết nhanh Trang chủ Tất cả sản phẩm Hộp Mix Tự Chọn Đơn hàng đặc biệt Blog Hỗ trợ khách hàng Về chúng tôi Chính sách giao hàng Chính sách thanh toán Chính sách bảo mật Liên hệ Liên hệ với chúng tôi Ume Fruits - Phương Mai 165 Phương Mai, Đống Đa, Hà Nội 0869277365 Ume Fruits 23 Ngô Tất Tố 23 Ngô Tất Tố, Đống Đa, Hà Nội 0869277365 ume.fruits@gmail.com Đăng ký nhận thông tin Đăng ký © 2026 Ume Fruits. Tất cả các quyền được bảo lưu.",
       "isHot": true,
       "inStock": false
@@ -1010,9 +1010,9 @@
       ],
       "price": 160000,
       "images": [
-        "/images/f1b6d2e6-15c2-4542-85d7-6d3c4061c503.jpeg"
+        "/media/f1b6d2e6-15c2-4542-85d7-6d3c4061c503.jpeg"
       ],
-      "thumbnail": "/images/f1b6d2e6-15c2-4542-85d7-6d3c4061c503.jpeg",
+      "thumbnail": "/media/f1b6d2e6-15c2-4542-85d7-6d3c4061c503.jpeg",
       "bodyText": "MENU Cửa hàng Ume Fruits - Phương Mai 🇻🇳 VI Đăng nhập 🔥 Hộp Trái Cây Cắt Sẵn HOT Hoa quả dầm Hộp mix cắt sẵn gợi ý Sữa chua Hy Lạp 🔥 Hộp Quà 4 Ngăn HOT Hộp Quà 6 Ngăn Hộp Quà 9 Ngăn Nước ép - Smoothie Trái Cây Nguyên Quả Hộp Quà 2 Tầng Hộp Quà Picnic Hộp Mix Tự Chọn SẮP RA MẮT Hộp Quà Trái Cây Tự Chọn SẮP RA MẮT Blog Trang chủ Kiwi xanh Zespri New Zealand Kiwi xanh Zespri New Zealand- size S 400gr 160.000₫ /Hộp Chọn loại: size S 400gr 160.000₫ size M 600gr 230.000₫ size L 800gr 300.000₫ Số lượng: Đơn giá: 160.000₫/Hộp Số lượng: 1 Hộp Tổng tiền: 160.000₫ Thêm vào giỏ hàng Giao hàng nhanh chóng Giao hoả tốc nội thành Hà Nội Cam kết chất lượng Trái cây tươi ngon, có chế độ bảo hành Mô tả sản phẩm Xuất xứ: New Zealand – thương hiệu Zespri nổi tiếng toàn cầu với quy trình trồng trọt chuẩn quốc tế Hương vị: Vỏ nâu có lông mịn, ruột xanh tươi mát, vị chua ngọt cân bằng, thơm dịu. Giá trị dinh dưỡng: Giàu vitamin C, K, chất xơ và chất chống oxy hoá; hỗ trợ tiêu hoá, tăng sức đề kháng, tốt cho tim mạch. Quý khách lưu ý: 1. Trái cây sẽ chỉ được sơ chế sau khi xác nhận đơn để giữ được độ tươi ngon nhất có thể. Thời gian chuẩn bị và giao dao động từ 30 phút đến 1 tiếng tuỳ số lượng và khung giờ. 2. Trái cây cắt sẵn nên dùng ngay sau khi nhận hàng, hoặc bảo quản tủ mát và ăn trong ngày để giữ vị ngon và hạn chế tình trạng chảy nước. 3. Ume nhận phản hồi & hỗ trợ xử lý khiếu nại trong vòng 𝟒 𝐠𝐢𝐨̛̀ kể từ lúc nhận hàng. Nếu đơn hàng có vấn đề, khách vui lòng chụp ảnh hoặc quay video sản phẩm và phản hồi sớm để tụi em hỗ trợ nhanh và tốt nhất. Về Ume Fruits Ume Fruits là thương hiệu trái cây tươi chất lượng cao, với đa dạng sản phẩm phục vụ mọi nhu cầu: đặc sản vùng miền, trái cây nhập khẩu, quà tặng trái cây, và nhiều hơn nữa. Facebook Instagram TikTok Liên kết nhanh Trang chủ Tất cả sản phẩm Hộp Mix Tự Chọn Đơn hàng đặc biệt Blog Hỗ trợ khách hàng Về chúng tôi Chính sách giao hàng Chính sách thanh toán Chính sách bảo mật Liên hệ Liên hệ với chúng tôi Ume Fruits - Phương Mai 165 Phương Mai, Đống Đa, Hà Nội 0869277365 Ume Fruits 23 Ngô Tất Tố 23 Ngô Tất Tố, Đống Đa, Hà Nội 0869277365 ume.fruits@gmail.com Đăng ký nhận thông tin Đăng ký © 2026 Ume Fruits. Tất cả các quyền được bảo lưu.",
       "isHot": true,
       "inStock": true
@@ -1031,9 +1031,9 @@
       ],
       "price": null,
       "images": [
-        "/images/3f4712f1-8f6c-4634-84b3-1fe6a40b84ce.jpg"
+        "/media/3f4712f1-8f6c-4634-84b3-1fe6a40b84ce.jpg"
       ],
-      "thumbnail": "/images/3f4712f1-8f6c-4634-84b3-1fe6a40b84ce.jpg",
+      "thumbnail": "/media/3f4712f1-8f6c-4634-84b3-1fe6a40b84ce.jpg",
       "bodyText": "MENU Cửa hàng Ume Fruits - Phương Mai 🇻🇳 VI Đăng nhập 🔥 Hộp Trái Cây Cắt Sẵn HOT Hoa quả dầm Hộp mix cắt sẵn gợi ý Sữa chua Hy Lạp 🔥 Hộp Quà 4 Ngăn HOT Hộp Quà 6 Ngăn Hộp Quà 9 Ngăn Nước ép - Smoothie Trái Cây Nguyên Quả Hộp Quà 2 Tầng Hộp Quà Picnic Hộp Mix Tự Chọn SẮP RA MẮT Hộp Quà Trái Cây Tự Chọn SẮP RA MẮT Blog Trang chủ Box mận hậu dầm 500gr Box mận hậu dầm 500gr- Dầm bò khô 85.000₫ /Cái Chọn loại: Dầm bò khô 85.000₫ Dầm chua cay 100.000₫ Số lượng: Đơn giá: 85.000₫/Cái Số lượng: 1 Cái Tổng tiền: 85.000₫ Thêm vào giỏ hàng Giao hàng nhanh chóng Giao hoả tốc nội thành Hà Nội Cam kết chất lượng Trái cây tươi ngon, có chế độ bảo hành Mô tả sản phẩm Quý khách có thể note điều chỉnh độ cay/mặn/ngọt Với đơn ship xa hoa quả có thể chảy nước do ngấm gia vị, quý khách có thể yêu cầu để riêng sốt dầm Quý khách lưu ý: 1. Trái cây sẽ chỉ được sơ chế sau khi xác nhận đơn để giữ được độ tươi ngon nhất có thể. Thời gian chuẩn bị và giao dao động từ 30 phút đến 1 tiếng tuỳ số lượng và khung giờ. 2. Trái cây cắt sẵn nên dùng ngay sau khi nhận hàng, hoặc bảo quản tủ mát và ăn trong ngày để giữ vị ngon và hạn chế tình trạng chảy nước. 3. Ume nhận phản hồi & hỗ trợ xử lý khiếu nại trong vòng 𝟒 𝐠𝐢𝐨̛̀ kể từ lúc nhận hàng. Nếu đơn hàng có vấn đề, khách vui lòng chụp ảnh hoặc quay video sản phẩm và phản hồi sớm để tụi em hỗ trợ nhanh và tốt nhất. Về Ume Fruits Ume Fruits là thương hiệu trái cây tươi chất lượng cao, với đa dạng sản phẩm phục vụ mọi nhu cầu: đặc sản vùng miền, trái cây nhập khẩu, quà tặng trái cây, và nhiều hơn nữa. Facebook Instagram TikTok Liên kết nhanh Trang chủ Tất cả sản phẩm Hộp Mix Tự Chọn Đơn hàng đặc biệt Blog Hỗ trợ khách hàng Về chúng tôi Chính sách giao hàng Chính sách thanh toán Chính sách bảo mật Liên hệ Liên hệ với chúng tôi Ume Fruits - Phương Mai 165 Phương Mai, Đống Đa, Hà Nội 0869277365 Ume Fruits 23 Ngô Tất Tố 23 Ngô Tất Tố, Đống Đa, Hà Nội 0869277365 ume.fruits@gmail.com Đăng ký nhận thông tin Đăng ký © 2026 Ume Fruits. Tất cả các quyền được bảo lưu.",
       "isHot": true,
       "inStock": true
@@ -1052,9 +1052,9 @@
       ],
       "price": null,
       "images": [
-        "/images/7e7b6d11-7242-4bdd-bdc5-b86b907aac3e.jpg"
+        "/media/7e7b6d11-7242-4bdd-bdc5-b86b907aac3e.jpg"
       ],
-      "thumbnail": "/images/7e7b6d11-7242-4bdd-bdc5-b86b907aac3e.jpg",
+      "thumbnail": "/media/7e7b6d11-7242-4bdd-bdc5-b86b907aac3e.jpg",
       "bodyText": "MENU Cửa hàng Ume Fruits - Phương Mai 🇻🇳 VI Đăng nhập 🔥 Hộp Trái Cây Cắt Sẵn HOT Hoa quả dầm Hộp mix cắt sẵn gợi ý Sữa chua Hy Lạp 🔥 Hộp Quà 4 Ngăn HOT Hộp Quà 6 Ngăn Hộp Quà 9 Ngăn Nước ép - Smoothie Trái Cây Nguyên Quả Hộp Quà 2 Tầng Hộp Quà Picnic Hộp Mix Tự Chọn SẮP RA MẮT Hộp Quà Trái Cây Tự Chọn SẮP RA MẮT Blog Trang chủ Box mix mận hậu , xoài bao tử dầm chua cay 500gr Box mix mận hậu , xoài bao tử dầm chua cay 500gr 90.000₫ /Hộp Số lượng: Đơn giá: 90.000₫/Hộp Số lượng: 1 Hộp Tổng tiền: 90.000₫ Thêm vào giỏ hàng Giao hàng nhanh chóng Giao hoả tốc nội thành Hà Nội Cam kết chất lượng Trái cây tươi ngon, có chế độ bảo hành Mô tả sản phẩm Quý khách có thể note điều chỉnh độ cay/mặn/ngọt Với đơn ship xa hoa quả có thể chảy nước do ngấm gia vị, quý khách có thể yêu cầu để riêng sốt dầm Quý khách lưu ý: 1. Trái cây sẽ chỉ được sơ chế sau khi xác nhận đơn để giữ được độ tươi ngon nhất có thể. Thời gian chuẩn bị và giao dao động từ 30 phút đến 1 tiếng tuỳ số lượng và khung giờ. 2. Trái cây cắt sẵn nên dùng ngay sau khi nhận hàng, hoặc bảo quản tủ mát và ăn trong ngày để giữ vị ngon và hạn chế tình trạng chảy nước. 3. Ume nhận phản hồi & hỗ trợ xử lý khiếu nại trong vòng 𝟒 𝐠𝐢𝐨̛̀ kể từ lúc nhận hàng. Nếu đơn hàng có vấn đề, khách vui lòng chụp ảnh hoặc quay video sản phẩm và phản hồi sớm để tụi em hỗ trợ nhanh và tốt nhất. Về Ume Fruits Ume Fruits là thương hiệu trái cây tươi chất lượng cao, với đa dạng sản phẩm phục vụ mọi nhu cầu: đặc sản vùng miền, trái cây nhập khẩu, quà tặng trái cây, và nhiều hơn nữa. Facebook Instagram TikTok Liên kết nhanh Trang chủ Tất cả sản phẩm Hộp Mix Tự Chọn Đơn hàng đặc biệt Blog Hỗ trợ khách hàng Về chúng tôi Chính sách giao hàng Chính sách thanh toán Chính sách bảo mật Liên hệ Liên hệ với chúng tôi Ume Fruits - Phương Mai 165 Phương Mai, Đống Đa, Hà Nội 0869277365 Ume Fruits 23 Ngô Tất Tố 23 Ngô Tất Tố, Đống Đa, Hà Nội 0869277365 ume.fruits@gmail.com Đăng ký nhận thông tin Đăng ký © 2026 Ume Fruits. Tất cả các quyền được bảo lưu.",
       "isHot": true,
       "inStock": true
@@ -1093,10 +1093,10 @@
       ],
       "price": 100000,
       "images": [
-        "/images/4cf278e7-d649-453e-8d51-f0bedca98652.jpg",
-        "/images/3192b208-cee3-4a53-87c2-78626211d51c.jpg"
+        "/media/4cf278e7-d649-453e-8d51-f0bedca98652.jpg",
+        "/media/3192b208-cee3-4a53-87c2-78626211d51c.jpg"
       ],
-      "thumbnail": "/images/4cf278e7-d649-453e-8d51-f0bedca98652.jpg",
+      "thumbnail": "/media/4cf278e7-d649-453e-8d51-f0bedca98652.jpg",
       "bodyText": "MENU Cửa hàng Ume Fruits - Phương Mai 🇻🇳 VI Đăng nhập 🔥 Hộp Trái Cây Cắt Sẵn HOT Hoa quả dầm Hộp mix cắt sẵn gợi ý Sữa chua Hy Lạp 🔥 Hộp Quà 4 Ngăn HOT Hộp Quà 6 Ngăn Hộp Quà 9 Ngăn Nước ép - Smoothie Trái Cây Nguyên Quả Hộp Quà 2 Tầng Hộp Quà Picnic Hộp Mix Tự Chọn SẮP RA MẮT Hộp Quà Trái Cây Tự Chọn SẮP RA MẮT Blog Trang chủ Box Mận hậu gọt vỏ bỏ hạt (Kèm sốt + muối omai) Box Mận hậu gọt vỏ bỏ hạt (Kèm sốt + muối omai)- Size S 400gr 100.000₫ /Hộp Chọn loại: Size S 400gr 100.000₫ Size M 600gr 140.000₫ Size L 800gr 180.000₫ Số lượng: Đơn giá: 100.000₫/Hộp Số lượng: 1 Hộp Tổng tiền: 100.000₫ Thêm vào giỏ hàng Giao hàng nhanh chóng Giao hoả tốc nội thành Hà Nội Cam kết chất lượng Trái cây tươi ngon, có chế độ bảo hành Về Ume Fruits Ume Fruits là thương hiệu trái cây tươi chất lượng cao, với đa dạng sản phẩm phục vụ mọi nhu cầu: đặc sản vùng miền, trái cây nhập khẩu, quà tặng trái cây, và nhiều hơn nữa. Facebook Instagram TikTok Liên kết nhanh Trang chủ Tất cả sản phẩm Hộp Mix Tự Chọn Đơn hàng đặc biệt Blog Hỗ trợ khách hàng Về chúng tôi Chính sách giao hàng Chính sách thanh toán Chính sách bảo mật Liên hệ Liên hệ với chúng tôi Ume Fruits - Phương Mai 165 Phương Mai, Đống Đa, Hà Nội 0869277365 Ume Fruits 23 Ngô Tất Tố 23 Ngô Tất Tố, Đống Đa, Hà Nội 0869277365 ume.fruits@gmail.com Đăng ký nhận thông tin Đăng ký © 2026 Ume Fruits. Tất cả các quyền được bảo lưu.",
       "isHot": true,
       "inStock": true
@@ -1115,9 +1115,9 @@
       ],
       "price": null,
       "images": [
-        "/images/97d75d87-7b52-49de-a92c-1604569edf46.jpg"
+        "/media/97d75d87-7b52-49de-a92c-1604569edf46.jpg"
       ],
-      "thumbnail": "/images/97d75d87-7b52-49de-a92c-1604569edf46.jpg",
+      "thumbnail": "/media/97d75d87-7b52-49de-a92c-1604569edf46.jpg",
       "bodyText": "MENU Cửa hàng Ume Fruits - Phương Mai 🇻🇳 VI Đăng nhập 🔥 Hộp Trái Cây Cắt Sẵn HOT Hoa quả dầm Hộp mix cắt sẵn gợi ý Sữa chua Hy Lạp 🔥 Hộp Quà 4 Ngăn HOT Hộp Quà 6 Ngăn Hộp Quà 9 Ngăn Nước ép - Smoothie Trái Cây Nguyên Quả Hộp Quà 2 Tầng Hộp Quà Picnic Hộp Mix Tự Chọn SẮP RA MẮT Hộp Quà Trái Cây Tự Chọn SẮP RA MẮT Blog Trang chủ Box trái cây thập cẩm dầm bò khô 500g Box trái cây thập cẩm dầm bò khô 500g 120.000₫ /Hộp Số lượng: Đơn giá: 120.000₫/Hộp Số lượng: 1 Hộp Tổng tiền: 120.000₫ Thêm vào giỏ hàng Giao hàng nhanh chóng Giao hoả tốc nội thành Hà Nội Cam kết chất lượng Trái cây tươi ngon, có chế độ bảo hành Mô tả sản phẩm Dầm ngẫu nhiên 3-5 loại trái cây tùy theo ngày/mùa vụ Quý khách có thể note điều chỉnh độ cay/mặn/ngọt Với đơn ship xa hoa quả có thể chảy nước do ngấm gia vị, quý khách có thể yêu cầu để riêng gia vị dầm Về Ume Fruits Ume Fruits là thương hiệu trái cây tươi chất lượng cao, với đa dạng sản phẩm phục vụ mọi nhu cầu: đặc sản vùng miền, trái cây nhập khẩu, quà tặng trái cây, và nhiều hơn nữa. Facebook Instagram TikTok Liên kết nhanh Trang chủ Tất cả sản phẩm Hộp Mix Tự Chọn Đơn hàng đặc biệt Blog Hỗ trợ khách hàng Về chúng tôi Chính sách giao hàng Chính sách thanh toán Chính sách bảo mật Liên hệ Liên hệ với chúng tôi Ume Fruits - Phương Mai 165 Phương Mai, Đống Đa, Hà Nội 0869277365 Ume Fruits 23 Ngô Tất Tố 23 Ngô Tất Tố, Đống Đa, Hà Nội 0869277365 ume.fruits@gmail.com Đăng ký nhận thông tin Đăng ký © 2026 Ume Fruits. Tất cả các quyền được bảo lưu.",
       "isHot": true,
       "inStock": true
@@ -1136,9 +1136,9 @@
       ],
       "price": null,
       "images": [
-        "/images/d38565d9-96c0-414b-bd97-b00afff4669d.jpg"
+        "/media/d38565d9-96c0-414b-bd97-b00afff4669d.jpg"
       ],
-      "thumbnail": "/images/d38565d9-96c0-414b-bd97-b00afff4669d.jpg",
+      "thumbnail": "/media/d38565d9-96c0-414b-bd97-b00afff4669d.jpg",
       "bodyText": "MENU Cửa hàng Ume Fruits - Phương Mai 🇻🇳 VI Đăng nhập 🔥 Hộp Trái Cây Cắt Sẵn HOT Hoa quả dầm Hộp mix cắt sẵn gợi ý Sữa chua Hy Lạp 🔥 Hộp Quà 4 Ngăn HOT Hộp Quà 6 Ngăn Hộp Quà 9 Ngăn Nước ép - Smoothie Trái Cây Nguyên Quả Hộp Quà 2 Tầng Hộp Quà Picnic Hộp Mix Tự Chọn SẮP RA MẮT Hộp Quà Trái Cây Tự Chọn SẮP RA MẮT Blog Trang chủ Box trái cây thập cẩm dầm chua cay 500g Box trái cây thập cẩm dầm chua cay 500g 120.000₫ /Hộp Số lượng: Đơn giá: 120.000₫/Hộp Số lượng: 1 Hộp Tổng tiền: 120.000₫ Thêm vào giỏ hàng Giao hàng nhanh chóng Giao hoả tốc nội thành Hà Nội Cam kết chất lượng Trái cây tươi ngon, có chế độ bảo hành Mô tả sản phẩm Dầm ngẫu nhiên 3-5 loại trái cây tùy theo ngày/mùa vụ Quý khách có thể note điều chỉnh độ cay/mặn/ngọt Với đơn ship xa hoa quả có thể chảy nước do ngấm gia vị, quý khách có thể yêu cầu để riêng gia vị dầm Về Ume Fruits Ume Fruits là thương hiệu trái cây tươi chất lượng cao, với đa dạng sản phẩm phục vụ mọi nhu cầu: đặc sản vùng miền, trái cây nhập khẩu, quà tặng trái cây, và nhiều hơn nữa. Facebook Instagram TikTok Liên kết nhanh Trang chủ Tất cả sản phẩm Hộp Mix Tự Chọn Đơn hàng đặc biệt Blog Hỗ trợ khách hàng Về chúng tôi Chính sách giao hàng Chính sách thanh toán Chính sách bảo mật Liên hệ Liên hệ với chúng tôi Ume Fruits - Phương Mai 165 Phương Mai, Đống Đa, Hà Nội 0869277365 Ume Fruits 23 Ngô Tất Tố 23 Ngô Tất Tố, Đống Đa, Hà Nội 0869277365 ume.fruits@gmail.com Đăng ký nhận thông tin Đăng ký © 2026 Ume Fruits. Tất cả các quyền được bảo lưu.",
       "isHot": true,
       "inStock": true
@@ -1157,10 +1157,10 @@
       ],
       "price": null,
       "images": [
-        "/images/263cafd7-11d7-4980-83a0-85e4491cf373.jpg",
-        "/images/aeec38e4-2409-4914-9a0a-21b0e22a5b0f.jpg"
+        "/media/263cafd7-11d7-4980-83a0-85e4491cf373.jpg",
+        "/media/aeec38e4-2409-4914-9a0a-21b0e22a5b0f.jpg"
       ],
-      "thumbnail": "/images/263cafd7-11d7-4980-83a0-85e4491cf373.jpg",
+      "thumbnail": "/media/263cafd7-11d7-4980-83a0-85e4491cf373.jpg",
       "bodyText": "MENU Cửa hàng Ume Fruits - Phương Mai 🇻🇳 VI Đăng nhập 🔥 Hộp Trái Cây Cắt Sẵn HOT Hoa quả dầm Hộp mix cắt sẵn gợi ý Sữa chua Hy Lạp 🔥 Hộp Quà 4 Ngăn HOT Hộp Quà 6 Ngăn Hộp Quà 9 Ngăn Nước ép - Smoothie Trái Cây Nguyên Quả Hộp Quà 2 Tầng Hộp Quà Picnic Hộp Mix Tự Chọn SẮP RA MẮT Hộp Quà Trái Cây Tự Chọn SẮP RA MẮT Blog Trang chủ Box Măng cụt dầm sốt chanh leo Box Măng cụt dầm sốt chanh leo- Box Măng cụt dầm sốt chanh leo 400gr 200.000₫ /Hộp Chọn loại: Box Măng cụt dầm sốt chanh leo 400gr 200.000₫ Box Măng cụt dầm sốt chanh leo 600gr 290.000₫ Box Măng cụt dầm sốt chanh leo 800gr 380.000₫ Số lượng: Đơn giá: 200.000₫/Hộp Số lượng: 1 Hộp Tổng tiền: 200.000₫ Thêm vào giỏ hàng Giao hàng nhanh chóng Giao hoả tốc nội thành Hà Nội Cam kết chất lượng Trái cây tươi ngon, có chế độ bảo hành Mô tả sản phẩm 𝑴𝒂̆𝒏𝒈 𝒄𝒖̣𝒕 𝒅𝒂̂̀𝒎 𝒔𝒐̂́𝒕 𝒄𝒉𝒂𝒏𝒉 𝒍𝒆𝒐 𝒉𝒐𝒂̀𝒏𝒈 𝒌𝒊𝒎 Măng cụt đã ngon, lại dầm sốt chanh leo hoàng kim ngọt ngào thơm lừng ướp lạnh nữa. Must-try mùa hè nha các bác ơi. Măng cụt ngay sau khi bóc sẽ ngả thâm rất nhanh không đẹp mắt, tuy nhiên không ảnh hưởng tới chất lượng và hương vị. Nhà Ume sẽ không bảo hành với măng cụt bị thâm các bác lưu ý trước khi đặt hàng giúp tụi em nghen ❤ Quý khách lưu ý: 1. Trái cây sẽ chỉ được sơ chế sau khi xác nhận đơn để giữ được độ tươi ngon nhất có thể. Thời gian chuẩn bị và giao dao động từ 30 phút đến 1 tiếng tuỳ số lượng và khung giờ. 2. Trái cây cắt sẵn nên dùng ngay sau khi nhận hàng, hoặc bảo quản tủ mát và ăn trong ngày để giữ vị ngon và hạn chế tình trạng chảy nước. 3. Ume nhận phản hồi & hỗ trợ xử lý khiếu nại trong vòng 𝟒 𝐠𝐢𝐨̛̀ kể từ lúc nhận hàng. Nếu đơn hàng có vấn đề, khách vui lòng chụp ảnh hoặc quay video sản phẩm và phản hồi sớm để tụi em hỗ trợ nhanh và tốt nhất. Về Ume Fruits Ume Fruits là thương hiệu trái cây tươi chất lượng cao, với đa dạng sản phẩm phục vụ mọi nhu cầu: đặc sản vùng miền, trái cây nhập khẩu, quà tặng trái cây, và nhiều hơn nữa. Facebook Instagram TikTok Liên kết nhanh Trang chủ Tất cả sản phẩm Hộp Mix Tự Chọn Đơn hàng đặc biệt Blog Hỗ trợ khách hàng Về chúng tôi Chính sách giao hàng Chính sách thanh toán Chính sách bảo mật Liên hệ Liên hệ với chúng tôi Ume Fruits - Phương Mai 165 Phương Mai, Đống Đa, Hà Nội 0869277365 Ume Fruits 23 Ngô Tất Tố 23 Ngô Tất Tố, Đống Đa, Hà Nội 0869277365 ume.fruits@gmail.com Đăng ký nhận thông tin Đăng ký © 2026 Ume Fruits. Tất cả các quyền được bảo lưu.",
       "isHot": true,
       "inStock": true

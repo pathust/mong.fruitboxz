@@ -1,6 +1,6 @@
 import { startTransition, useDeferredValue, useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { LoaderCircle, Search, X } from 'lucide-react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { LoaderCircle, Minus, Plus, Search, Trash2, X } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../context/LanguageContext'
@@ -13,11 +13,13 @@ export default function Header() {
   const [showCategories, setShowCategories] = useState(false)
   const [searchLoading, setSearchLoading] = useState(false)
   const [searchHits, setSearchHits] = useState([])
-  const { cart } = useCart()
+  const [cartPreviewOpen, setCartPreviewOpen] = useState(false)
+  const { cart, removeItem, updateQuantity } = useCart()
   const { customer, logout } = useAuth()
   const { lang, setLang, t } = useLanguage()
   const { categories } = useCatalog()
   const navigate = useNavigate()
+  const location = useLocation()
   const deferredSearchQuery = useDeferredValue(searchQuery.trim())
   const menuCategories = useMemo(
     () => categories.slice(0, 12).map((c) => ({ slug: c.slug, label: c.displayName || c.name })),
@@ -29,6 +31,13 @@ export default function Header() {
   const displayUser = customer || adminUser
 
   const isAdminAuth = !!localStorage.getItem("admin_token")
+  const subtotal = cart.items.reduce((sum, item) => sum + (Number(item.price) || 0) * (Number(item.quantity) || 0), 0)
+  const previewItems = cart.items.slice(-4).reverse()
+  const formatCurrency = (value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(value) || 0)
+  const getCartItemLink = (item) => {
+    if (item.metadata?.custom_box_slug) return `/custom-box/${item.metadata.custom_box_slug}`
+    return `/products/${item.slug || item.handle || item.id}`
+  }
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -39,13 +48,25 @@ export default function Header() {
     setMenuOpen(false)
   }
   const links = [
-    { to: '/', label: t('home') },
     { to: '/categories', label: t('categories') },
     { to: '/custom-box/hop-qua-trai-cay-tu-chon', label: t('customBox') },
     { to: '/blog', label: t('blog') },
     { to: '/about-us', label: t('about') },
     { to: '/contact', label: t('contact') },
   ]
+  const isActivePath = (to) => {
+    if (to === '/') return location.pathname === '/'
+    return location.pathname === to || location.pathname.startsWith(`${to}/`)
+  }
+  const navLinkClass = (to) => {
+    const active = isActivePath(to)
+    return [
+      'relative px-4 py-2 rounded-full transition-colors duration-200 font-bold',
+      'hover:bg-white/60 hover:text-primary',
+      'after:absolute after:bottom-0 after:left-4 after:right-4 after:h-[2px] after:rounded-full after:bg-primary after:transition-opacity after:duration-200',
+      active ? 'text-primary after:opacity-100' : 'after:opacity-0',
+    ].join(' ')
+  }
   useEffect(() => {
     if (!searchOpen || !deferredSearchQuery) {
       return
@@ -73,8 +94,11 @@ export default function Header() {
             <img src="/mong_logo-removebg.png" alt="Mọng" className="h-28 w-auto object-contain translate-y-2" />
           </Link>
           <nav className="hidden lg:flex items-center gap-1 text-[14px] text-[#5f5548]">
+            <Link to="/" className={navLinkClass('/')}>
+              {t('home')}
+            </Link>
             <div className="relative" onMouseEnter={() => setShowCategories(true)} onMouseLeave={() => setShowCategories(false)}>
-              <Link to="/products" className="px-4 py-2 rounded-full hover:bg-white/60 transition-all inline-flex items-center gap-1.5 font-bold hover-lift">
+              <Link to="/products" className={`${navLinkClass('/products')} inline-flex items-center gap-1.5`}>
                 {t('products')}
                 <span className={`text-xs transition-transform duration-300 ${showCategories ? 'rotate-180' : ''}`}>▾</span>
               </Link>
@@ -94,7 +118,7 @@ export default function Header() {
               )}
             </div>
             {links.map((link) => (
-              <Link key={link.to} to={link.to} className="px-4 py-2 rounded-full hover:bg-white/60 transition-all font-bold hover-lift">
+              <Link key={link.to} to={link.to} className={navLinkClass(link.to)}>
                 {link.label}
               </Link>
             ))}
@@ -120,12 +144,12 @@ export default function Header() {
             </button>
             <div className="h-6 w-[1px] bg-[#e6ded1] mx-1 hidden sm:block"></div>
             {displayUser ? (
-              <Link to={customer ? "/account" : "/admin"} className="hidden sm:flex items-center gap-2 px-4 h-10 rounded-full hover:bg-white/60 transition-all text-sm font-bold text-[#5f5548] hover-lift" aria-label="account">
+              <Link to={customer ? "/account" : "/admin"} className="hidden sm:flex h-10 items-center gap-2 rounded-full border border-[#eadfcd] bg-[#fffaf4] px-4 text-sm font-bold text-[#5f5548] shadow-[0_10px_24px_-20px_rgba(76,47,22,0.65)] transition-all hover:border-primary/45 hover:bg-white hover:text-primary hover-lift" aria-label="account">
                 <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                 <span className="max-w-[100px] truncate">{displayUser.email?.split('@')[0] || 'Tài khoản'}</span>
               </Link>
             ) : (
-              <Link to="/auth/login" className="h-10 w-10 rounded-full hover:bg-white/60 transition-all hidden sm:flex items-center justify-center hover-lift" aria-label="account">
+              <Link to="/auth/login" className="hidden h-10 w-10 items-center justify-center rounded-full border border-[#eadfcd] bg-[#fffaf4] text-[#5f5548] shadow-[0_10px_24px_-20px_rgba(76,47,22,0.65)] transition-all hover:border-primary/45 hover:bg-white hover:text-primary hover-lift sm:flex" aria-label="account">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
               </Link>
             )}
@@ -138,18 +162,114 @@ export default function Header() {
 
                 }
                 window.location.reload();
-              }} className="h-10 w-10 rounded-full hover:bg-white/60 transition-all hidden sm:flex items-center justify-center text-red-500/80 hover:text-red-600 hover-lift" aria-label="logout" title={t('logout')}>
+              }} className="hidden h-10 w-10 items-center justify-center rounded-full border border-[#eadfcd] bg-[#fffaf4] text-red-500/80 shadow-[0_10px_24px_-20px_rgba(76,47,22,0.65)] transition-all hover:border-red-200 hover:bg-white hover:text-red-600 hover-lift sm:flex" aria-label="logout" title={t('logout')}>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
               </button>
             )}
-            <Link to="/cart" className="relative h-10 w-10 rounded-full bg-gradient-to-br from-[#ea5a2a] to-[#d44a1e] text-white flex items-center justify-center transition-all hover-lift shadow-lg shadow-primary/30" aria-label="cart">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17" /></svg>
-              {cart.count > 0 && (
-                <span className="absolute -top-1 -right-1 h-5 min-w-[20px] px-1.5 bg-black text-white text-[11px] font-bold rounded-full flex items-center justify-center shadow-md animate-pulse-slow border-2 border-white">
-                  {cart.count > 9 ? '9+' : cart.count}
-                </span>
-              )}
-            </Link>
+            <div
+              className="group/cart relative"
+              onMouseEnter={() => setCartPreviewOpen(true)}
+              onMouseLeave={() => setCartPreviewOpen(false)}
+              onFocusCapture={() => setCartPreviewOpen(true)}
+              onBlurCapture={(event) => {
+                if (!event.currentTarget.contains(event.relatedTarget)) setCartPreviewOpen(false)
+              }}
+            >
+              <Link
+                to="/cart"
+                className="relative h-10 w-10 rounded-full bg-gradient-to-br from-[#ea5a2a] to-[#d44a1e] text-white flex items-center justify-center transition-all hover-lift shadow-lg shadow-primary/30"
+                aria-label={`Giỏ hàng với ${cart.count} sản phẩm`}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17" /></svg>
+                {cart.count > 0 && (
+                  <span className="absolute -top-1 -right-1 h-5 min-w-[20px] px-1.5 bg-black text-white text-[11px] font-bold rounded-full flex items-center justify-center shadow-md animate-pulse-slow border-2 border-white" aria-live="polite">
+                    {cart.count > 9 ? '9+' : cart.count}
+                  </span>
+                )}
+              </Link>
+
+              <div className={`absolute right-0 top-[calc(100%+12px)] z-50 hidden w-[380px] origin-top-right rounded-3xl border border-[#eadfcd] bg-white shadow-[0_24px_70px_-34px_rgba(64,42,22,0.55)] transition-all duration-200 group-hover/cart:pointer-events-auto group-hover/cart:translate-y-0 group-hover/cart:opacity-100 group-focus-within/cart:pointer-events-auto group-focus-within/cart:translate-y-0 group-focus-within/cart:opacity-100 lg:block ${cartPreviewOpen ? 'pointer-events-auto translate-y-0 opacity-100' : 'pointer-events-none -translate-y-2 opacity-0'}`} role="dialog" aria-label="Xem nhanh giỏ hàng">
+                <div className="absolute -top-2 right-5 h-4 w-4 rotate-45 border-l border-t border-[#eadfcd] bg-white" aria-hidden="true" />
+                <div className="relative overflow-hidden rounded-3xl">
+                  <div className="flex items-center justify-between border-b border-[#f1e7da] bg-[#fffaf4] px-5 py-4">
+                    <div>
+                      <p className="text-sm font-extrabold text-[#43382b]">Giỏ hàng của bạn</p>
+                      <p className="product-meta mt-0.5 text-[12px]">{cart.count} sản phẩm đã thêm</p>
+                    </div>
+                    <Link to="/cart" onClick={() => setCartPreviewOpen(false)} className="text-xs font-bold text-primary hover:text-primary-dark">
+                      Xem tất cả
+                    </Link>
+                  </div>
+
+                  {cart.items.length === 0 ? (
+                    <div className="px-5 py-8 text-center">
+                      <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[#fff4ea] text-primary">
+                        <svg className="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+                      </div>
+                      <p className="font-bold text-[#43382b]">Chưa có món nào trong giỏ</p>
+                      <p className="product-meta mt-1 text-[12px]">Thêm sản phẩm trước, đặt hàng sau.</p>
+                      <Link to="/products" onClick={() => setCartPreviewOpen(false)} className="mt-4 inline-flex min-h-10 items-center justify-center rounded-full bg-primary px-5 text-sm font-bold text-white hover:bg-primary-dark">
+                        Mua sắm ngay
+                      </Link>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="max-h-[330px] overflow-y-auto">
+                        {previewItems.map((item) => (
+                          <div key={item.id} className="flex gap-3 border-b border-[#f7eee2] px-5 py-4 last:border-b-0">
+                            <Link to={getCartItemLink(item)} onClick={() => setCartPreviewOpen(false)} className="h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-[#f7eee1]">
+                              <img src={item.image || '/media/58645746-dfac-4e9f-8914-649ea9576caf.jpeg'} alt={item.title} className="h-full w-full object-cover" />
+                            </Link>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex gap-2">
+                                <Link to={getCartItemLink(item)} onClick={() => setCartPreviewOpen(false)} className="line-clamp-2 flex-1 text-sm font-bold leading-snug text-[#3f352b] hover:text-primary">
+                                  {item.title}
+                                </Link>
+                                <button type="button" onClick={() => removeItem(item.id)} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#b74b2c] transition hover:bg-[#fff1ea]" aria-label={`Xóa ${item.title}`}>
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
+                              </div>
+                              {item.variantLabel && <p className="product-meta mt-1 text-[11px]">{item.variantLabel}</p>}
+                              <div className="mt-2 flex items-center justify-between gap-3">
+                                <div className="flex h-8 items-center overflow-hidden rounded-full border border-[#eadfcd] bg-[#fffaf4]">
+                                  <button type="button" onClick={() => item.quantity > 1 ? updateQuantity(item.id, item.quantity - 1) : removeItem(item.id)} className="flex h-full w-8 items-center justify-center text-[#6c5b49] hover:text-primary" aria-label="Giảm số lượng">
+                                    <Minus className="h-3.5 w-3.5" />
+                                  </button>
+                                  <span className="min-w-7 text-center text-xs font-bold text-[#43382b]">{item.quantity}</span>
+                                  <button type="button" onClick={() => updateQuantity(item.id, item.quantity + 1)} className="flex h-full w-8 items-center justify-center text-[#6c5b49] hover:text-primary" aria-label="Tăng số lượng">
+                                    <Plus className="h-3.5 w-3.5" />
+                                  </button>
+                                </div>
+                                <div className="text-right">
+                                  <p className="text-[11px] font-semibold text-[#9a8b79]">{formatCurrency(item.price)} / món</p>
+                                  <p className="product-price text-sm text-primary">{formatCurrency(item.price * item.quantity)}</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="border-t border-[#eadfcd] bg-[#fffaf4] px-5 py-4">
+                        <div className="mb-3 flex items-end justify-between">
+                          <span className="product-meta text-sm font-bold text-[#5d5246]">Tạm tính</span>
+                          <span className="product-price text-[20px] text-primary">{formatCurrency(subtotal)}</span>
+                        </div>
+                        <p className="mb-4 text-[12px] font-medium text-[#8b7b68]">Giỏ hàng chỉ để xem và chỉnh món. Đặt hàng sẽ tiếp tục ở bước thanh toán.</p>
+                        <div className="grid grid-cols-2 gap-2">
+                          <Link to="/cart" onClick={() => setCartPreviewOpen(false)} className="flex min-h-11 items-center justify-center rounded-full border border-[#dfcfba] bg-white text-sm font-bold text-[#5d5246] transition hover:border-primary hover:text-primary">
+                            Xem giỏ hàng
+                          </Link>
+                          <Link to="/checkout" onClick={() => setCartPreviewOpen(false)} className="flex min-h-11 items-center justify-center rounded-full bg-primary text-sm font-bold text-white shadow-lg shadow-primary/20 transition hover:bg-primary-dark">
+                            Đặt hàng
+                          </Link>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
             <button onClick={() => setMenuOpen(!menuOpen)} className="lg:hidden h-10 w-10 rounded-full hover:bg-white/60 flex items-center justify-center transition-all" aria-label="menu">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {menuOpen ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /> : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />}
@@ -202,12 +322,12 @@ export default function Header() {
                   {(searchOpen && deferredSearchQuery ? searchHits : []).map((item) => (
                     <Link
                       key={item.id}
-                      to={`/products/${item.handle}`}
+                      to={`/products/${item.slug || item.handle || item.id}`}
                       onClick={() => setSearchOpen(false)}
                       className="flex items-center gap-3 px-4 py-3 transition hover:bg-[#fff8f0]"
                     >
                       <div className="h-14 w-14 overflow-hidden rounded-2xl bg-[#f7eee1]">
-                        <img src={item.thumbnail || '/images/placeholder.svg'} alt={item.title} className="h-full w-full object-cover" />
+                        <img src={item.thumbnail || '/media/placeholder.svg'} alt={item.title} className="h-full w-full object-cover" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold text-[#3d342c]">{item.title}</p>
@@ -230,9 +350,10 @@ export default function Header() {
       {menuOpen && (
         <div className="lg:hidden border-t border-[#e6ded1] bg-white">
           <div className="px-4 py-3 space-y-1 max-h-[70vh] overflow-auto">
-            <Link to="/products" onClick={() => setMenuOpen(false)} className="block px-3 py-2 rounded-lg hover:bg-[#fbf7f1]">{t('products')}</Link>
+            <Link to="/" onClick={() => setMenuOpen(false)} className={`block px-3 py-2 rounded-lg hover:bg-[#fbf7f1] ${isActivePath('/') ? 'text-primary underline underline-offset-4 decoration-2' : ''}`}>{t('home')}</Link>
+            <Link to="/products" onClick={() => setMenuOpen(false)} className={`block px-3 py-2 rounded-lg hover:bg-[#fbf7f1] ${isActivePath('/products') ? 'text-primary underline underline-offset-4 decoration-2' : ''}`}>{t('products')}</Link>
             {links.map((link) => (
-              <Link key={link.to} to={link.to} onClick={() => setMenuOpen(false)} className="block px-3 py-2 rounded-lg hover:bg-[#fbf7f1]">
+              <Link key={link.to} to={link.to} onClick={() => setMenuOpen(false)} className={`block px-3 py-2 rounded-lg hover:bg-[#fbf7f1] ${isActivePath(link.to) ? 'text-primary underline underline-offset-4 decoration-2' : ''}`}>
                 {link.label}
               </Link>
             ))}

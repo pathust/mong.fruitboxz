@@ -1,5 +1,16 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 
+function normalizeRoleName(name: unknown) {
+  return String(name || "").trim().replace(/\s+/g, " ")
+}
+
+async function findDuplicateRole(rbacService: any, name: string, currentId: string) {
+  const roles = await rbacService.listRoles({})
+  return roles.find((role: any) => {
+    return role.id !== currentId && normalizeRoleName(role.name).toLowerCase() === name.toLowerCase()
+  })
+}
+
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const rbacService = req.scope.resolve("rbac") as any
   const { id } = req.params
@@ -11,7 +22,41 @@ export async function PUT(req: MedusaRequest, res: MedusaResponse) {
   const rbacService = req.scope.resolve("rbac") as any
   const { id } = req.params
   const body = req.body as Record<string, unknown>
-  const role = await rbacService.updateRoles({ id, ...body })
+  const name = normalizeRoleName(body.name)
+
+  if ("name" in body && !name) {
+    return res.status(400).json({ error: "Tên role là bắt buộc" })
+  }
+
+  if (name) {
+    const duplicate = await findDuplicateRole(rbacService, name, id)
+    if (duplicate) {
+      return res.status(409).json({ error: "Tên role đã tồn tại" })
+    }
+  }
+
+  const role = await rbacService.updateRoles({ id, ...body, ...(name ? { name } : {}) })
+  res.json({ role })
+}
+
+export async function POST(req: MedusaRequest, res: MedusaResponse) {
+  const rbacService = req.scope.resolve("rbac") as any
+  const { id } = req.params
+  const body = req.body as Record<string, unknown>
+  const name = normalizeRoleName(body.name)
+
+  if ("name" in body && !name) {
+    return res.status(400).json({ error: "Tên role là bắt buộc" })
+  }
+
+  if (name) {
+    const duplicate = await findDuplicateRole(rbacService, name, id)
+    if (duplicate) {
+      return res.status(409).json({ error: "Tên role đã tồn tại" })
+    }
+  }
+
+  const role = await rbacService.updateRoles({ id, ...body, ...(name ? { name } : {}) })
   res.json({ role })
 }
 

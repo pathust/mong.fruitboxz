@@ -42,15 +42,16 @@ function pickProductPrice(product: any) {
 }
 
 export function buildProductDocument(product: any) {
+  const slug = product.handle || product.id
   return {
     id: product.id,
-    handle: product.handle || product.id,
+    slug,
     title: product.title || "San pham",
     description: product.description || "",
     thumbnail: product.thumbnail || product.images?.[0]?.url || "",
     status: product.status || "draft",
     category_names: (product.categories || []).map((category: any) => category.name).filter(Boolean),
-    category_handles: (product.categories || []).map((category: any) => category.handle).filter(Boolean),
+    category_slugs: (product.categories || []).map((category: any) => category.handle).filter(Boolean),
     price_min: pickProductPrice(product),
     updated_at: product.updated_at ? new Date(product.updated_at).toISOString() : new Date().toISOString(),
   }
@@ -98,11 +99,11 @@ export async function ensureProductIndex() {
   await Promise.all([
     meiliRequest(`/indexes/${getIndexUid()}/settings/searchable-attributes`, {
       method: "PUT",
-      body: JSON.stringify(["title", "description", "category_names", "category_handles", "handle"]),
+      body: JSON.stringify(["title", "description", "category_names", "category_slugs", "slug"]),
     }),
     meiliRequest(`/indexes/${getIndexUid()}/settings/filterable-attributes`, {
       method: "PUT",
-      body: JSON.stringify(["status", "category_handles"]),
+      body: JSON.stringify(["status", "category_slugs"]),
     }),
     meiliRequest(`/indexes/${getIndexUid()}/settings/sortable-attributes`, {
       method: "PUT",
@@ -112,13 +113,13 @@ export async function ensureProductIndex() {
       method: "PUT",
       body: JSON.stringify([
         "id",
-        "handle",
+        "slug",
         "title",
         "description",
         "thumbnail",
         "status",
         "category_names",
-        "category_handles",
+        "category_slugs",
         "price_min",
         "updated_at",
       ]),
@@ -182,7 +183,7 @@ export async function searchProducts(query: string, category?: string, limit = 1
       q: query || "",
       limit,
       offset,
-      filter: category ? `category_handles = "${escapeFilterValue(category)}" AND status = "published"` : `status = "published"`,
+      filter: category ? `category_slugs = "${escapeFilterValue(category)}" AND status = "published"` : `status = "published"`,
       sort: ["updated_at:desc"],
     }),
   }).catch(() => null)
@@ -253,9 +254,9 @@ export async function findFallbackProducts(scope: any, query: string, category?:
     .map(buildProductDocument)
     .filter((doc) => doc.status === "published")
     .filter((doc) => {
-      if (category && !doc.category_handles.includes(category)) return false
+      if (category && !doc.category_slugs.includes(category)) return false
       if (!normalized) return true
-      const haystack = normalize([doc.title, doc.description, doc.handle, ...doc.category_names].join(" "))
+      const haystack = normalize([doc.title, doc.description, doc.slug, ...doc.category_names].join(" "))
       return haystack.includes(normalized)
     })
     .slice(0, limit)

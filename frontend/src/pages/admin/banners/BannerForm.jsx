@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
 import ImagePicker from "../../../components/admin/ImagePicker"
 import ProductPicker from "../../../components/admin/ProductPicker"
+import { X } from "lucide-react"
 
 export default function BannerForm() {
   const { api } = useAdminAuth()
@@ -14,6 +15,7 @@ export default function BannerForm() {
   const [form, setForm] = useState({ title: "", subtitle: "", image: "", link: "", active: true })
   const [showImagePicker, setShowImagePicker] = useState(false)
   const [showProductPicker, setShowProductPicker] = useState(false)
+  const [previewOpen, setPreviewOpen] = useState(false)
 
   useEffect(() => {
     if (!isNew) {
@@ -63,7 +65,9 @@ export default function BannerForm() {
           <label className="block text-sm font-medium text-secondary mb-1">Image</label>
           <div className="flex items-center gap-4">
             {form.image && (
-              <img src={form.image} alt="Banner" className="h-16 w-32 rounded-xl object-cover border border-gray-200" />
+              <button type="button" onClick={() => setPreviewOpen(true)} className="overflow-hidden rounded-xl border border-gray-200 transition hover:border-primary hover:shadow-sm" title="Xem ảnh banner">
+                <img src={form.image} alt="Banner" className="h-16 w-32 object-cover" />
+              </button>
             )}
             <button
               type="button"
@@ -115,11 +119,27 @@ export default function BannerForm() {
             setForm(f => ({
               ...f,
               image: p.thumbnail || f.image,
-              link: `/products/${p.handle || p.id}`
+              link: `/products/${p.slug || p.handle || p.id}`
             }))
             setShowProductPicker(false)
           }}
         />
+      )}
+
+      {previewOpen && form.image && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setPreviewOpen(false)}>
+          <div className="relative max-h-[88vh] w-full max-w-5xl overflow-hidden rounded-2xl bg-white shadow-2xl" onClick={(event) => event.stopPropagation()}>
+            <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
+              <p className="font-semibold text-secondary">{form.title || "Ảnh banner"}</p>
+              <button type="button" onClick={() => setPreviewOpen(false)} className="rounded-full p-2 text-gray-500 transition hover:bg-gray-100 hover:text-secondary" aria-label="Đóng xem ảnh">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="max-h-[78vh] overflow-auto bg-gray-950 p-3">
+              <img src={form.image} alt={form.title || "Ảnh banner"} className="mx-auto max-h-[72vh] w-auto max-w-full rounded-xl object-contain" />
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

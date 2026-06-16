@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react"
+import { useMemo, useState, useEffect } from "react"
 import { Pencil, Trash2 } from "lucide-react"
 import { useAdminAuth } from "../../context/AdminAuthContext"
+import { AdminListFilters, filterBySearch } from "../../components/admin/AdminListFilters"
 
 export default function PermissionsList() {
   const { api } = useAdminAuth()
@@ -9,6 +10,9 @@ export default function PermissionsList() {
   const [form, setForm] = useState({ name: "", description: "" })
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState(null)
+  const [query, setQuery] = useState("")
+  const [moduleFilter, setModuleFilter] = useState("all")
+  const [actionFilter, setActionFilter] = useState("all")
 
   useEffect(() => {
     api("/admin/permissions")
@@ -37,6 +41,33 @@ export default function PermissionsList() {
     setPermissions(prev => prev.filter(p => p.id !== id))
   }
 
+  const moduleOptions = useMemo(() => {
+    const modules = [...new Set(permissions.map((permission) => permission.name?.split(".")[0]).filter(Boolean))]
+    return [
+      { value: "all", label: "Tất cả nhóm" },
+      ...modules.sort().map((moduleName) => ({ value: moduleName, label: moduleName })),
+    ]
+  }, [permissions])
+
+  const actionOptions = useMemo(() => {
+    const actions = [...new Set(permissions.map((permission) => permission.name?.split(".")[1]).filter(Boolean))]
+    return [
+      { value: "all", label: "Tất cả quyền" },
+      ...actions.sort().map((actionName) => ({ value: actionName, label: actionName })),
+    ]
+  }, [permissions])
+
+  const filteredPermissions = useMemo(() => {
+    return permissions.filter((permission) => {
+      const [moduleName, actionName] = (permission.name || "").split(".")
+      return (
+        filterBySearch(permission, query, ["name", "description"]) &&
+        (moduleFilter === "all" || moduleName === moduleFilter) &&
+        (actionFilter === "all" || actionName === actionFilter)
+      )
+    })
+  }, [permissions, query, moduleFilter, actionFilter])
+
   if (loading) return <div className="text-center py-12 text-secondary-light">Loading...</div>
 
   return (
@@ -60,6 +91,23 @@ export default function PermissionsList() {
         </div>
       )}
 
+      <AdminListFilters
+        search={query}
+        onSearchChange={setQuery}
+        searchPlaceholder="Tìm theo permission hoặc mô tả..."
+        showing={filteredPermissions.length}
+        total={permissions.length}
+        onReset={() => {
+          setQuery("")
+          setModuleFilter("all")
+          setActionFilter("all")
+        }}
+        filters={[
+          { label: "Nhóm", value: moduleFilter, onChange: setModuleFilter, options: moduleOptions },
+          { label: "Quyền", value: actionFilter, onChange: setActionFilter, options: actionOptions },
+        ]}
+      />
+
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 text-secondary-light">
@@ -70,7 +118,7 @@ export default function PermissionsList() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {permissions.map(p => (
+            {filteredPermissions.map(p => (
               <tr key={p.id} className="hover:bg-gray-50">
                 <td className="px-4 py-3 font-medium text-secondary font-mono text-xs">{p.name}</td>
                 <td className="px-4 py-3 text-secondary-light">{p.description || "—"}</td>

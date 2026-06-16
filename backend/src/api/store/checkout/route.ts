@@ -51,6 +51,20 @@ function getCustomerId(req: MedusaRequest): string | undefined {
   return undefined
 }
 
+function generateOrderCode(order: { id?: string; created_at?: string | Date }) {
+  const date = order.created_at ? new Date(order.created_at) : new Date()
+  const datePart = Number.isNaN(date.getTime())
+    ? "LOCAL"
+    : date.toISOString().slice(0, 10).replace(/-/g, "")
+  const suffix = String(order.id || "")
+    .replace(/[^a-zA-Z0-9]/g, "")
+    .slice(-6)
+    .toUpperCase()
+    .padStart(6, "0")
+
+  return `MONG-${datePart}-${suffix}`
+}
+
 export async function POST(req: MedusaRequest, res: MedusaResponse) {
   // 1. Zod Validation
   const parsed = CheckoutSchema.safeParse(req.body)
@@ -187,32 +201,33 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
       if (promotions && promotions.length > 0) {
         const promo = promotions[0] as any
         const promotionMetadata = await getPromotionMetadata(siteService, promo.id)
+        const startsAt = promotionMetadata.starts_at || promo.campaign?.starts_at
+        const endsAt = promotionMetadata.ends_at || promo.campaign?.ends_at
+        const usageLimit = Number(promotionMetadata.usage_limit || promo.campaign?.budget?.limit || 0)
 
         let isValid = true
-        if (promo.campaign) {
-          const now = new Date()
-          if (promo.campaign.starts_at && new Date(promo.campaign.starts_at) > now) {
-            isValid = false
-          }
-          if (promo.campaign.ends_at && new Date(promo.campaign.ends_at) < now) {
-            isValid = false
-          }
-          if (promo.campaign.budget?.type === "usage" && promo.campaign.budget.limit > 0) {
-            try {
-              const query = req.scope.resolve("query")
-              const { data } = await query.graph({
-                entity: "order",
-                fields: ["id", "metadata"],
-              })
-              const usedCount = (data as Array<{ metadata?: Record<string, unknown> | null }>)
-                .filter((order) => order.metadata?.promotion_code === promo.code)
-                .length
-              if (usedCount >= promo.campaign.budget.limit) {
-                isValid = false
-              }
-            } catch (e) {
-              console.error(e)
+        const now = new Date()
+        if (startsAt && new Date(startsAt) > now) {
+          isValid = false
+        }
+        if (endsAt && new Date(endsAt) < now) {
+          isValid = false
+        }
+        if (usageLimit > 0) {
+          try {
+            const query = req.scope.resolve("query")
+            const { data } = await query.graph({
+              entity: "order",
+              fields: ["id", "metadata"],
+            })
+            const usedCount = (data as Array<{ metadata?: Record<string, unknown> | null }>)
+              .filter((order) => order.metadata?.promotion_code === promo.code)
+              .length
+            if (usedCount >= usageLimit) {
+              isValid = false
             }
+          } catch (e) {
+            console.error(e)
           }
         }
 
@@ -299,11 +314,30 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
       original_subtotal: originalSubtotal
     },
   })
+  const orderCode = generateOrderCode(order as any)
+  let responseOrder = order
+
+  try {
+    const updated = await (orderModuleService as any).updateOrders([{
+      id: order.id,
+      metadata: {
+        ...(order.metadata || {}),
+        order_code: orderCode,
+      },
+    }])
+    responseOrder = Array.isArray(updated) ? updated[0] : updated
+  } catch (err) {
+    console.error("Failed to persist order code", err)
+    ;(responseOrder as any).metadata = {
+      ...((responseOrder as any).metadata || {}),
+      order_code: orderCode,
+    }
+  }
 
   const subtotal = normalizedItems.reduce((sum, item) => sum + item.unit_price * item.quantity, 0)
   const total = subtotal + shippingFee
 
-  res.json({ order, summary: { original_subtotal: originalSubtotal, subtotal, discount: discountAmount, shipping: shippingFee, total } })
+  res.json({ order: responseOrder, summary: { original_subtotal: originalSubtotal, subtotal, discount: discountAmount, shipping: shippingFee, total } })
 }
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {

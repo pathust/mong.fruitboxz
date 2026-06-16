@@ -31,19 +31,37 @@ export async function rbacMiddleware(req: MedusaRequest, res: MedusaResponse, ne
   // If it's a known module we map it to permissions
   const readModules = new Set([
     "products", "product-categories", "orders", "users", "banners", "roles",
-    "permissions", "settings", "reviews", "media", "search", "chatbot"
+    "permissions", "settings", "reviews", "media", "search", "chatbot", "blog-posts"
   ])
 
   // Standardize module names for permissions
   let permModule = moduleName
   if (moduleName === "product-categories") permModule = "categories"
+  if (moduleName === "blog-posts") permModule = "settings"
 
   if (!readModules.has(moduleName)) {
     return next()
   }
 
-  const requiredAction = (method === "GET" || method === "OPTIONS") ? "read" : "write"
-  const requiredPermission = `${permModule}.${requiredAction}`
+  const segments = path.split("/").filter(Boolean)
+  const hasEntityTarget = segments.length > 2
+  let requiredAction = "read"
+
+  if (method === "DELETE") {
+    requiredAction = "delete"
+  } else if (method === "PUT" || method === "PATCH") {
+    requiredAction = "edit"
+  } else if (method === "POST") {
+    requiredAction = hasEntityTarget || permModule === "settings" ? "edit" : "create"
+  }
+
+  const actionAliases: Record<string, string[]> = {
+    read: ["read", "view", "list"],
+    create: ["create", "add", "write"],
+    edit: ["edit", "update", "write"],
+    delete: ["delete", "remove", "write"],
+  }
+  const requiredPermissions = (actionAliases[requiredAction] || [requiredAction]).map((action) => `${permModule}.${action}`)
 
   // Now resolve user and check permissions
   const userService = req.scope.resolve("user") as any
@@ -59,7 +77,7 @@ export async function rbacMiddleware(req: MedusaRequest, res: MedusaResponse, ne
 
     const roleIds = user.metadata?.roles || []
     if (!Array.isArray(roleIds) || roleIds.length === 0) {
-      return res.status(403).json({ error: `Forbidden: requires ${requiredPermission}` })
+      return res.status(403).json({ error: `Forbidden: requires one of ${requiredPermissions.join(", ")}` })
     }
 
     const roles = await rbacService.listRoles({ id: roleIds })
@@ -73,14 +91,14 @@ export async function rbacMiddleware(req: MedusaRequest, res: MedusaResponse, ne
     }
 
     if (permissionIds.size === 0) {
-      return res.status(403).json({ error: `Forbidden: requires ${requiredPermission}` })
+      return res.status(403).json({ error: `Forbidden: requires one of ${requiredPermissions.join(", ")}` })
     }
 
     const permissions = await rbacService.listPermissions({ id: Array.from(permissionIds) })
-    const hasPerm = permissions.some((p: any) => p.name === requiredPermission || p.name === "*")
+    const hasPerm = permissions.some((p: any) => requiredPermissions.includes(p.name) || p.name === "*")
 
     if (!hasPerm) {
-      return res.status(403).json({ error: `Forbidden: requires ${requiredPermission}` })
+      return res.status(403).json({ error: `Forbidden: requires one of ${requiredPermissions.join(", ")}` })
     }
 
     return next()

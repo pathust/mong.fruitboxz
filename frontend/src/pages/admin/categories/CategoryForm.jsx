@@ -3,6 +3,16 @@ import { useNavigate, useParams } from "react-router-dom"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
 import ImagePicker from "../../../components/admin/ImagePicker"
 
+function slugify(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/đ/g, "d")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+}
+
 export default function CategoryForm() {
   const { api } = useAdminAuth()
   const navigate = useNavigate()
@@ -10,7 +20,7 @@ export default function CategoryForm() {
   const isNew = !id
   const [loading, setLoading] = useState(!isNew)
   const [saving, setSaving] = useState(false)
-  const [form, setForm] = useState({ name: "", handle: "", description: "", image: "" })
+  const [form, setForm] = useState({ name: "", slug: "", description: "", image: "" })
   const [showImagePicker, setShowImagePicker] = useState(false)
 
   useEffect(() => {
@@ -20,7 +30,7 @@ export default function CategoryForm() {
           const c = d.product_category
           setForm({
             name: c.name || "",
-            handle: c.handle || "",
+            slug: slugify(c.handle || c.name || ""),
             description: c.description || "",
             image: c.metadata?.image || ""
           })
@@ -35,7 +45,7 @@ export default function CategoryForm() {
     try {
       const body = {
         name: form.name,
-        handle: form.handle || form.name.toLowerCase().replace(/\s+/g, "-"),
+        handle: slugify(form.slug || form.name),
         description: form.description,
         is_active: true,
         metadata: { image: form.image }
@@ -91,8 +101,8 @@ export default function CategoryForm() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-secondary mb-1">Handle (slug)</label>
-          <input value={form.handle} onChange={e => setForm({ ...form, handle: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
+          <label className="block text-sm font-medium text-secondary mb-1">Slug (đường dẫn)</label>
+          <input value={form.slug} onChange={e => setForm({ ...form, slug: slugify(e.target.value) })} placeholder="hop-qua-trai-cay" className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
         </div>
         <div>
           <label className="block text-sm font-medium text-secondary mb-1">Description</label>

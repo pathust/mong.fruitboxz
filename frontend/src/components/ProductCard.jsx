@@ -8,7 +8,7 @@ export default function ProductCard({ product, viewMode = 'grid' }) {
   const [selectedVariant, setSelectedVariant] = useState(0)
   const [added, setAdded] = useState(false)
 
-  const image = product.thumbnail || product.images?.[0] || '/images/58645746-dfac-4e9f-8914-649ea9576caf.jpeg'
+  const image = product.thumbnail || product.images?.[0] || '/media/58645746-dfac-4e9f-8914-649ea9576caf.jpeg'
   const variants = product.variants?.length
     ? product.variants
     : [{ price: product.price ?? product.price_min ?? null }]
@@ -18,6 +18,7 @@ export default function ProductCard({ product, viewMode = 'grid' }) {
   const originalPrice = variant?.prices?.[1]?.amount || null
   const isOutOfStock = product.inStock === false || product.stock === 0 || !hasPrice
   const discount = product.discount || (originalPrice ? Math.round((1 - price / originalPrice) * 100) : 0)
+  const productSlug = product.slug || product.id
 
   const handleAddToCart = (e) => {
     e.preventDefault()
@@ -28,6 +29,7 @@ export default function ProductCard({ product, viewMode = 'grid' }) {
       price,
       image,
       quantity: 1,
+      slug: productSlug,
       variantLabel: variant?.label || '',
       variantId: variant?.id || null,
       productId: product.medusa_id || null,
@@ -39,7 +41,7 @@ export default function ProductCard({ product, viewMode = 'grid' }) {
   if (viewMode === 'list') {
     return (
       <article className="group rounded-2xl glass-panel p-3 hover-lift transition-all flex flex-row h-full">
-        <Link to={`/products/${product.handle || product.id}`} className="w-1/3 md:w-1/4 shrink-0 rounded-xl overflow-hidden relative bg-gradient-to-br from-[#f8f4ed] to-[#fffaf3]">
+        <Link to={`/products/${productSlug}`} className="w-1/3 md:w-1/4 shrink-0 rounded-xl overflow-hidden relative bg-gradient-to-br from-[#f8f4ed] to-[#fffaf3]">
           <div className="relative h-full aspect-square md:aspect-auto">
             <img src={image} alt={product.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
             {discount > 0 && <span className="absolute left-2 top-2 text-[10px] font-bold gradient-badge px-2.5 py-1 rounded-full shadow-sm">-{discount}%</span>}
@@ -49,7 +51,7 @@ export default function ProductCard({ product, viewMode = 'grid' }) {
 
         <div className="pl-4 md:pl-5 flex flex-col justify-between flex-1">
           <div>
-            <Link to={`/products/${product.handle || product.id}`}>
+            <Link to={`/products/${productSlug}`}>
               <h3 className="product-title text-[15px] md:text-[17px] text-[#3f3a34] hover:text-primary transition-colors line-clamp-2 leading-[1.3]">{product.title}</h3>
             </Link>
 
@@ -96,14 +98,14 @@ export default function ProductCard({ product, viewMode = 'grid' }) {
 
   return (
     <article className="group rounded-2xl glass-panel p-3 hover-lift transition-all flex flex-col h-full bg-white/60">
-      <Link to={`/products/${product.handle || product.id}`} className="block relative overflow-hidden rounded-xl aspect-[4/5] bg-gradient-to-br from-[#f8f4ed] to-[#fffaf3]">
+      <Link to={`/products/${productSlug}`} className="block relative overflow-hidden rounded-xl aspect-[4/5] bg-gradient-to-br from-[#f8f4ed] to-[#fffaf3]">
         <img src={image} alt={product.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
         {discount > 0 && <span className="absolute left-2 top-2 text-[10px] font-bold gradient-badge px-2.5 py-1 rounded-full shadow-sm">-{discount}%</span>}
         {isOutOfStock && <span className="absolute right-2 top-2 text-[10px] font-semibold bg-black/70 backdrop-blur-md text-white px-2.5 py-1 rounded-full">Hết hàng</span>}
       </Link>
 
       <div className="mt-3 flex flex-col flex-1">
-        <Link to={`/products/${product.handle || product.id}`}>
+        <Link to={`/products/${productSlug}`}>
           <h3 className="product-title text-[14px] md:text-[15px] text-[#3f3a34] line-clamp-2 min-h-[2.8rem] hover:text-primary transition-colors leading-[1.3]">{product.title}</h3>
         </Link>
         <div className="mt-1.5 flex items-end gap-2.5">

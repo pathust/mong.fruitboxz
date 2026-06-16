@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
-import { PackagePlus, Search, ChevronLeft, ChevronRight, Pencil, Trash2 } from "lucide-react"
+import { PackagePlus, ChevronLeft, ChevronRight, Pencil, Trash2 } from "lucide-react"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
+import { AdminListFilters } from "../../../components/admin/AdminListFilters"
 
 function formatVnd(n) {
   if (!n || n <= 0) return "Het hang"
@@ -13,7 +14,7 @@ function pickProductImage(p) {
   if (Array.isArray(p.images) && p.images.length > 0) {
     return p.images[0]?.url || p.images[0]
   }
-  return "/images/58645746-dfac-4e9f-8914-649ea9576caf.jpeg"
+  return "/media/58645746-dfac-4e9f-8914-649ea9576caf.jpeg"
 }
 
 function minVariantPrice(p) {
@@ -36,6 +37,7 @@ export default function ProductsList() {
   const [loading, setLoading] = useState(true)
   const [query, setQuery] = useState("")
   const [debouncedQuery, setDebouncedQuery] = useState("")
+  const [status, setStatus] = useState("all")
 
   // Pagination state
   const [offset, setOffset] = useState(0)
@@ -54,9 +56,12 @@ export default function ProductsList() {
   useEffect(() => {
     const timer = window.setTimeout(() => {
       setLoading(true)
-      let url = `/admin/products?fields=id,title,handle,status,thumbnail,images,variants,created_at&limit=${limit}&offset=${offset}`
+      let url = `/admin/products?fields=id,title,status,thumbnail,images,variants,created_at&limit=${limit}&offset=${offset}`
       if (debouncedQuery) {
         url += `&q=${encodeURIComponent(debouncedQuery)}`
+      }
+      if (status !== "all") {
+        url += `&status=${encodeURIComponent(status)}`
       }
 
       api(url)
@@ -68,7 +73,7 @@ export default function ProductsList() {
         .finally(() => setLoading(false))
     }, 0)
     return () => window.clearTimeout(timer)
-  }, [api, offset, debouncedQuery])
+  }, [api, offset, debouncedQuery, status])
 
   const deleteProduct = async (id) => {
     if (!confirm("Delete this product?")) return
@@ -106,15 +111,35 @@ export default function ProductsList() {
         </Link>
       </div>
 
-      <div className="admin-input flex w-full items-center gap-2 px-4 py-3 md:w-96">
-        <Search className="h-4 w-4 text-[#8b7966]" />
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Tim theo ten hoac handle..."
-          className="w-full bg-transparent text-sm text-[#4c4238] focus:outline-none"
-        />
-      </div>
+      <AdminListFilters
+        search={query}
+        onSearchChange={setQuery}
+        searchPlaceholder="Tìm theo tên sản phẩm..."
+        showing={products.length}
+        total={total}
+        onReset={() => {
+          setQuery("")
+          setStatus("all")
+          setOffset(0)
+        }}
+        filters={[
+          {
+            label: "Trạng thái",
+            value: status,
+            onChange: (value) => {
+              setStatus(value)
+              setOffset(0)
+            },
+            options: [
+              { value: "all", label: "Tất cả trạng thái" },
+              { value: "published", label: "Published" },
+              { value: "draft", label: "Draft" },
+              { value: "proposed", label: "Proposed" },
+              { value: "rejected", label: "Rejected" },
+            ],
+          },
+        ]}
+      />
 
       <div className="admin-table">
         <div className="overflow-x-auto">
@@ -127,7 +152,6 @@ export default function ProductsList() {
                   <th className="text-left px-4 py-3 font-medium">Product</th>
                   <th className="text-left px-4 py-3 font-medium">Gia tu</th>
                   <th className="text-left px-4 py-3 font-medium">Variants</th>
-                  <th className="text-left px-4 py-3 font-medium">Handle</th>
                   <th className="text-left px-4 py-3 font-medium">Status</th>
                   <th className="text-right px-4 py-3 font-medium">Actions</th>
                 </tr>
@@ -142,7 +166,7 @@ export default function ProductsList() {
                             src={pickProductImage(p)}
                             alt=""
                             className="h-full w-full object-cover"
-                            onError={e => { e.currentTarget.src = "/images/58645746-dfac-4e9f-8914-649ea9576caf.jpeg" }}
+                            onError={e => { e.currentTarget.src = "/media/58645746-dfac-4e9f-8914-649ea9576caf.jpeg" }}
                           />
                         </div>
                         <span className="font-medium text-secondary">{p.title}</span>
@@ -150,7 +174,6 @@ export default function ProductsList() {
                     </td>
                     <td className="px-4 py-3 text-secondary">{formatVnd(minVariantPrice(p))}</td>
                     <td className="px-4 py-3 text-secondary-light">{p.variants?.length || 0}</td>
-                    <td className="px-4 py-3 text-secondary-light">{p.handle}</td>
                     <td className="px-4 py-3">
                       <span className={`admin-status ${p.status === "published" ? "bg-[#e8f6e9] text-[#2f7a37]" : "bg-[#f1eadf] text-[#766957]"}`}>{p.status}</span>
                     </td>
@@ -167,7 +190,7 @@ export default function ProductsList() {
                   </tr>
                 ))}
                 {products.length === 0 && (
-                  <tr><td colSpan={6} className="px-4 py-8 text-center text-secondary-light">No products found</td></tr>
+                  <tr><td colSpan={5} className="px-4 py-8 text-center text-secondary-light">No products found</td></tr>
                 )}
               </tbody>
             </table>

@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Link, useLocation, useNavigate, Outlet } from "react-router-dom"
-import { Bot, Boxes, ExternalLink, FolderKanban, Gauge, Image as ImageIcon, LayoutTemplate, LogOut, Menu, Package, ScanSearch, Settings, Shield, ShoppingCart, Star, Users, X, WalletCards, Tag, Truck, Calculator, Leaf } from "lucide-react"
+import { Bot, Boxes, ExternalLink, FileText, FolderKanban, Gauge, Gift, Image as ImageIcon, Info, LayoutTemplate, LogOut, Mail, Menu, Package, ScanSearch, Settings, Shield, ShoppingCart, Star, Users, X, WalletCards, Tag, Truck, Calculator, Leaf } from "lucide-react"
 import { useAdminAuth } from "../../context/AdminAuthContext"
 
 const navGroups = [
@@ -25,6 +25,20 @@ const navGroups = [
       { label: "Search", path: "/admin/search", icon: ScanSearch, permission: "search.read" },
       { label: "Chatbot", path: "/admin/chatbot", icon: Bot, permission: "chatbot.read" },
       { label: "Reviews", path: "/admin/reviews", icon: Star, permission: "reviews.read" },
+    ],
+  },
+  {
+    label: "Content",
+    items: [
+      { label: "Blog", path: "/admin/blog", icon: FileText, permission: "settings.read" },
+      { label: "Về chúng tôi", path: "/admin/content/about", icon: Info, permission: "settings.read" },
+      { label: "Liên hệ", path: "/admin/content/contact", icon: Mail, permission: "settings.read" },
+      { label: "Hộp tự chọn", path: "/admin/content/custom-box", icon: Gift, permission: "settings.read" },
+    ],
+  },
+  {
+    label: "Configure",
+    items: [
       { label: "Settings", path: "/admin/settings", icon: Settings, permission: "settings.read" },
       { label: "Shipping", path: "/admin/settings/shipping", icon: Truck, permission: "settings.read" },
       { label: "Costs", path: "/admin/settings/costs", icon: Calculator, permission: "settings.read" },

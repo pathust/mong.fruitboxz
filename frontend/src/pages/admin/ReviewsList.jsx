@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { EyeOff, Check, Trash2 } from "lucide-react"
 import { useAdminAuth } from "../../context/AdminAuthContext"
+import { AdminListFilters } from "../../components/admin/AdminListFilters"
 
 function formatDate(iso) {
   try {
@@ -16,6 +17,7 @@ export default function ReviewsList() {
   const [loading, setLoading] = useState(true)
   const [status, setStatus] = useState("all")
   const [query, setQuery] = useState("")
+  const [rating, setRating] = useState("all")
 
   useEffect(() => {
     api("/admin/reviews")
@@ -27,11 +29,12 @@ export default function ReviewsList() {
   const filtered = useMemo(() => {
     return reviews.filter((r) => {
       const passStatus = status === "all" || (status === "approved" ? r.approved : !r.approved)
+      const passRating = rating === "all" || Number(r.rating) === Number(rating)
       const q = query.trim().toLowerCase()
-      const passQuery = !q || (r.handle || "").toLowerCase().includes(q) || (r.comment || "").toLowerCase().includes(q)
-      return passStatus && passQuery
+      const passQuery = !q || (r.comment || "").toLowerCase().includes(q)
+      return passStatus && passRating && passQuery
     })
-  }, [reviews, status, query])
+  }, [reviews, status, rating, query])
 
   const toggleApproved = async (review) => {
     const next = !review.approved
@@ -57,30 +60,49 @@ export default function ReviewsList() {
         <div className="text-sm text-secondary-light">{filtered.length} review(s)</div>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-3 mb-4">
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search by handle or comment..."
-          className="w-full md:w-96 px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
-        />
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-          className="md:w-48 px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
-        >
-          <option value="all">All</option>
-          <option value="approved">Approved</option>
-          <option value="hidden">Hidden</option>
-        </select>
-      </div>
+      <AdminListFilters
+        search={query}
+        onSearchChange={setQuery}
+        searchPlaceholder="Tìm theo bình luận..."
+        showing={filtered.length}
+        total={reviews.length}
+        onReset={() => {
+          setQuery("")
+          setStatus("all")
+          setRating("all")
+        }}
+        filters={[
+          {
+            label: "Trạng thái",
+            value: status,
+            onChange: setStatus,
+            options: [
+              { value: "all", label: "Tất cả trạng thái" },
+              { value: "approved", label: "Approved" },
+              { value: "hidden", label: "Hidden" },
+            ],
+          },
+          {
+            label: "Rating",
+            value: rating,
+            onChange: setRating,
+            options: [
+              { value: "all", label: "Tất cả rating" },
+              { value: "5", label: "5 sao" },
+              { value: "4", label: "4 sao" },
+              { value: "3", label: "3 sao" },
+              { value: "2", label: "2 sao" },
+              { value: "1", label: "1 sao" },
+            ],
+          },
+        ]}
+      />
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 text-secondary-light">
               <tr>
-                <th className="text-left px-4 py-3 font-medium">Product</th>
                 <th className="text-left px-4 py-3 font-medium">Rating</th>
                 <th className="text-left px-4 py-3 font-medium">Comment</th>
                 <th className="text-left px-4 py-3 font-medium">Date</th>
@@ -91,7 +113,6 @@ export default function ReviewsList() {
             <tbody className="divide-y divide-gray-100">
               {filtered.map((r) => (
                 <tr key={r.id} className="hover:bg-gray-50 align-top">
-                  <td className="px-4 py-3 text-secondary">{r.handle}</td>
                   <td className="px-4 py-3">{"⭐".repeat(Number(r.rating) || 0)}</td>
                   <td className="px-4 py-3 text-secondary-light max-w-[420px]">{r.comment || "—"}</td>
                   <td className="px-4 py-3 text-secondary-light">{formatDate(r.created_at)}</td>
@@ -114,7 +135,7 @@ export default function ReviewsList() {
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-secondary-light">No reviews found</td>
+                  <td colSpan={5} className="px-4 py-8 text-center text-secondary-light">No reviews found</td>
                 </tr>
               )}
             </tbody>

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Sparkles, Navigation } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 import { apiFetch } from '../lib/api'
+import { getOrderCode } from '../lib/orderCodes'
 
 const HANOI_DISTRICTS = [
   { district: 'Hoan Kiem', city: 'Ha Noi', lat: 21.0288, lng: 105.8522, aliases: ['hoan kiem', 'hoàn kiếm'], fastLane: true },
@@ -282,7 +283,7 @@ export default function Checkout() {
       })
 
       const finalAmount = subtotal - (discountData?.discount_amount || 0) + shipping
-      const displayId = res?.order?.display_id || res?.display_id || form.phone
+      const displayId = res?.order ? getOrderCode(res.order) : form.phone
 
       clearCart()
       setSubmitted({ amount: finalAmount, orderId: displayId })

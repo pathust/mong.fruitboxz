@@ -53,6 +53,9 @@ const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'))
 const MediaLibrary = lazy(() => import('./pages/admin/MediaLibrary'))
 const SearchConsole = lazy(() => import('./pages/admin/SearchConsole'))
 const ChatbotConsole = lazy(() => import('./pages/admin/ChatbotConsole'))
+const BlogPostsList = lazy(() => import('./pages/admin/blog/BlogPostsList'))
+const BlogPostForm = lazy(() => import('./pages/admin/blog/BlogPostForm'))
+const ContentSettingsPage = lazy(() => import('./pages/admin/content/ContentSettingsPage'))
 
 function ScreenLoader() {
   return (
@@ -120,6 +123,12 @@ export default function App() {
           <Route path="media" element={<Suspense fallback={<ScreenLoader />}><MediaLibrary /></Suspense>} />
           <Route path="search" element={<Suspense fallback={<ScreenLoader />}><SearchConsole /></Suspense>} />
           <Route path="chatbot" element={<Suspense fallback={<ScreenLoader />}><ChatbotConsole /></Suspense>} />
+          <Route path="blog" element={<Suspense fallback={<ScreenLoader />}><BlogPostsList /></Suspense>} />
+          <Route path="blog/new" element={<Suspense fallback={<ScreenLoader />}><BlogPostForm /></Suspense>} />
+          <Route path="blog/:id" element={<Suspense fallback={<ScreenLoader />}><BlogPostForm /></Suspense>} />
+          <Route path="content/about" element={<Suspense fallback={<ScreenLoader />}><ContentSettingsPage type="about" /></Suspense>} />
+          <Route path="content/contact" element={<Suspense fallback={<ScreenLoader />}><ContentSettingsPage type="contact" /></Suspense>} />
+          <Route path="content/custom-box" element={<Suspense fallback={<ScreenLoader />}><ContentSettingsPage type="customBox" /></Suspense>} />
           <Route path="settings" element={<Suspense fallback={<ScreenLoader />}><Settings /></Suspense>} />
         </Route>
       </Route>
