@@ -8,7 +8,7 @@ import { apiFetch } from '../lib/api'
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '../components/ui/carousel'
 
 function HomeMiniCard({ product, onAdd }) {
-  const image = product.thumbnail || product.images?.[0] || '/media/58645746-dfac-4e9f-8914-649ea9576caf.jpeg'
+  const image = product.thumbnail || product.images?.[0] || '/mong_logo-removebg.png'
   const price = product.variants?.[0]?.price ?? product.price ?? null
   const hasPrice = typeof price === 'number' && price > 0
   const originalPrice = product.variants?.[0]?.prices?.[1]?.amount || null

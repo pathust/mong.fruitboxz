@@ -14,7 +14,7 @@ function pickProductImage(p) {
   if (Array.isArray(p.images) && p.images.length > 0) {
     return p.images[0]?.url || p.images[0]
   }
-  return "/media/58645746-dfac-4e9f-8914-649ea9576caf.jpeg"
+  return "/mong_logo-removebg.png"
 }
 
 function minVariantPrice(p) {
@@ -166,7 +166,7 @@ export default function ProductsList() {
                             src={pickProductImage(p)}
                             alt=""
                             className="h-full w-full object-cover"
-                            onError={e => { e.currentTarget.src = "/media/58645746-dfac-4e9f-8914-649ea9576caf.jpeg" }}
+                            onError={e => { e.currentTarget.src = "/mong_logo-removebg.png" }}
                           />
                         </div>
                         <span className="font-medium text-secondary">{p.title}</span>

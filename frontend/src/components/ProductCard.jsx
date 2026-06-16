@@ -8,7 +8,7 @@ export default function ProductCard({ product, viewMode = 'grid' }) {
   const [selectedVariant, setSelectedVariant] = useState(0)
   const [added, setAdded] = useState(false)
 
-  const image = product.thumbnail || product.images?.[0] || '/media/58645746-dfac-4e9f-8914-649ea9576caf.jpeg'
+  const image = product.thumbnail || product.images?.[0] || '/mong_logo-removebg.png'
   const variants = product.variants?.length
     ? product.variants
     : [{ price: product.price ?? product.price_min ?? null }]
