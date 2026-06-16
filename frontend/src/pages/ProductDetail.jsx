@@ -80,7 +80,7 @@ export default function ProductDetail() {
     const metaDesc = document.querySelector('meta[name="description"]')
     const previousDesc = metaDesc ? metaDesc.getAttribute('content') : ''
 
-    document.title = `${product.title} | Mong Fruitboxz`
+    document.title = `${product.title} | Mọng`
     if (metaDesc) {
       metaDesc.setAttribute('content', product.description ? product.description.substring(0, 160) : `Mua ${product.title} tươi ngon tại Mong Fruitboxz`)
     }
