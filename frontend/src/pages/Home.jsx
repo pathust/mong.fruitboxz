@@ -244,7 +244,7 @@ export default function Home() {
                 <h2 id="featured-products-title" className="section-title text-[26px] md:text-[32px]">Món nổi bật tại Mọng</h2>
                 <p className="product-meta mt-2 text-sm">Những lựa chọn đang được khách hàng yêu thích.</p>
               </div>
-              <Link to="/products" className="shrink-0 text-sm font-bold text-primary">Xem tất cả →</Link>
+              <Link to="/products" className="shrink-0 text-[15px] md:text-base font-bold text-primary hover:text-primary-dark transition-colors">Xem tất cả →</Link>
             </div>
             <HomeProductCarousel products={featuredProducts} onAdd={addQuick} />
           </div>
@@ -261,7 +261,7 @@ export default function Home() {
             <div className="max-w-[1240px] mx-auto px-4">
               <div className="flex items-end justify-between mb-4">
                 <h2 className="section-title text-[24px] md:text-[28px]">{category.displayName || category.name}</h2>
-                <Link to={`/categories/${category.slug}`} className="text-primary text-sm font-medium">{t('viewMore')} →</Link>
+                <Link to={`/categories/${category.slug}`} className="shrink-0 text-[15px] md:text-base font-bold text-primary hover:text-primary-dark transition-colors">{t('viewMore')} →</Link>
               </div>
               <HomeProductCarousel products={products} onAdd={addQuick} />
             </div>
