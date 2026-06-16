@@ -39,9 +39,10 @@ export default function Cart() {
             {cart.items.map((item, index) => (
               <div key={item.id} className={`p-5 flex items-center gap-5 ${index !== cart.items.length - 1 ? 'border-b border-[#efe7dc]/60' : ''}`}>
                 <img
-                  src={item.image}
+                  src={item.image || '/mong_logo-removebg.png'}
                   alt={item.title}
                   className="w-24 h-24 object-cover rounded-xl border border-gray-100"
+                  onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = '/mong_logo-removebg.png' }}
                 />
                 <div className="flex-1 min-w-0">
                   <Link to={`/products/${item.id}`} className="product-title text-[18px] text-secondary hover:text-primary line-clamp-2 leading-snug mb-1 transition-colors">

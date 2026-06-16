@@ -435,7 +435,7 @@ export default function Checkout() {
                 {cart.items.map(item => (
                   <div key={item.id} className="flex items-center gap-4 bg-white p-3 rounded-xl border border-[#efe7dc]/60">
                     <div className="relative">
-                      <img src={item.image} alt={item.title} className="w-16 h-16 object-cover rounded-lg border border-gray-100" />
+                      <img src={item.image || '/mong_logo-removebg.png'} alt={item.title} className="w-16 h-16 object-cover rounded-lg border border-gray-100" onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = '/mong_logo-removebg.png' }} />
                       <span className="absolute -top-2 -right-2 bg-gray-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">{item.quantity}</span>
                     </div>
                     <div className="flex-1 min-w-0">

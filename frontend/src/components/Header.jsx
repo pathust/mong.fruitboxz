@@ -250,7 +250,7 @@ export default function Header() {
                         {previewItems.map((item) => (
                           <div key={item.id} className="flex gap-3 border-b border-[#f7eee2] px-5 py-4 last:border-b-0">
                             <Link to={getCartItemLink(item)} onClick={() => setCartPreviewOpen(false)} className="h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-[#f7eee1]">
-                              <img src={item.image || '/mong_logo-removebg.png'} alt={item.title} className="h-full w-full object-cover" />
+                              <img src={item.image || '/mong_logo-removebg.png'} alt={item.title} className="h-full w-full object-cover" onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = '/mong_logo-removebg.png' }} />
                             </Link>
                             <div className="min-w-0 flex-1">
                               <div className="flex gap-2">
