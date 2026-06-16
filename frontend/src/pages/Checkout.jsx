@@ -88,10 +88,23 @@ function districtToLocation(record) {
 }
 
 export default function Checkout() {
-  const { cart, clearCart } = useCart()
+  const { cart, clearCart, updateQuantity, removeItem } = useCart()
   const location = useLocation()
-  // Use only the items the user selected in Cart; fall back to all items
-  const checkoutItems = location.state?.selectedItems || cart.items
+  // Local editable copy of selected items (initialised from Cart selection or all items)
+  const [checkoutItems, setCheckoutItems] = useState(
+    () => location.state?.selectedItems || cart.items
+  )
+
+  const updateCheckoutQty = (id, qty) => {
+    if (qty < 1) return
+    setCheckoutItems(prev => prev.map(i => i.id === id ? { ...i, quantity: qty } : i))
+    updateQuantity(id, qty) // keep CartContext in sync
+  }
+
+  const removeCheckoutItem = (id) => {
+    setCheckoutItems(prev => prev.filter(i => i.id !== id))
+    removeItem(id) // keep CartContext in sync
+  }
   const [form, setForm] = useState({
     name: '',
     phone: '',
@@ -434,22 +447,60 @@ export default function Checkout() {
                 <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
                 Đơn hàng của bạn
               </h2>
-              <div className="space-y-4 mb-6 max-h-[300px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200">
+              <div className="space-y-3 mb-6 max-h-[360px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-200">
                 {checkoutItems.map(item => (
-                  <div key={item.id} className="flex items-center gap-4 bg-white p-3 rounded-xl border border-[#efe7dc]/60">
-                    <div className="relative">
-                      <img src={item.image || '/mong_logo-removebg.png'} alt={item.title} className="w-16 h-16 object-cover rounded-lg border border-gray-100" onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = '/mong_logo-removebg.png' }} />
-                      <span className="absolute -top-2 -right-2 bg-gray-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">{item.quantity}</span>
+                  <div key={item.id} className="flex items-center gap-3 bg-white p-3 rounded-xl border border-[#efe7dc]/60">
+                    {/* Image */}
+                    <div className="relative shrink-0">
+                      <img src={item.image || '/mong_logo-removebg.png'} alt={item.title} className="w-14 h-14 object-cover rounded-lg border border-gray-100" onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = '/mong_logo-removebg.png' }} />
                     </div>
+
+                    {/* Title + controls */}
                     <div className="flex-1 min-w-0">
-                      <p className="product-title text-sm text-secondary line-clamp-2 leading-snug">{item.title}</p>
+                      <p className="product-title text-xs text-secondary line-clamp-2 leading-snug mb-1.5">{item.title}</p>
+
+                      {/* Qty stepper */}
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center border border-gray-200 rounded-lg h-7 bg-gray-50">
+                          <button
+                            type="button"
+                            onClick={() => updateCheckoutQty(item.id, item.quantity - 1)}
+                            className="px-2 h-full text-secondary hover:text-primary transition-colors flex items-center"
+                          >
+                            <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" /></svg>
+                          </button>
+                          <span className="px-2 text-xs font-semibold text-secondary min-w-[1.5rem] text-center">{item.quantity}</span>
+                          <button
+                            type="button"
+                            onClick={() => updateCheckoutQty(item.id, item.quantity + 1)}
+                            className="px-2 h-full text-secondary hover:text-primary transition-colors flex items-center"
+                          >
+                            <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                          </button>
+                        </div>
+
+                        <span className="product-price text-xs font-semibold text-primary ml-auto">
+                          {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price * item.quantity)}
+                        </span>
+
+                        {/* Remove */}
+                        <button
+                          type="button"
+                          onClick={() => removeCheckoutItem(item.id)}
+                          className="shrink-0 text-gray-300 hover:text-red-400 transition-colors"
+                          aria-label={`Xóa ${item.title}`}
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                      </div>
                     </div>
-                    <span className="product-price text-sm font-semibold text-primary">
-                      {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price * item.quantity)}
-                    </span>
                   </div>
                 ))}
+                {checkoutItems.length === 0 && (
+                  <p className="text-center text-sm text-gray-400 py-4">Không có sản phẩm nào</p>
+                )}
               </div>
+
 
               <div className="border-t border-[#efe7dc] pt-5 space-y-3 mb-6">
                 <div className="flex justify-between text-sm">
