@@ -19,10 +19,10 @@ export default function Categories() {
         <div className="max-w-[1240px] mx-auto px-4 text-center">
           <span className="inline-block text-xs font-bold tracking-widest text-primary uppercase mb-4 opacity-80">Danh mục</span>
           <h1 className="page-title text-[36px] md:text-[52px] text-secondary leading-tight">
-            Khám phá từng nhóm<br className="hidden md:block" /> trái cây của Mọng
+            Chạm vào thế giới<br className="hidden md:block" /> trái ngọt của Mọng
           </h1>
-          <p className="text-[#8b7b68] mt-4 max-w-xl mx-auto text-base md:text-lg">
-            Mỗi danh mục là một thế giới hương vị riêng — tươi ngon, tinh tế và được chăm chút từng chi tiết.
+          <p className="text-[#8b7b68] mt-4 max-w-2xl mx-auto text-base md:text-[17px] leading-relaxed">
+            Hơn cả một thức quà, mỗi danh mục là một hành trình đầy cảm hứng — từ những nông trại xanh mướt, nơi sương sớm còn vương trên cuống lá, cho đến khi những trái cây căng mọng, tinh tuyển nhất nằm trọn vẹn trong lòng bàn tay bạn.
           </p>
         </div>
       </div>
@@ -86,7 +86,7 @@ export default function Categories() {
                   <p className="text-[#6b5e52] text-base md:text-[17px] leading-relaxed mb-8">
                     {cat.description
                       ? cat.description
-                      : `Khám phá các sản phẩm trong danh mục ${cat.displayName || cat.name} — được tuyển chọn kỹ lưỡng, đảm bảo tươi ngon và chất lượng cao nhất.`
+                      : `Bước vào bộ sưu tập ${cat.displayName || cat.name} — nơi từng thức quả được chúng tôi nâng niu và tuyển lựa bằng cả tâm huyết. Hương vị nguyên bản, ngọt ngào và tươi mới sẽ đánh thức mọi giác quan, mang đến cho bạn trải nghiệm thưởng thức tinh tế không thể chối từ.`
                     }
                   </p>
 
