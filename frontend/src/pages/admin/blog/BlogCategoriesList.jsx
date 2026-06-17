@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
 import { useToast } from "../../../components/ui/ToastProvider"
-import { AdminLoading, AdminEmptyState, AdminErrorState } from "../../../components/admin/AdminStates"
+import { AdminLoading, AdminEmpty, AdminError } from "../../../components/admin/AdminStates"
 
 export default function BlogCategoriesList() {
   const { api } = useAdminAuth()
@@ -39,7 +39,7 @@ export default function BlogCategoriesList() {
   }
 
   if (loading) return <AdminLoading title="Đang tải danh mục blog..." />
-  if (error) return <AdminErrorState message={error} onRetry={fetchCategories} />
+  if (error) return <AdminError message={error} onRetry={fetchCategories} />
 
   return (
     <div className="space-y-6">
@@ -54,11 +54,14 @@ export default function BlogCategoriesList() {
       </div>
 
       {categories.length === 0 ? (
-        <AdminEmptyState
+        <AdminEmpty
           title="Chưa có danh mục blog nào"
-          description="Tạo danh mục để phân loại các bài viết trên blog của bạn."
-          action={{ label: "Thêm danh mục", href: "/admin/blog-categories/new" }}
-        />
+          message="Tạo danh mục để phân loại các bài viết trên blog của bạn."
+        >
+          <Link to="/admin/blog-categories/new" className="admin-button-primary px-6 py-2.5 text-sm">
+            Thêm danh mục
+          </Link>
+        </AdminEmpty>
       ) : (
         <div className="admin-card overflow-hidden">
           <table className="w-full text-left text-sm">
