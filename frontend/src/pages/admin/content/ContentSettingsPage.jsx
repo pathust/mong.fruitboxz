@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react"
 import { Link } from "react-router-dom"
 import { Plus, Trash2 } from "lucide-react"
 import ImagePicker from "../../../components/admin/ImagePicker"
+import RichTextEditor from "../../../components/admin/RichTextEditor"
 import { AdminError, AdminLoading } from "../../../components/admin/AdminStates"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
 import { useToast } from "../../../components/ui/ToastProvider"
@@ -17,8 +18,7 @@ const configs = {
       { key: "about_intro", label: "Mở đầu", type: "textarea", rows: 3 },
       { key: "about_image", label: "Ảnh giới thiệu", type: "image" },
       { key: "about_story_title", label: "Tiêu đề câu chuyện", type: "text" },
-      { key: "about_story", label: "Câu chuyện", type: "textarea", rows: 5 },
-      { key: "about_story_secondary", label: "Câu chuyện bổ sung", type: "textarea", rows: 5 },
+      { key: "about_story", label: "Nội dung câu chuyện", type: "richtext" },
       { key: "about_reasons_title", label: "Tiêu đề lý do chọn Mọng", type: "text" },
       { key: "about_reasons_json", label: "Danh sách lý do chọn Mọng", type: "reasons" },
     ],
@@ -219,6 +219,12 @@ export default function ContentSettingsPage({ type }) {
                 onChange={(e) => setField(field.key, e.target.value)}
                 rows={field.rows || 4}
                 className="admin-input w-full px-4 py-2.5"
+              />
+            ) : field.type === "richtext" ? (
+              <RichTextEditor
+                value={form[field.key] || ""}
+                onChange={(val) => setField(field.key, val)}
+                minHeight={300}
               />
             ) : field.type === "reasons" ? (
               <ReasonListEditor value={form[field.key]} onChange={(items) => setForm((current) => updateListField(current, field.key, items))} />

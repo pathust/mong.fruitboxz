@@ -41,8 +41,15 @@ export default function AboutUs() {
           <div>
             <h2 className="text-2xl font-bold text-secondary mb-4">{settings?.about_story_title}</h2>
             <div className="space-y-4 text-gray-600 leading-relaxed">
-              {settings?.about_story && <p>{settings.about_story}</p>}
-              {settings?.about_story_secondary && <p>{settings.about_story_secondary}</p>}
+              {settings?.about_story ? (
+                <div 
+                  className="prose prose-sm md:prose-base prose-stone max-w-none prose-headings:text-secondary prose-a:text-primary hover:prose-a:text-primary-dark"
+                  dangerouslySetInnerHTML={{ __html: settings.about_story }} 
+                />
+              ) : null}
+              {settings?.about_story_secondary && !settings?.about_story?.includes('<') && (
+                <p>{settings.about_story_secondary}</p>
+              )}
             </div>
           </div>
         </div>
