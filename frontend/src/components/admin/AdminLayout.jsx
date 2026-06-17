@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Link, useLocation, useNavigate, Outlet } from "react-router-dom"
-import { Bot, Boxes, ExternalLink, FileText, FolderKanban, Gauge, Gift, Image as ImageIcon, Info, LayoutTemplate, LogOut, Mail, Menu, Package, ScanSearch, Settings, Shield, ShoppingCart, Star, Users, X, WalletCards, Tag, Truck, Calculator, Leaf } from "lucide-react"
+import { Bot, Boxes, ExternalLink, FileText, FolderKanban, Gauge, Gift, Image as ImageIcon, Info, LayoutTemplate, LogOut, Mail, Menu, Package, ScanSearch, Settings, Shield, ShoppingCart, Star, Users, X, WalletCards, Tag, Truck, Calculator, Leaf, Search, MessageSquare } from "lucide-react"
 import { useAdminAuth } from "../../context/AdminAuthContext"
 
 const navGroups = [
@@ -22,7 +22,6 @@ const navGroups = [
     label: "Experience",
     items: [
       { label: "Media", path: "/admin/media", icon: ImageIcon, permission: "media.read" },
-      { label: "Search", path: "/admin/search", icon: ScanSearch, permission: "search.read" },
       { label: "Chatbot", path: "/admin/chatbot", icon: Bot, permission: "chatbot.read" },
       { label: "Reviews", path: "/admin/reviews", icon: Star, permission: "reviews.read" },
     ],
@@ -39,11 +38,13 @@ const navGroups = [
     ],
   },
   {
-    label: "Configure",
+    label: "CẤU HÌNH HỆ THỐNG",
     items: [
-      { label: "Settings", path: "/admin/settings", icon: Settings, permission: "settings.read" },
-      { label: "Shipping", path: "/admin/settings/shipping", icon: Truck, permission: "settings.read" },
-      { label: "Costs", path: "/admin/settings/costs", icon: Calculator, permission: "settings.read" },
+      { label: "Cài đặt phí ship", path: "/admin/settings/shipping", icon: Truck, permission: "settings.read" },
+      { label: "Cài đặt định mức Cost", path: "/admin/settings/costs", icon: Calculator, permission: "settings.read" },
+      { label: "Cấu hình Tìm kiếm", path: "/admin/search", icon: Search, permission: "settings.read" },
+      { label: "Cấu hình AI Chatbot", path: "/admin/chatbot", icon: MessageSquare, permission: "settings.read" },
+      { label: "Cài đặt chung", path: "/admin/settings", icon: Settings, permission: "settings.read" },
     ],
   },
   {
