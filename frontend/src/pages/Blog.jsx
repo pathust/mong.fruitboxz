@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { LoaderCircle } from 'lucide-react'
 import { apiFetch } from '../lib/api'
+import { useSiteSettings } from '../hooks/useSiteSettings'
 
 function formatDate(value) {
   if (!value) return ''
@@ -9,6 +10,7 @@ function formatDate(value) {
 }
 
 export default function Blog() {
+  const { settings, loading: settingsLoading } = useSiteSettings()
   const [posts, setPosts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -28,14 +30,25 @@ export default function Blog() {
     return () => { mounted = false }
   }, [])
 
-  if (loading) return <div className="min-h-[420px] flex items-center justify-center text-primary"><LoaderCircle className="h-8 w-8 animate-spin" /></div>
+  if (loading || settingsLoading) return <div className="min-h-[420px] flex items-center justify-center text-primary"><LoaderCircle className="h-8 w-8 animate-spin" /></div>
   if (error) return <div className="max-w-3xl mx-auto px-4 py-20 text-center text-red-600">{error}</div>
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      <div className="text-center mb-12">
-        <h1 className="text-3xl font-bold text-secondary">Blog</h1>
-        <p className="text-gray-500 mt-2">Kiến thức về trái cây tươi và sức khỏe</p>
+      {/* Hero header */}
+      <div className="bg-gradient-to-br from-[#fff8f0] to-[#fdefd8] border-b border-[#f0e5d5] py-14 md:py-20 mb-12 -mx-4 px-4 sm:mx-0 sm:rounded-3xl sm:mt-8">
+        <div className="max-w-[800px] mx-auto text-center">
+          <span className="inline-block text-xs font-bold tracking-widest text-primary uppercase mb-4 opacity-80">
+            {settings?.blog_eyebrow || "Góc Chuyện Trò"}
+          </span>
+          <h1 
+            className="page-title text-[36px] md:text-[52px] text-secondary leading-tight"
+            dangerouslySetInnerHTML={{ __html: settings?.blog_title || "Nơi hương vị<br className=\"hidden md:block\" /> kể câu chuyện của mình" }}
+          />
+          <p className="text-[#8b7b68] mt-4 max-w-xl mx-auto text-base md:text-lg leading-relaxed whitespace-pre-wrap">
+            {settings?.blog_intro || "Không chỉ là bí quyết chọn quả ngon hay sống khỏe, đây còn là nơi Mọng trải lòng về hành trình mang thiên nhiên nguyên bản đến tận tay người trân quý."}
+          </p>
+        </div>
       </div>
 
       {posts.length === 0 ? (

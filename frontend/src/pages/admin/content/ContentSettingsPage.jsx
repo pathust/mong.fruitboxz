@@ -23,6 +23,17 @@ const configs = {
       { key: "about_reasons_json", label: "Danh sách lý do chọn Mọng", type: "reasons" },
     ],
   },
+  blog: {
+    eyebrow: "CMS / Trang Blog",
+    title: "Trang Blog",
+    description: "Quản lý nội dung hiển thị ở phần giới thiệu đầu trang /blog.",
+    preview: "/blog",
+    fields: [
+      { key: "blog_eyebrow", label: "Eyebrow (Chữ nhỏ trên cùng)", type: "text" },
+      { key: "blog_title", label: "Tiêu đề chính", type: "text" },
+      { key: "blog_intro", label: "Mô tả ngắn", type: "textarea", rows: 3 },
+    ],
+  },
   contact: {
     eyebrow: "CMS / Liên hệ",
     title: "Liên hệ",

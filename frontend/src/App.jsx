@@ -134,6 +134,7 @@ export default function App() {
           <Route path="content/about" element={<Suspense fallback={<ScreenLoader />}><ContentSettingsPage type="about" /></Suspense>} />
           <Route path="content/contact" element={<Suspense fallback={<ScreenLoader />}><ContentSettingsPage type="contact" /></Suspense>} />
           <Route path="content/custom-box" element={<Suspense fallback={<ScreenLoader />}><ContentSettingsPage type="customBox" /></Suspense>} />
+          <Route path="content/blog" element={<Suspense fallback={<ScreenLoader />}><ContentSettingsPage type="blog" /></Suspense>} />
           <Route path="settings" element={<Suspense fallback={<ScreenLoader />}><Settings /></Suspense>} />
         </Route>
       </Route>
