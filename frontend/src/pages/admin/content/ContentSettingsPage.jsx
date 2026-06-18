@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
-import { AdminHeaderPortal } from "../../components/admin/AdminHeaderPortal"
+import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal"
 import { Link } from "react-router-dom"
 import { Plus, Trash2 } from "lucide-react"
 import ImagePicker from "../../../components/admin/ImagePicker"

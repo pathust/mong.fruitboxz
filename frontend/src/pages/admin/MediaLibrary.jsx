@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { AdminHeaderPortal } from "../components/admin/AdminHeaderPortal"
+import { AdminHeaderPortal } from "../../components/admin/AdminHeaderPortal"
 import { Copy, ImagePlus, LoaderCircle, Trash2 } from 'lucide-react'
 import { useAdminAuth } from '../../context/AdminAuthContext'
 import { useToast } from '../../components/ui/ToastProvider'

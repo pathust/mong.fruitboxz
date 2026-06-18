@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
-import { AdminHeaderPortal } from "../../components/admin/AdminHeaderPortal"
+import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal"
 import { useNavigate, useParams } from "react-router-dom"
 import ImagePicker from "../../../components/admin/ImagePicker"
 import RichTextEditor from "../../../components/admin/RichTextEditor"

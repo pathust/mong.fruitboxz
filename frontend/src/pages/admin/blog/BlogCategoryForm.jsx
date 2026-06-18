@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { AdminHeaderPortal } from "../../components/admin/AdminHeaderPortal"
+import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal"
 import { useNavigate, useParams } from "react-router-dom"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
 import { useToast } from "../../../components/ui/ToastProvider"

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { AdminHeaderPortal } from "../../components/admin/AdminHeaderPortal"
+import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal"
 import { Link } from "react-router-dom"
 import { PackagePlus, ChevronLeft, ChevronRight, Pencil, Trash2 } from "lucide-react"
 import { useAdminAuth } from "../../../context/AdminAuthContext"

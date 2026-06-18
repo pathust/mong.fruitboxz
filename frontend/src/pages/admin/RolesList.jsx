@@ -1,5 +1,5 @@
 import { RequirePermission } from "../../components/admin/RequirePermission"
-import { AdminHeaderPortal } from "../components/admin/AdminHeaderPortal"
+import { AdminHeaderPortal } from "../../components/admin/AdminHeaderPortal"
 import { useMemo, useState, useEffect } from "react"
 import { Pencil, Plus, Save, Trash2, X, ShieldCheck } from "lucide-react"
 import { useAdminAuth } from "../../context/AdminAuthContext"

@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from "react"
-import { AdminHeaderPortal } from "../components/admin/AdminHeaderPortal"
+import { AdminHeaderPortal } from "../../components/admin/AdminHeaderPortal"
 import { Shield, UserPlus, X, Mail, ShieldAlert, BadgeCheck } from "lucide-react"
 import { useAdminAuth } from "../../context/AdminAuthContext"
 import { AdminListFilters, filterBySearch } from "../../components/admin/AdminListFilters"

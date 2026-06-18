@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { AdminHeaderPortal } from "../../components/admin/AdminHeaderPortal"
+import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal"
 import { Link } from "react-router-dom"
 import { AlertTriangle, ArrowUpRight, BadgeDollarSign, BarChart3, Download, PieChart, TrendingUp, WalletCards } from "lucide-react"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
