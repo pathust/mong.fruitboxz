@@ -31,7 +31,8 @@ export async function rbacMiddleware(req: MedusaRequest, res: MedusaResponse, ne
   // If it's a known module we map it to permissions
   const readModules = new Set([
     "products", "product-categories", "orders", "users", "banners", "roles",
-    "permissions", "settings", "reviews", "media", "search", "chatbot", "blog-posts"
+    "permissions", "settings", "reviews", "media", "search", "chatbot", "blog-posts",
+    "promotions", "customers", "inventory-items", "price-lists"
   ])
 
   // Standardize module names for permissions

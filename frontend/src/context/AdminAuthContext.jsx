@@ -66,12 +66,12 @@ export function AdminAuthProvider({ children }) {
   }, [request])
 
   useEffect(() => {
-    if (user && (!user.permissions)) {
+    if (user && user.id) {
       const timer = window.setTimeout(fetchPermissions, 0)
       return () => window.clearTimeout(timer)
     }
     return undefined
-  }, [user, fetchPermissions])
+  }, [user?.id, fetchPermissions])
 
   const login = useCallback(async (email, password) => {
     const data = await apiFetch("/auth/user/emailpass", {
@@ -86,7 +86,7 @@ export function AdminAuthProvider({ children }) {
       id: decoded?.app_metadata?.user_id || decoded?.actor_id,
       email,
       roles: decoded?.app_metadata?.roles || [],
-      permissions: [],
+      permissions: null,
     }
 
     localStorage.setItem("admin_user", JSON.stringify(userInfo))
@@ -101,9 +101,23 @@ export function AdminAuthProvider({ children }) {
   }, [])
 
   const hasPermission = useCallback((perm) => {
-    if (!user) return false
-    if (user.permissions?.includes("*")) return true
-    return user.permissions?.includes(perm)
+    if (!user || !user.permissions) return false
+    if (user.permissions.includes("*")) return true
+    
+    if (user.permissions.includes(perm)) return true
+    
+    const [module, action] = perm.split(".")
+    if (!module || !action) return false
+
+    const actionAliases = {
+      read: ["read", "view", "list"],
+      create: ["create", "add", "write"],
+      edit: ["edit", "update", "write"],
+      delete: ["delete", "remove", "write"],
+    }
+    
+    const aliases = actionAliases[action] || [action]
+    return aliases.some(a => user.permissions.includes(`${module}.${a}`))
   }, [user])
 
   const value = useMemo(() => ({ user, loading, login, logout, api: request, hasPermission }), [user, loading, login, logout, request, hasPermission])

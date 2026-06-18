@@ -1,14 +1,19 @@
 import { useMemo, useState, useEffect } from "react"
+import { Shield, UserPlus, X, Mail, ShieldAlert, BadgeCheck } from "lucide-react"
 import { useAdminAuth } from "../../context/AdminAuthContext"
 import { AdminListFilters, filterBySearch } from "../../components/admin/AdminListFilters"
 
 export default function UsersList() {
-  const { api } = useAdminAuth()
+  const { api, user: currentUser } = useAdminAuth()
   const [users, setUsers] = useState([])
   const [roles, setRoles] = useState([])
   const [loading, setLoading] = useState(true)
   const [query, setQuery] = useState("")
   const [roleFilter, setRoleFilter] = useState("all")
+  const [showAssignModal, setShowAssignModal] = useState(null)
+  
+  const [isCreating, setIsCreating] = useState(false)
+  const [newEmail, setNewEmail] = useState("")
 
   useEffect(() => {
     Promise.all([
@@ -23,39 +28,47 @@ export default function UsersList() {
   const setUserRoles = async (userId, roleIds) => {
     await api(`/admin/users/${userId}/roles`, {
       method: "POST",
-      body: { roles: roleIds },
+      body: JSON.stringify({ roles: roleIds }),
     })
     const update = await api(`/admin/users/${userId}`)
     setUsers(prev => prev.map(u => u.id === userId ? update.user : u))
+    if (showAssignModal && showAssignModal.id === userId) {
+      setShowAssignModal(update.user)
+    }
   }
 
-  const assignRole = async (userId, roleId, currentRoleIds) => {
-    if (!roleId) return
-    await setUserRoles(userId, [...new Set([...currentRoleIds, roleId])])
+  const toggleRole = async (userId, roleId) => {
+    const currentUser = users.find(u => u.id === userId)
+    const currentRoleIds = currentUser?.metadata?.roles || []
+    
+    const isAssigned = currentRoleIds.includes(roleId)
+    const newRoleIds = isAssigned 
+      ? currentRoleIds.filter(id => id !== roleId)
+      : [...currentRoleIds, roleId]
+    
+    await setUserRoles(userId, newRoleIds)
   }
 
-  const removeRole = async (userId, roleId, currentRoleIds) => {
-    await setUserRoles(userId, currentRoleIds.filter((id) => id !== roleId))
-  }
-
-  const createUser = async () => {
-    const email = prompt("Enter email:")
-    if (!email) return
+  const handleCreateUser = async (e) => {
+    e.preventDefault()
+    if (!newEmail) return
     try {
       const result = await api("/admin/users", {
         method: "POST",
-        body: { email },
+        body: JSON.stringify({ email: newEmail }),
       })
-      setUsers(prev => [...prev, result.user])
+      setUsers(prev => [result.user, ...prev])
+      setIsCreating(false)
+      setNewEmail("")
     } catch (err) {
-      alert(err.message)
+      alert(err.message || "Lỗi tạo tài khoản")
     }
   }
 
   const roleOptions = useMemo(() => {
     return [
-      { value: "all", label: "Tất cả role" },
-      { value: "none", label: "Chưa có role" },
+      { value: "all", label: "Tất cả vai trò" },
+      { value: "none", label: "Chưa phân quyền" },
       ...roles.map((role) => ({ value: role.id, label: role.name })),
     ]
   }, [roles])
@@ -71,76 +84,190 @@ export default function UsersList() {
     })
   }, [users, query, roleFilter])
 
-  if (loading) return <div className="text-center py-12 text-secondary-light">Loading...</div>
+  if (loading) return <div className="text-center py-20 text-[#a08d79]"><div className="h-8 w-8 mx-auto rounded-full border-4 border-primary border-t-transparent animate-spin mb-4" />Đang tải dữ liệu...</div>
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-secondary">Users</h1>
-        <button onClick={createUser} className="bg-primary text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-primary-dark">+ Add User</button>
+    <div className="space-y-6">
+      <div className="admin-panel px-6 py-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <p className="product-meta text-[12px] uppercase tracking-[0.14em] text-[#a08d79] mb-2">Access</p>
+          <h1 className="page-title text-[28px]">Quản trị viên</h1>
+          <p className="product-meta mt-2 text-[14px] text-[#766957]">Quản lý tài khoản đăng nhập Admin và phân quyền hệ thống.</p>
+        </div>
+        <button 
+          onClick={() => setIsCreating(true)} 
+          className="admin-button-primary px-5 py-2.5 text-sm flex items-center gap-2 shadow-lg shadow-primary/20"
+        >
+          <UserPlus className="w-4 h-4" /> Thêm tài khoản
+        </button>
       </div>
+
+      {isCreating && (
+        <div className="admin-card p-6 bg-gradient-to-br from-[#fffaf4] to-white border-primary/20">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="font-bold text-secondary text-lg">Cấp tài khoản mới</h3>
+            <button onClick={() => setIsCreating(false)} className="text-[#a08d79] hover:text-red-500 transition-colors"><X className="w-5 h-5" /></button>
+          </div>
+          <form onSubmit={handleCreateUser} className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1 relative">
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#a08d79]" />
+              <input
+                type="email"
+                required
+                autoFocus
+                placeholder="Nhập email nhân viên..."
+                value={newEmail}
+                onChange={e => setNewEmail(e.target.value)}
+                className="w-full h-12 pl-12 pr-4 rounded-xl border border-[#eadfcd] focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+              />
+            </div>
+            <button type="submit" className="h-12 px-6 bg-secondary text-white font-bold rounded-xl hover:bg-[#2c2018] transition-colors shrink-0">
+              Khởi tạo
+            </button>
+          </form>
+          <p className="text-xs text-[#8a7a67] mt-3 flex items-center gap-1.5"><ShieldAlert className="w-3.5 h-3.5" /> Mật khẩu mặc định sẽ tự động được tạo và gửi hoặc yêu cầu đổi mật khẩu sau.</p>
+        </div>
+      )}
+
       <AdminListFilters
         search={query}
         onSearchChange={setQuery}
-        searchPlaceholder="Tìm theo email hoặc tên..."
+        searchPlaceholder="Tìm theo email, tên..."
         showing={filteredUsers.length}
         total={users.length}
         onReset={() => {
           setQuery("")
           setRoleFilter("all")
         }}
-        filters={[{ label: "Role", value: roleFilter, onChange: setRoleFilter, options: roleOptions }]}
+        filters={[{ label: "Vai trò", value: roleFilter, onChange: setRoleFilter, options: roleOptions }]}
       />
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+
+      <div className="admin-table overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-secondary-light">
+          <thead>
             <tr>
-              <th className="text-left px-4 py-3 font-medium">Email</th>
-              <th className="text-left px-4 py-3 font-medium">Name</th>
-              <th className="text-left px-4 py-3 font-medium">Roles</th>
+              <th className="px-5 py-4 text-left font-bold text-secondary w-[40%]">Tài khoản</th>
+              <th className="px-5 py-4 text-left font-bold text-secondary">Vai trò & Quyền hạn</th>
+              <th className="px-5 py-4 text-right font-bold text-secondary">Thao tác</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody>
             {filteredUsers.map(u => {
               const userRoleIds = u.metadata?.roles || []
+              const isMe = currentUser?.id === u.id
               return (
-                <tr key={u.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-medium text-secondary">{u.email}</td>
-                  <td className="px-4 py-3 text-secondary-light">{u.first_name || ""} {u.last_name || ""}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      {userRoleIds.map(rid => {
-                        const role = roles.find(r => r.id === rid)
-                        return role ? (
-                          <button
-                            key={rid}
-                            type="button"
-                            onClick={() => removeRole(u.id, rid, userRoleIds)}
-                            className="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full hover:bg-primary/20"
-                            title="Remove role"
-                          >
-                            {role.name} ×
-                          </button>
-                        ) : null
-                      })}
-                      <select
-                        value=""
-                        onChange={e => assignRole(u.id, e.target.value, userRoleIds)}
-                        className="ml-2 text-xs border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary/30"
-                      >
-                        <option value="">+ Assign role</option>
-                        {roles.filter(r => !userRoleIds.includes(r.id)).map(r => (
-                          <option key={r.id} value={r.id}>{r.name}</option>
-                        ))}
-                      </select>
+                <tr key={u.id} className="group">
+                  <td className="px-5 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#f0e5d5] to-[#eadfcd] flex items-center justify-center text-secondary font-bold uppercase shrink-0">
+                        {u.email.charAt(0)}
+                      </div>
+                      <div>
+                        <p className="font-bold text-[#3f352b] flex items-center gap-2">
+                          {u.email}
+                          {isMe && <span className="bg-primary/10 text-primary text-[10px] uppercase font-extrabold px-2 py-0.5 rounded-full tracking-wider">Bạn</span>}
+                        </p>
+                        {(u.first_name || u.last_name) && (
+                          <p className="text-xs text-[#8a7a67] mt-0.5">{u.first_name} {u.last_name}</p>
+                        )}
+                      </div>
                     </div>
+                  </td>
+                  <td className="px-5 py-4">
+                    <div className="flex flex-wrap gap-2">
+                      {userRoleIds.length === 0 ? (
+                        <span className="text-xs font-medium text-[#a08d79] bg-[#fffaf4] px-3 py-1 rounded-full border border-[#eadfcd] border-dashed">Chưa cấp quyền</span>
+                      ) : (
+                        userRoleIds.map(rid => {
+                          const role = roles.find(r => r.id === rid)
+                          return role ? (
+                            <span key={rid} className="inline-flex items-center gap-1.5 text-xs font-bold text-secondary bg-[#f0e5d5] px-3 py-1 rounded-full border border-[#eadfcd]">
+                              <Shield className="w-3.5 h-3.5 text-[#a08d79]" /> {role.name}
+                            </span>
+                          ) : null
+                        })
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-5 py-4 text-right">
+                    <button 
+                      onClick={() => setShowAssignModal(u)}
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-primary-dark hover:bg-primary/5 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-primary/20"
+                    >
+                      <BadgeCheck className="w-4 h-4" /> Quản lý Vai trò
+                    </button>
                   </td>
                 </tr>
               )
             })}
           </tbody>
         </table>
+        {filteredUsers.length === 0 && (
+          <div className="p-12 text-center">
+            <ShieldAlert className="w-12 h-12 text-[#eadfcd] mx-auto mb-4" />
+            <p className="text-[#a08d79] font-medium text-lg">Không tìm thấy tài khoản nào.</p>
+          </div>
+        )}
       </div>
+
+      {/* Role Assignment Modal */}
+      {showAssignModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#2c2018]/40 backdrop-blur-sm">
+          <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="p-6 md:p-8 bg-gradient-to-b from-[#fffaf4] to-white border-b border-[#eadfcd]">
+              <div className="flex items-start justify-between mb-2">
+                <div>
+                  <h2 className="text-2xl font-extrabold text-secondary">Cấp Quyền Tài Khoản</h2>
+                  <p className="text-[#766957] font-medium mt-1">{showAssignModal.email}</p>
+                </div>
+                <button onClick={() => setShowAssignModal(null)} className="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-[#eadfcd] text-[#a08d79] hover:text-red-500 hover:border-red-200 transition-colors shadow-sm">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-6 md:p-8 max-h-[60vh] overflow-y-auto">
+              {roles.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-[#a08d79] font-medium">Chưa có vai trò nào trong hệ thống.</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {roles.map(role => {
+                    const isSelected = (showAssignModal.metadata?.roles || []).includes(role.id)
+                    return (
+                      <button
+                        key={role.id}
+                        onClick={() => toggleRole(showAssignModal.id, role.id)}
+                        className={`w-full text-left p-4 rounded-2xl border-2 transition-all duration-300 flex items-center justify-between group ${isSelected ? 'border-primary bg-[#fff4ea]' : 'border-[#eadfcd] bg-white hover:border-primary/40 hover:bg-[#fffaf4]'}`}
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${isSelected ? 'border-primary bg-primary' : 'border-[#d0c1af] bg-white group-hover:border-primary/50'}`}>
+                            {isSelected && <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
+                          </div>
+                          <div>
+                            <p className={`font-bold ${isSelected ? 'text-primary' : 'text-secondary'}`}>{role.name}</p>
+                            {role.description && <p className="text-xs text-[#8a7a67] mt-0.5">{role.description}</p>}
+                          </div>
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+
+            <div className="p-6 bg-gray-50 border-t border-[#eadfcd] flex justify-end">
+              <button 
+                onClick={() => setShowAssignModal(null)}
+                className="bg-secondary text-white font-bold px-6 py-3 rounded-xl hover:bg-[#2c2018] transition-colors"
+              >
+                Hoàn tất
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

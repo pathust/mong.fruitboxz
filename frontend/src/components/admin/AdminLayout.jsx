@@ -1,68 +1,82 @@
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Link, useLocation, useNavigate, Outlet } from "react-router-dom"
-import { Bot, Boxes, ExternalLink, FileText, FolderKanban, Gauge, Gift, Image as ImageIcon, Info, LayoutTemplate, LogOut, Mail, Menu, Package, ScanSearch, Settings, Shield, ShoppingCart, Star, Users, X, WalletCards, Tag, Truck, Calculator, Leaf, Search, MessageSquare } from "lucide-react"
+import { ChevronLeft, ChevronRight, Languages, Bot, Boxes, ExternalLink, FileText, FolderKanban, Gauge, Gift, Image as ImageIcon, Info, LayoutTemplate, LogOut, Mail, Menu, Package, ScanSearch, Settings, Shield, ShoppingCart, Star, Users, X, WalletCards, Tag, Truck, Calculator, Leaf, Search, MessageSquare } from "lucide-react"
 import { useAdminAuth } from "../../context/AdminAuthContext"
 
 const navGroups = [
   {
-    label: "Operate",
+    label: "Vận hành",
     items: [
-      { label: "Dashboard", path: "/admin", icon: Gauge, permission: null },
-      { label: "Finance", path: "/admin/finance", icon: WalletCards, permission: null },
-      { label: "Orders", path: "/admin/orders", icon: ShoppingCart, permission: "orders.read" },
-      { label: "Products", path: "/admin/products", icon: Package, permission: "products.read" },
-      { label: "Ingredients", path: "/admin/ingredients", icon: Leaf, permission: "products.read" },
-      { label: "Inventory", path: "/admin/inventory", icon: Package, permission: "products.read" },
-      { label: "Categories", path: "/admin/categories", icon: FolderKanban, permission: "categories.read" },
-      { label: "Promotions", path: "/admin/promotions", icon: Tag, permission: "products.read" },
+      { label: "Tổng quan", path: "/admin", icon: Gauge, permission: null },
+      { label: "Tài chính", path: "/admin/finance", icon: WalletCards, permission: null },
+      { label: "Đơn hàng", path: "/admin/orders", icon: ShoppingCart, permission: "orders.read" },
+      { label: "Sản phẩm", path: "/admin/products", icon: Package, permission: "products.read" },
+      { label: "Nguyên liệu", path: "/admin/ingredients", icon: Leaf, permission: "products.read" },
+      { label: "Tồn kho", path: "/admin/inventory", icon: Package, permission: "products.read" },
+      { label: "Danh mục", path: "/admin/categories", icon: FolderKanban, permission: "categories.read" },
+      { label: "Khuyến mãi", path: "/admin/promotions", icon: Tag, permission: "products.read" },
+      { label: "Hộp tự chọn", path: "/admin/content/custom-box", icon: Gift, permission: "settings.read" },
       { label: "Banners", path: "/admin/banners", icon: LayoutTemplate, permission: "banners.read" },
     ],
   },
   {
-    label: "Experience",
+    label: "Trải nghiệm",
     items: [
-      { label: "Media", path: "/admin/media", icon: ImageIcon, permission: "media.read" },
+      { label: "Thư viện ảnh", path: "/admin/media", icon: ImageIcon, permission: "media.read" },
       { label: "Chatbot", path: "/admin/chatbot", icon: Bot, permission: "chatbot.read" },
-      { label: "Reviews", path: "/admin/reviews", icon: Star, permission: "reviews.read" },
+
     ],
   },
   {
-    label: "Content",
+    label: "Nội dung",
     items: [
       { label: "Bài viết Blog", path: "/admin/blog", icon: FileText, permission: "settings.read" },
       { label: "Danh mục Blog", path: "/admin/blog-categories", icon: FolderKanban, permission: "settings.read" },
       { label: "Trang Blog", path: "/admin/content/blog", icon: LayoutTemplate, permission: "settings.read" },
       { label: "Về chúng tôi", path: "/admin/content/about", icon: Info, permission: "settings.read" },
       { label: "Liên hệ", path: "/admin/content/contact", icon: Mail, permission: "settings.read" },
-      { label: "Hộp tự chọn", path: "/admin/content/custom-box", icon: Gift, permission: "settings.read" },
+      { label: "CS Thanh toán", path: "/admin/content/payment-policy", icon: FileText, permission: "orders.read" },
+      { label: "CS Bảo mật", path: "/admin/content/privacy-policy", icon: Shield, permission: "orders.read" },
+      { label: "CS Vận chuyển", path: "/admin/content/shipping-policy", icon: Truck, permission: "orders.read" },
     ],
   },
   {
-    label: "CẤU HÌNH HỆ THỐNG",
+    label: "Cấu hình hệ thống",
     items: [
-      { label: "Cài đặt phí ship", path: "/admin/settings/shipping", icon: Truck, permission: "settings.read" },
-      { label: "Cài đặt định mức Cost", path: "/admin/settings/costs", icon: Calculator, permission: "settings.read" },
-      { label: "Cấu hình Tìm kiếm", path: "/admin/search", icon: Search, permission: "settings.read" },
-      { label: "Cấu hình AI Chatbot", path: "/admin/chatbot", icon: MessageSquare, permission: "settings.read" },
-      { label: "Cài đặt chung", path: "/admin/settings", icon: Settings, permission: "settings.read" },
+      { label: "Cài đặt phí ship", path: "/admin/settings/shipping", icon: Truck, permission: "users.read" },
+      { label: "Cài đặt định mức Cost", path: "/admin/settings/costs", icon: Calculator, permission: "users.read" },
+      { label: "Cấu hình Tìm kiếm", path: "/admin/search", icon: Search, permission: "users.read" },
+      { label: "Cấu hình AI Chatbot", path: "/admin/chatbot", icon: MessageSquare, permission: "users.read" },
+      { label: "Cài đặt chung", path: "/admin/settings", icon: Settings, permission: "users.read" },
     ],
   },
   {
-    label: "Access",
+    label: "Phân quyền",
     items: [
-      { label: "Users", path: "/admin/users", icon: Users, permission: "users.read" },
-      { label: "Roles", path: "/admin/roles", icon: Shield, permission: "roles.read" },
-      { label: "Permissions", path: "/admin/permissions", icon: Boxes, permission: "permissions.read" },
+      { label: "Quản trị viên", path: "/admin/users", icon: Users, permission: "users.read" },
+      { label: "Phân quyền", path: "/admin/roles", icon: Shield, permission: "roles.read" },
     ],
   },
 ]
 
 export default function AdminLayout() {
-  const { user, logout } = useAdminAuth()
+  const { user, logout, hasPermission } = useAdminAuth()
   const location = useLocation()
   const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [isCollapsed, setIsCollapsed] = useState(false)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const userMenuRef = useRef(null)
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setUserMenuOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
 
   const handleLogout = () => {
     logout()
@@ -71,13 +85,22 @@ export default function AdminLayout() {
 
   return (
     <div className="admin-surface flex h-screen overflow-hidden">
-      <aside className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-[#eadfcd] bg-[#fffaf3]/95 shadow-[28px_0_60px_-48px_rgba(71,45,21,0.55)] backdrop-blur-xl transition-all duration-300 lg:static lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} ${isCollapsed ? "lg:w-20 w-72" : "w-72"}`}>
+      <aside className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-[#eadfcd] bg-[#fffaf3]/95 shadow-[28px_0_60px_-48px_rgba(71,45,21,0.55)] backdrop-blur-xl transition-all duration-300 lg:relative lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} ${isCollapsed ? "lg:w-20 w-72" : "w-72"}`}>
+        {/* Desktop Sidebar Toggle Button */}
+        <button 
+          type="button" 
+          onClick={() => setIsCollapsed(!isCollapsed)} 
+          className="hidden lg:flex absolute -right-3.5 top-7 h-7 w-7 items-center justify-center rounded-full border border-[#eadfcd] bg-white text-[#5d5246] shadow-sm hover:bg-gray-50 hover:text-primary transition-colors z-50"
+        >
+          {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+        </button>
+
         <div className={`flex items-center border-b border-[#eadfcd] p-5 ${isCollapsed ? "lg:justify-center justify-between" : "justify-between"}`}>
           <Link to="/admin" className={`flex min-w-0 items-center gap-3 ${isCollapsed ? "lg:justify-center" : ""}`}>
             <img src="/mong_logo-removebg.png" alt="Mọng" className={`h-12 w-auto object-contain ${isCollapsed ? "lg:mx-auto" : ""}`} />
             <div className={`min-w-0 ${isCollapsed ? "lg:hidden" : ""}`}>
               <p className="truncate text-sm font-extrabold text-primary">Mọng Admin</p>
-              <p className="truncate text-xs font-semibold text-[#8a7a67]">Fresh fruit operations</p>
+              <p className="truncate text-xs font-semibold text-[#8a7a67]">Quản lý cửa hàng</p>
             </div>
           </Link>
           <button type="button" onClick={() => setSidebarOpen(false)} className="inline-flex h-9 w-9 items-center justify-center rounded-full text-[#766957] transition hover:bg-white lg:hidden">
@@ -86,14 +109,16 @@ export default function AdminLayout() {
         </div>
         <nav className="flex-1 space-y-5 overflow-y-auto p-4 pb-28">
           {navGroups.map((group) => {
-            const visibleItems = group.items
+            const visibleItems = group.items.filter(item => !item.permission || hasPermission(item.permission))
             if (visibleItems.length === 0) return null
             return (
               <div key={group.label}>
                 <p className={`mb-2 px-3 text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#ad9b86] ${isCollapsed ? "lg:hidden" : ""}`}>{group.label}</p>
                 <div className="space-y-1">
                   {visibleItems.map(item => {
-                    const active = location.pathname === item.path || location.pathname.startsWith(item.path + "/")
+                    const active = item.path === "/admin" 
+                      ? location.pathname === "/admin" 
+                      : (location.pathname === item.path || location.pathname.startsWith(item.path + "/"))
                     const Icon = item.icon
                     return (
                       <Link
@@ -113,17 +138,6 @@ export default function AdminLayout() {
             )
           })}
         </nav>
-        <div className="absolute bottom-0 left-0 right-0 border-t border-[#eadfcd] bg-[#fffaf3]/95 p-4 backdrop-blur">
-          <div className={`flex items-center ${isCollapsed ? "lg:justify-center lg:px-2" : "justify-between"} justify-between rounded-[18px] bg-white px-4 py-3 shadow-[0_14px_30px_-26px_rgba(84,58,30,0.4)]`}>
-            <div className={`text-sm min-w-0 ${isCollapsed ? "lg:hidden" : ""}`}>
-              <p className="truncate font-bold text-[#4d4339]">{user?.email}</p>
-              <p className="text-xs font-semibold text-[#9b8975]">Admin session</p>
-            </div>
-            <button type="button" onClick={handleLogout} className="inline-flex h-9 w-9 items-center justify-center rounded-full text-[#c7643a] transition hover:bg-[#fff1ea]">
-              <LogOut className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
       </aside>
 
       {/* Overlay */}
@@ -134,17 +148,50 @@ export default function AdminLayout() {
           <button type="button" className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#eadfcd] bg-white text-[#5d5246] lg:hidden" onClick={() => setSidebarOpen(true)}>
             <Menu className="h-5 w-5" />
           </button>
-          <button type="button" className="hidden lg:inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#eadfcd] bg-white text-[#5d5246] hover:bg-gray-50 transition-colors" onClick={() => setIsCollapsed(!isCollapsed)}>
-            <Menu className="h-5 w-5" />
-          </button>
           <div className="flex-1">
-            <p className="text-sm font-extrabold text-[#4d4339]">Store operations</p>
-            <p className="text-xs font-semibold text-[#8d7f6f]">Catalog, orders, media, search, chatbot, and shipping controls</p>
+            <p className="text-sm font-extrabold text-[#4d4339]">Trang quản trị</p>
+            <p className="text-xs font-semibold text-[#8d7f6f]">Quản lý sản phẩm, đơn hàng, nội dung và cấu hình hệ thống</p>
           </div>
-          <Link to="/" className="admin-button-secondary hidden px-4 py-2 text-xs sm:inline-flex">
-            <ExternalLink className="h-3.5 w-3.5" />
-            Storefront
-          </Link>
+          <div className="relative" ref={userMenuRef}>
+            <button 
+              onClick={() => setUserMenuOpen(!userMenuOpen)} 
+              className="flex h-10 items-center gap-2 rounded-full border border-[#eadfcd] bg-[#fffaf4] px-4 text-sm font-bold text-[#5f5548] shadow-[0_10px_24px_-20px_rgba(76,47,22,0.65)] transition-all hover:border-primary/45 hover:bg-white hover:text-primary hover-card" 
+            >
+              <Users className="w-5 h-5 text-primary" />
+              <span className="max-w-[100px] truncate">{user?.email?.split('@')[0] || 'Quản trị'}</span>
+            </button>
+            
+            {userMenuOpen && (
+              <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-56 origin-top-right rounded-2xl border border-[#eadfcd] bg-white p-2 shadow-[0_24px_70px_-34px_rgba(64,42,22,0.55)] animate-in fade-in zoom-in-95 duration-200">
+                <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
+                  Thông tin tài khoản
+                </div>
+                <div className="px-3 pb-2 text-sm text-gray-600 truncate font-medium">
+                  {user?.email}
+                </div>
+                <div className="my-1 h-[1px] w-full bg-gray-100" />
+                <Link 
+                  to="/" 
+                  onClick={() => setUserMenuOpen(false)}
+                  className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold text-[#5f5548] transition-colors hover:bg-[#fffaf4] hover:text-primary"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  Storefront
+                </Link>
+                <div className="my-1 h-[1px] w-full bg-gray-100" />
+                <button 
+                  onClick={() => {
+                    setUserMenuOpen(false)
+                    handleLogout()
+                  }}
+                  className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold text-red-500 transition-colors hover:bg-red-50"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Đăng xuất
+                </button>
+              </div>
+            )}
+          </div>
         </header>
         <main className="flex-1 overflow-y-auto p-4 lg:p-6 relative">
           <Outlet />
