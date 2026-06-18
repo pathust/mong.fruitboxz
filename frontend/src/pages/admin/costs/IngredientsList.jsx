@@ -269,8 +269,10 @@ export default function IngredientsList() {
             <div>
               <label className="block text-sm font-medium mb-1">Phân loại</label>
               <select value={form.category} onChange={e => setForm({...form, category: e.target.value})} className="admin-input w-full px-4 py-2">
-                <option value="Fruit">Hoa quả (Fruit)</option>
-                <option value="Sauce">Sốt / Topping (Sauce)</option>
+                <option value="Fruit">Hoa quả tươi (Fruit)</option>
+                <option value="Yogurt">Sữa chua (Yogurt)</option>
+                <option value="Topping">Đồ ăn kèm (Topping/Snack)</option>
+                <option value="Sauce">Gia vị / Sốt (Sauce)</option>
                 <option value="Packaging">Bao bì (Packaging)</option>
                 <option value="Other">Khác (Other)</option>
               </select>
