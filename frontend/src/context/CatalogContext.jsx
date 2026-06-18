@@ -7,6 +7,7 @@ const CatalogContext = createContext(null)
 
 function mapVariant(v) {
   const amount = Number(
+    v?.price ??
     v?.calculated_price?.calculated_amount ??
     v?.prices?.[0]?.amount ??
     v?.prices?.[0]?.calculated_amount ??
@@ -14,7 +15,9 @@ function mapVariant(v) {
   )
   
   let inStock = true;
-  if (v?.manage_inventory && !v?.allow_backorder) {
+  if (typeof v?.in_stock === "boolean") {
+    inStock = v.in_stock
+  } else if (v?.manage_inventory && !v?.allow_backorder) {
     inStock = (v?.inventory_quantity ?? 0) > 0;
   }
 
@@ -81,40 +84,14 @@ export function CatalogProvider({ children }) {
 
     async function load() {
       try {
-        const categoriesRes = await apiFetch("/store/product-categories?limit=100")
+        const categoriesRes = await apiFetch("/store/catalog/categories")
         if (!mounted) return
 
-        const cats = categoriesRes?.product_categories || []
-
-        // Enhance categories with fallback images from their first product
-        const enrichedCats = await Promise.all(cats.map(async (c) => {
-          let image = c.metadata?.image || ""
-
-          if (!image) {
-            try {
-              const pRes = await apiFetch(`/store/products?limit=1&category_id[]=${c.id}&fields=id,thumbnail,*images`)
-              const product = pRes.products?.[0]
-              if (product) {
-                image = product.thumbnail || product.images?.[0]?.url || ""
-              }
-            } catch {
-              console.error("Failed to fetch fallback image for category:", c.name)
-            }
-          }
-
-          const slug = c.slug || c.handle || c.id
-          return {
-            id: c.id,
-            name: c.name,
-            slug,
-            displayName: c.name,
-            description: c.description || c.metadata?.description || '',
-            image,
-          }
-        }))
-
         if (mounted) {
-          setCategories(enrichedCats)
+          setCategories((categoriesRes?.categories || []).map((category) => ({
+            ...category,
+            displayName: category.name,
+          })))
         }
       } catch {
         // API failed — keep empty arrays

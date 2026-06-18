@@ -10,7 +10,8 @@ export default function Products() {
   const [priceRange, setPriceRange] = useState('')
   const [sortBy, setSortBy] = useState('')
   const [page, setPage] = useState(1)
-  const [allProducts, setAllProducts] = useState([])
+  const [products, setProducts] = useState([])
+  const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [viewMode, setViewMode] = useState('grid') // 'grid' | 'list'
 
@@ -30,66 +31,36 @@ export default function Products() {
     { value: 'over-500', label: 'Trên 500.000đ' },
   ]
 
-  // Fetch ALL products ONCE
   useEffect(() => {
-    let mounted = true
-    async function fetchAllProducts() {
+    const controller = new AbortController()
+    async function fetchProducts() {
       try {
         setLoading(true)
-        const url = `/store/products?limit=1000&fields=id,handle,title,thumbnail,*images,*variants,*variants.prices,+variants.inventory_quantity,*categories`
-        const res = await apiFetch(url)
-        if (mounted) {
-          setAllProducts((res.products || []).map(mapProduct))
-          setLoading(false)
+        const params = new URLSearchParams({
+          limit: String(limit),
+          offset: String((page - 1) * limit),
+          sort: sortBy === 'price-asc' ? 'price:asc' : sortBy === 'price-desc' ? 'price:desc' : 'created_at:desc',
+        })
+        if (selectedCategory) params.set('category', selectedCategory)
+        if (priceRange) params.set('price_range', priceRange)
+        const res = await apiFetch(`/store/search?${params}`, { signal: controller.signal })
+        setProducts((res.hits || []).map(mapProduct))
+        setTotal(Number(res.total || 0))
+      } catch {
+        if (!controller.signal.aborted) {
+          setProducts([])
+          setTotal(0)
         }
-      } catch (err) {
-        console.error(err)
-        if (mounted) setLoading(false)
+      } finally {
+        if (!controller.signal.aborted) setLoading(false)
       }
     }
 
-    const timer = window.setTimeout(() => fetchAllProducts(), 0)
-    return () => {
-      mounted = false
-      window.clearTimeout(timer)
-    }
-  }, [])
-
-  // Filter and Sort
-  const { filteredProducts, total } = (() => {
-    let result = [...allProducts]
-
-    if (selectedCategory) {
-      result = result.filter(p => p.categoryIds?.includes(selectedCategory))
-    }
-
-    if (priceRange) {
-      result = result.filter(p => {
-        if (!p.price) return false
-        if (priceRange === 'under-100') return p.price < 100000
-        if (priceRange === '100-300') return p.price >= 100000 && p.price <= 300000
-        if (priceRange === '300-500') return p.price >= 300000 && p.price <= 500000
-        if (priceRange === 'over-500') return p.price > 500000
-        return true
-      })
-    }
-
-    if (sortBy === 'price-asc') {
-      result.sort((a, b) => (a.price || 0) - (b.price || 0))
-    } else if (sortBy === 'price-desc') {
-      result.sort((a, b) => (b.price || 0) - (a.price || 0))
-    }
-
-    return { filteredProducts: result, total: result.length }
-  })()
+    fetchProducts()
+    return () => controller.abort()
+  }, [limit, page, priceRange, selectedCategory, sortBy])
 
   const totalPages = Math.ceil(total / limit)
-  const products = filteredProducts.slice((page - 1) * limit, page * limit)
-
-  // Reset page when filters change
-  useEffect(() => {
-    setPage(1)
-  }, [selectedCategory, priceRange, sortBy, limit])
 
   return (
     <div className="max-w-[1240px] mx-auto px-4 py-8 md:py-10">
@@ -110,8 +81,8 @@ export default function Products() {
           </button>
           
           <div className="flex items-center p-1 bg-[#f8f4ed] rounded-lg border border-[#e8e0d3] shrink-0">
-            <button onClick={() => setViewMode('grid')} className={`p-1.5 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-white shadow-sm text-primary' : 'text-gray-400'}`}><LayoutGrid className="w-4 h-4" /></button>
-            <button onClick={() => setViewMode('list')} className={`p-1.5 rounded-md transition-colors ${viewMode === 'list' ? 'bg-white shadow-sm text-primary' : 'text-gray-400'}`}><List className="w-4 h-4" /></button>
+            <button onClick={() => { setViewMode('grid'); setPage(1) }} className={`p-1.5 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-white shadow-sm text-primary' : 'text-gray-400'}`}><LayoutGrid className="w-4 h-4" /></button>
+            <button onClick={() => { setViewMode('list'); setPage(1) }} className={`p-1.5 rounded-md transition-colors ${viewMode === 'list' ? 'bg-white shadow-sm text-primary' : 'text-gray-400'}`}><List className="w-4 h-4" /></button>
           </div>
         </div>
 
@@ -183,14 +154,14 @@ export default function Products() {
           <div className="hidden md:flex justify-between items-center mb-6">
             <div className="flex items-center p-1 bg-[#f8f4ed] rounded-lg border border-[#e8e0d3] shrink-0">
               <button
-                onClick={() => setViewMode('grid')}
+                onClick={() => { setViewMode('grid'); setPage(1) }}
                 className={`p-1.5 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-white shadow-sm text-primary' : 'text-gray-400 hover:text-gray-600'}`}
                 title="Dạng lưới"
               >
                 <LayoutGrid className="w-5 h-5" />
               </button>
               <button
-                onClick={() => setViewMode('list')}
+                onClick={() => { setViewMode('list'); setPage(1) }}
                 className={`p-1.5 rounded-md transition-colors ${viewMode === 'list' ? 'bg-white shadow-sm text-primary' : 'text-gray-400 hover:text-gray-600'}`}
                 title="Dạng danh sách"
               >

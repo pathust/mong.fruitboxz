@@ -1,10 +1,14 @@
 import { defineMiddlewares, authenticate } from "@medusajs/framework/http"
 import { rbacMiddleware } from "./middlewares/rbac"
 import { contactMiddlewares } from "./store/contact/middlewares"
+import { chatbotMessageMiddlewares } from "./store/chatbot/message/middlewares"
+import { sessionCartMiddlewares } from "./store/session-cart/[id]/middlewares"
 
 export default defineMiddlewares({
   routes: [
     ...contactMiddlewares,
+    ...chatbotMessageMiddlewares,
+    ...sessionCartMiddlewares,
     {
       matcher: "/admin/products*",
       middlewares: [authenticate("user", ["bearer", "session"]), rbacMiddleware],

@@ -1,10 +1,19 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useReducer, useEffect, useState, useCallback } from 'react'
+import { createContext, useContext, useReducer, useEffect, useState, useCallback, useRef } from 'react'
 import { apiFetch } from '../lib/api'
 
 const CartContext = createContext()
 
 const CART_KEY = 'mong_fruitbox_cart'
+const CART_SESSION_KEY = 'mong_fruitbox_cart_session'
+
+function getCartSessionId() {
+  const existing = localStorage.getItem(CART_SESSION_KEY)
+  if (existing) return existing
+  const id = globalThis.crypto?.randomUUID?.() || `cart_${Date.now()}_${Math.random().toString(36).slice(2)}`
+  localStorage.setItem(CART_SESSION_KEY, id)
+  return id
+}
 
 function isExternalImage(url) {
   if (!url) return false
@@ -76,6 +85,9 @@ function cartReducer(state, action) {
     case 'CLEAR_CART':
       newState = { items: [], count: 0 }
       break
+    case 'REPLACE_CART':
+      newState = action.payload
+      break
     default:
       return state
   }
@@ -86,10 +98,49 @@ function cartReducer(state, action) {
 export function CartProvider({ children }) {
   const [cart, dispatch] = useReducer(cartReducer, null, loadCart)
   const [toast, setToast] = useState(null)
+  const [sessionId] = useState(getCartSessionId)
+  const remoteReady = useRef(false)
 
   useEffect(() => {
     localStorage.setItem(CART_KEY, JSON.stringify(cart))
   }, [cart])
+
+  useEffect(() => {
+    let mounted = true
+    async function hydrateRemoteCart() {
+      try {
+        const data = await apiFetch(`/store/session-cart/${encodeURIComponent(sessionId)}`)
+        const remoteCart = data?.cart
+        if (mounted && remoteCart?.items?.length) {
+          dispatch({ type: 'REPLACE_CART', payload: remoteCart })
+        } else if (mounted) {
+          await apiFetch(`/store/session-cart/${encodeURIComponent(sessionId)}`, {
+            method: 'POST',
+            body: cart,
+          })
+        }
+      } catch {
+        // Local cart remains authoritative while Redis is unavailable.
+      } finally {
+        if (mounted) remoteReady.current = true
+      }
+    }
+    hydrateRemoteCart()
+    return () => { mounted = false }
+  // Hydrate once; later updates are handled by the debounced sync below.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId])
+
+  useEffect(() => {
+    if (!remoteReady.current) return undefined
+    const timer = window.setTimeout(() => {
+      apiFetch(`/store/session-cart/${encodeURIComponent(sessionId)}`, {
+        method: 'POST',
+        body: cart,
+      }).catch(() => undefined)
+    }, 250)
+    return () => window.clearTimeout(timer)
+  }, [cart, sessionId])
 
   // On mount: for any cart item that still has an old external image URL,
   // fetch the correct thumbnail from the local Medusa store API and patch it.

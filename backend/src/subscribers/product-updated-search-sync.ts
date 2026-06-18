@@ -1,7 +1,9 @@
+import { SubscriberArgs, type SubscriberConfig } from "@medusajs/framework"
 import { Modules } from "@medusajs/framework/utils"
-import { upsertProductDocument } from "../lib/search"
+import { upsertProductDocument, type ProductRecord } from "../lib/search"
+import { CACHE_KEYS, resolveCache } from "../lib/cache"
 
-export default async function productUpdatedSearchSync({ event, container }: any) {
+export default async function productUpdatedSearchSync({ event, container }: SubscriberArgs<{ id: string }>) {
   const productModuleService = container.resolve(Modules.PRODUCT)
   const productId = event.data.id
   if (!productId) return
@@ -9,10 +11,16 @@ export default async function productUpdatedSearchSync({ event, container }: any
     relations: ["variants", "variants.prices", "categories", "images"],
   }).catch(() => null)
   if (product) {
-    await upsertProductDocument(product).catch(() => null)
+    const cache = resolveCache(container)
+    await Promise.all([
+      upsertProductDocument(product as unknown as ProductRecord).catch(() => null),
+      cache.invalidate(CACHE_KEYS.product(product.handle || product.id)),
+      cache.invalidate(CACHE_KEYS.product(product.id)),
+      cache.invalidate("search:*")
+    ])
   }
 }
 
-export const config = {
+export const config: SubscriberConfig = {
   event: "product.updated",
 }

@@ -32,6 +32,17 @@ module.exports = defineConfig({
       key: Modules.EVENT_BUS,
       options: {
         redisUrl,
+        workerOptions: {
+          concurrency: Number(process.env.EVENT_BUS_CONCURRENCY || 5),
+        },
+      },
+    }, {
+      resolve: "@medusajs/cache-redis",
+      key: Modules.CACHE,
+      options: {
+        redisUrl,
+        namespace: "mong",
+        ttl: 300,
       },
     }] : []),
     {

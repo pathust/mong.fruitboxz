@@ -88,7 +88,7 @@ export async function buildChatbotReply({
     }
   }
 
-  const searchResult = await searchProducts(trimmed, undefined, 4, 0).catch(() => null)
+  const searchResult = await searchProducts(trimmed, { limit: 4 }).catch(() => null)
   const hits = searchResult?.hits?.map(mapHitToSuggestion) || []
 
   if (hits.length > 0) {
@@ -99,7 +99,7 @@ export async function buildChatbotReply({
     }
   }
 
-  const fallbackHits = await findFallbackProducts(scope, trimmed, undefined, 4).catch(() => [])
+  const fallbackHits = await findFallbackProducts(scope, trimmed, { limit: 4 }).catch(() => [])
   if (fallbackHits.length > 0) {
     return {
       mode: "catalog-fallback",

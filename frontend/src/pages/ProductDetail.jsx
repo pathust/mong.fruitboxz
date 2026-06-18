@@ -24,11 +24,11 @@ export default function ProductDetail() {
     let mounted = true
     const timer = window.setTimeout(() => {
       setLoading(true)
-      apiFetch(`/store/products?handle=${slug}&fields=id,handle,title,thumbnail,*images,*variants,*variants.prices,+variants.inventory_quantity,*categories,description`)
+      apiFetch(`/store/catalog/products/${encodeURIComponent(slug)}`)
         .then((res) => {
-          if (mounted && res.products && res.products.length > 0) {
-            const p = mapProduct(res.products[0])
-            setProduct({ ...p, description: res.products[0].description })
+          if (mounted && res.product) {
+            const p = mapProduct(res.product)
+            setProduct({ ...p, description: res.product.description })
             const firstInStock = p.variants?.findIndex(v => v.inStock !== false) ?? 0
             setSelectedVariant(firstInStock >= 0 ? firstInStock : 0)
           } else if (mounted) {
