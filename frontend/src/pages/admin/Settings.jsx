@@ -119,30 +119,7 @@ export default function Settings() {
           </div>
         </div>
 
-        {/* Các Chính Sách */}
-        <div className="admin-card overflow-hidden">
-          <div className="border-b border-[#eadfcd] bg-gradient-to-r from-[#fffaf4] to-white px-6 py-5">
-            <h2 className="text-lg font-extrabold text-secondary flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-primary" /> Chính sách Khách hàng
-            </h2>
-            <p className="mt-1 text-[13px] font-medium text-[#8a7a67]">Các chính sách này sẽ được hiển thị ở Footer và trang thanh toán.</p>
-          </div>
-          <div className="p-6 space-y-6">
-            <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-[#8a7a67] uppercase tracking-wider flex items-center gap-1.5"><Truck className="w-3.5 h-3.5" /> Chính sách Vận chuyển & Giao hàng</label>
-              <textarea value={form.shipping_policy_text || ""} onChange={e => setForm({ ...form, shipping_policy_text: e.target.value })} rows={5} className="w-full rounded-xl border border-[#eadfcd] bg-white px-4 py-3 text-[15px] font-medium text-secondary outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 leading-relaxed" placeholder="Nhập nội dung chính sách vận chuyển..." />
-            </div>
-            <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-[#8a7a67] uppercase tracking-wider flex items-center gap-1.5"><CreditCard className="w-3.5 h-3.5" /> Chính sách Thanh toán</label>
-              <textarea value={form.payment_policy_text || ""} onChange={e => setForm({ ...form, payment_policy_text: e.target.value })} rows={5} className="w-full rounded-xl border border-[#eadfcd] bg-white px-4 py-3 text-[15px] font-medium text-secondary outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 leading-relaxed" placeholder="Nhập nội dung chính sách thanh toán..." />
-            </div>
-            <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-[#8a7a67] uppercase tracking-wider flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5" /> Chính sách Bảo mật & Quyền riêng tư</label>
-              <textarea value={form.privacy_policy_text || ""} onChange={e => setForm({ ...form, privacy_policy_text: e.target.value })} rows={5} className="w-full rounded-xl border border-[#eadfcd] bg-white px-4 py-3 text-[15px] font-medium text-secondary outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 leading-relaxed" placeholder="Nhập nội dung chính sách bảo mật..." />
-            </div>
-          </div>
         </div>
-
       </form>
     </div>
   )
