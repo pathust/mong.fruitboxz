@@ -1,5 +1,7 @@
 import { MedusaContainer } from "@medusajs/framework/types"
 import { Modules } from "@medusajs/framework/utils"
+import * as fs from "fs"
+import * as path from "path"
 
 const CUSTOM_MAPPING = {
   "Sâm đất": ["Sâm"],
@@ -24,6 +26,16 @@ export default async function run({ container }: { container: MedusaContainer })
   const inventoryService = container.resolve("inventory")
   const remoteLink = container.resolve("remoteLink")
 
+  let explicitMap: Record<string, string[]> = {}
+  try {
+    const mapPath = path.resolve(__dirname, "product-map.json")
+    const mapContent = fs.readFileSync(mapPath, "utf-8")
+    explicitMap = JSON.parse(mapContent)
+    console.log(`Loaded explicit product map with ${Object.keys(explicitMap).length} entries.`)
+  } catch (e) {
+    console.log("Could not load product-map.json, relying on regex matching.")
+  }
+
   const inventoryItems = await inventoryService.listInventoryItems({}, { take: 1000 })
   const inventoryMap = new Map()
   for (const item of inventoryItems) {
@@ -43,17 +55,24 @@ export default async function run({ container }: { container: MedusaContainer })
     let titleStr = (product.title || "").toLowerCase()
     let ingredientsFound = new Set<string>()
 
-    for (const [key, ingredients] of Object.entries(CUSTOM_MAPPING)) {
-      if (titleStr.includes(key.toLowerCase())) {
-        ingredients.forEach(i => ingredientsFound.add(i.toLowerCase()))
-        titleStr = titleStr.replace(key.toLowerCase(), "")
+    // Use explicit mapping first if available
+    const explicitIngredients = explicitMap[product.title]
+    if (explicitIngredients) {
+      explicitIngredients.forEach(i => ingredientsFound.add(i.toLowerCase()))
+    } else {
+      // Fallback to regex/substring
+      for (const [key, ingredients] of Object.entries(CUSTOM_MAPPING)) {
+        if (titleStr.includes(key.toLowerCase())) {
+          ingredients.forEach(i => ingredientsFound.add(i.toLowerCase()))
+          titleStr = titleStr.replace(key.toLowerCase(), "")
+        }
       }
-    }
 
-    for (const name of ingredientNames) {
-      if (titleStr.includes(name)) {
-        ingredientsFound.add(name)
-        titleStr = titleStr.replace(name, "")
+      for (const name of ingredientNames) {
+        if (titleStr.includes(name)) {
+          ingredientsFound.add(name)
+          titleStr = titleStr.replace(name, "")
+        }
       }
     }
 
