@@ -1,72 +1,72 @@
-import { useEffect, useState } from "react"
-import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal"
-import { useNavigate, useParams } from "react-router-dom"
-import { FolderKanban } from "lucide-react"
-import { useAdminAuth } from "../../../context/AdminAuthContext"
-import { useToast } from "../../../components/ui/ToastProvider"
-import { AdminLoading } from "../../../components/admin/AdminStates"
+import { useEffect, useState } from "react";
+import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal";
+import { useNavigate, useParams } from "react-router-dom";
+import { FolderKanban } from "lucide-react";
+import { useAdminAuth } from "../../../context/AdminAuthContext";
+import { useToast } from "../../../components/ui/ToastProvider";
+import { AdminLoading } from "../../../components/admin/AdminStates";
 
 function slugify(value) {
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/đ/g, "d")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
+  return value.
+  normalize("NFD").
+  replace(/[\u0300-\u036f]/g, "").
+  toLowerCase().
+  replace(/đ/g, "d").
+  replace(/[^a-z0-9]+/g, "-").
+  replace(/^-+|-+$/g, "");
 }
 
 const emptyCategory = {
   name: "",
   slug: "",
-  description: "",
-}
+  description: ""
+};
 
 export default function BlogCategoryForm() {
-  const { api } = useAdminAuth()
-  const { pushToast } = useToast()
-  const navigate = useNavigate()
-  const { id } = useParams()
-  const isNew = !id
+  const { api } = useAdminAuth();
+  const { pushToast } = useToast();
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const isNew = !id;
 
-  const [loading, setLoading] = useState(!isNew)
-  const [saving, setSaving] = useState(false)
-  const [form, setForm] = useState(emptyCategory)
+  const [loading, setLoading] = useState(!isNew);
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState(emptyCategory);
 
   useEffect(() => {
     if (!isNew) {
-      api(`/admin/blog-categories/${id}`)
-        .then((data) => setForm({ ...emptyCategory, ...(data.blog_category || {}) }))
-        .finally(() => setLoading(false))
+      api(`/admin/blog-categories/${id}`).
+      then((data) => setForm({ ...emptyCategory, ...(data.blog_category || {}) })).
+      finally(() => setLoading(false));
     }
-  }, [api, id, isNew])
+  }, [api, id, isNew]);
 
   const setField = (key, value) => {
     setForm((current) => {
-      const next = { ...current, [key]: value }
+      const next = { ...current, [key]: value };
       if (key === "name" && (!current.slug || current.slug === slugify(current.name))) {
-        next.slug = slugify(value)
+        next.slug = slugify(value);
       }
-      return next
-    })
-  }
+      return next;
+    });
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setSaving(true)
+    e.preventDefault();
+    setSaving(true);
     try {
-      const url = isNew ? "/admin/blog-categories" : `/admin/blog-categories/${id}`
-      await api(url, { method: "POST", body: JSON.stringify(form) })
-      pushToast("Đã lưu danh mục blog.", "success")
-      navigate("/admin/blog-categories")
+      const url = isNew ? "/admin/blog-categories" : `/admin/blog-categories/${id}`;
+      await api(url, { method: "POST", body: JSON.stringify(form) });
+      pushToast("Đã lưu danh mục blog.", "success");
+      navigate("/admin/blog-categories");
     } catch (err) {
-      pushToast(err?.message || "Không lưu được danh mục.", "error")
+      pushToast(err?.message || "Không lưu được danh mục.", "error");
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
-  if (loading) return <AdminLoading title="Đang tải dữ liệu..." />
+
 
   return (
     <div className="max-w-2xl space-y-6">
@@ -80,7 +80,7 @@ export default function BlogCategoryForm() {
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Cập nhật tên và mô tả danh mục blog.</p>
           </div>
         </div>
-      </AdminHeaderPortal>
+      </AdminHeaderPortal>{loading ? <AdminLoading /> : <>
 
       <form onSubmit={handleSubmit} className="admin-card space-y-5 p-6">
         <div>
@@ -103,6 +103,6 @@ export default function BlogCategoryForm() {
           <button type="button" onClick={() => navigate("/admin/blog-categories")} className="admin-button-secondary px-6 py-2.5 text-sm">Hủy</button>
         </div>
       </form>
-    </div>
-  )
+    </>}</div>);
+
 }

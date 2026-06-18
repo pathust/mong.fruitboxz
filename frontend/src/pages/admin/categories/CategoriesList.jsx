@@ -1,33 +1,35 @@
-import { useMemo, useState, useEffect } from "react"
-import { Link } from "react-router-dom"
-import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal"
-import { Tags } from "lucide-react"
-import { Pencil, Trash2 } from "lucide-react"
-import { useAdminAuth } from "../../../context/AdminAuthContext"
-import { AdminListFilters, filterBySearch } from "../../../components/admin/AdminListFilters"
+import { useMemo, useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal";
+import { Tags } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
+import { useAdminAuth } from "../../../context/AdminAuthContext";
+import { AdminListFilters, filterBySearch } from "../../../components/admin/AdminListFilters";
+import { AdminLoading } from "../../../components/admin/AdminStates"
+
 export default function CategoriesList() {
-  const { api } = useAdminAuth()
-  const [categories, setCategories] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [query, setQuery] = useState("")
+  const { api } = useAdminAuth();
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
-    api("/admin/product-categories?limit=50")
-      .then(d => setCategories(d.product_categories || []))
+    api("/admin/product-categories?limit=50").
+    then((d) => setCategories(d.product_categories || [])).
 
-      .catch(() => {})
-      .finally(() => setLoading(false))
-  }, [api])
+    catch(() => {}).
+    finally(() => setLoading(false));
+  }, [api]);
 
   const deleteCategory = async (id) => {
-    if (!confirm("Delete this category?")) return
-    await api(`/admin/product-categories/${id}`, { method: "DELETE" })
-    setCategories(prev => prev.filter(c => c.id !== id))
-  }
+    if (!confirm("Delete this category?")) return;
+    await api(`/admin/product-categories/${id}`, { method: "DELETE" });
+    setCategories((prev) => prev.filter((c) => c.id !== id));
+  };
   const filteredCategories = useMemo(() => {
-    return categories.filter((category) => filterBySearch(category, query, ["name", "description"]))
-  }, [categories, query])
-  if (loading) return <div className="text-center py-12 text-secondary-light">Đang tải dữ liệu...</div>
+    return categories.filter((category) => filterBySearch(category, query, ["name", "description"]));
+  }, [categories, query]);
+
   return (
     <div>
       <AdminHeaderPortal>
@@ -44,7 +46,7 @@ export default function CategoriesList() {
       </AdminHeaderPortal>
       <AdminListFilters
         actions={
-          <>
+        <>
             <Link to="/admin/categories/new" className="admin-button-primary px-4 py-2 text-sm">+ Thêm danh mục</Link>
           </>
         }
@@ -53,8 +55,8 @@ export default function CategoriesList() {
         searchPlaceholder="Tìm theo tên hoặc mô tả..."
         showing={filteredCategories.length}
         total={categories.length}
-        onReset={() => setQuery("")}
-      />
+        onReset={() => setQuery("")} />{loading ? <AdminLoading /> : <>
+        
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 text-secondary-light">
@@ -64,7 +66,7 @@ export default function CategoriesList() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {filteredCategories.map(c => (
+            {filteredCategories.map((c) =>
               <tr key={c.id} className="hover:bg-gray-50">
                 <td className="px-4 py-3 font-medium text-secondary">{c.name}</td>
                 <td className="px-4 py-3 text-right">
@@ -78,10 +80,10 @@ export default function CategoriesList() {
                   </div>
                 </td>
               </tr>
-            ))}
+              )}
           </tbody>
         </table>
       </div>
-    </div>
-  )
+    </>}</div>);
+
 }

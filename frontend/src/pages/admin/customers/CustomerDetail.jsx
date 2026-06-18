@@ -1,62 +1,64 @@
-import { useCallback, useState, useEffect } from "react"
-import { useParams, Link } from "react-router-dom"
-import { ArrowLeft, Mail, Phone, Calendar, ShoppingBag, MapPin, LoaderCircle, Users } from "lucide-react"
-import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal"
-import { useAdminAuth } from "../../../context/AdminAuthContext"
-import { getOrderCode } from "../../../lib/orderCodes"
+import { useCallback, useState, useEffect } from "react";
+import { useParams, Link } from "react-router-dom";
+import { ArrowLeft, Mail, Phone, Calendar, ShoppingBag, MapPin, LoaderCircle, Users } from "lucide-react";
+import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal";
+import { useAdminAuth } from "../../../context/AdminAuthContext";
+import { getOrderCode } from "../../../lib/orderCodes";
+import { AdminLoading } from "../../../components/admin/AdminStates"
+
 
 export default function CustomerDetail() {
-  const { id } = useParams()
-  const { api } = useAdminAuth()
-  const [customer, setCustomer] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const { id } = useParams();
+  const { api } = useAdminAuth();
+  const [customer, setCustomer] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const fetchCustomer = useCallback(async () => {
     try {
-      setLoading(true)
-      const res = await api(`/admin/customers/${id}?fields=*orders,*orders.items`)
+      setLoading(true);
+      const res = await api(`/admin/customers/${id}?fields=*orders,*orders.items`);
       if (res?.customer) {
-        let totalSpent = 0
-        let totalOrders = (res.customer.orders || []).length
-        for (const o of (res.customer.orders || [])) {
-          for (const item of (o.items || [])) {
-            totalSpent += (Number(item.unit_price) || 0) * (Number(item.quantity) || 0)
+        let totalSpent = 0;
+        let totalOrders = (res.customer.orders || []).length;
+        for (const o of res.customer.orders || []) {
+          for (const item of o.items || []) {
+            totalSpent += (Number(item.unit_price) || 0) * (Number(item.quantity) || 0);
           }
         }
-        setCustomer({ ...res.customer, total_spent: totalSpent, total_orders: totalOrders })
+        setCustomer({ ...res.customer, total_spent: totalSpent, total_orders: totalOrders });
       }
     } catch (error) {
-      console.error("Failed to fetch customer:", error)
+      console.error("Failed to fetch customer:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [api, id])
+  }, [api, id]);
 
   useEffect(() => {
-    const timer = window.setTimeout(fetchCustomer, 0)
-    return () => window.clearTimeout(timer)
-  }, [fetchCustomer])
+    const timer = window.setTimeout(fetchCustomer, 0);
+    return () => window.clearTimeout(timer);
+  }, [fetchCustomer]);
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount)
-  }
+    return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount);
+  };
 
   const formatDate = (dateString) => {
-    if (!dateString) return "N/A"
-    return new Date(dateString).toLocaleString("vi-VN")
-  }
+    if (!dateString) return "N/A";
+    return new Date(dateString).toLocaleString("vi-VN");
+  };
 
-  if (loading) {
-    return <div className="p-8 text-center text-gray-500">Đang tải thông tin khách hàng...</div>
-  }
+
+
+
 
   if (!customer) {
-    return <div className="p-8 text-center text-red-500">Không tìm thấy khách hàng</div>
+    return <div className="p-8 text-center text-red-500">Không tìm thấy khách hàng</div>;
   }
 
-  const name = customer.first_name || customer.last_name
-    ? `${customer.first_name || ""} ${customer.last_name || ""}`.trim()
-    : "Chưa cập nhật tên"
+  const name = customer.first_name || customer.last_name ?
+  `${customer.first_name || ""} ${customer.last_name || ""}`.trim() :
+  "Chưa cập nhật tên";
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
@@ -92,25 +94,25 @@ export default function CustomerDetail() {
             </div>
 
             <div className="p-6 space-y-4">
-              {customer.email && (
-                <div className="flex items-start gap-3">
+              {customer.email &&
+              <div className="flex items-start gap-3">
                   <Mail className="w-5 h-5 text-gray-400 mt-0.5" />
                   <div>
                     <div className="text-xs text-gray-500 uppercase font-medium">Email</div>
                     <div className="text-gray-900 dark:text-white">{customer.email}</div>
                   </div>
                 </div>
-              )}
+              }
 
-              {customer.phone && (
-                <div className="flex items-start gap-3">
+              {customer.phone &&
+              <div className="flex items-start gap-3">
                   <Phone className="w-5 h-5 text-gray-400 mt-0.5" />
                   <div>
                     <div className="text-xs text-gray-500 uppercase font-medium">Số điện thoại</div>
                     <div className="text-gray-900 dark:text-white">{customer.phone}</div>
                   </div>
                 </div>
-              )}
+              }
             </div>
           </div>
 
@@ -133,17 +135,17 @@ export default function CustomerDetail() {
             </div>
 
             <div className="divide-y divide-gray-100 dark:divide-gray-700">
-              {(!customer.orders || customer.orders.length === 0) ? (
-                <div className="p-8 text-center text-gray-500">Chưa có đơn hàng nào</div>
-              ) : (
-                customer.orders.map((order) => {
-                  let orderTotal = 0
-                  for (const item of (order.items || [])) {
-                    orderTotal += (Number(item.unit_price) || 0) * (Number(item.quantity) || 0)
-                  }
+              {!customer.orders || customer.orders.length === 0 ?
+              <div className="p-8 text-center text-gray-500">Chưa có đơn hàng nào</div> :
 
-                  return (
-                    <div key={order.id} className="p-6 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+              customer.orders.map((order) => {
+                let orderTotal = 0;
+                for (const item of order.items || []) {
+                  orderTotal += (Number(item.unit_price) || 0) * (Number(item.quantity) || 0);
+                }
+
+                return (
+                  <div key={order.id} className="p-6 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
                       <div className="flex justify-between items-start mb-4">
                         <div>
                           <Link to={`/admin/orders/${order.id}`} className="font-bold text-blue-600 hover:underline">
@@ -158,20 +160,20 @@ export default function CustomerDetail() {
                           <div className="font-bold text-gray-900 dark:text-white">{formatCurrency(orderTotal)}</div>
                           <div className="text-sm">
                             <span className={`inline-block mt-1 px-2 py-0.5 rounded text-xs font-medium ${
-                              order.status === "completed" ? "bg-green-100 text-green-700" :
-                              order.status === "canceled" ? "bg-red-100 text-red-700" :
-                              "bg-yellow-100 text-yellow-700"
-                            }`}>
+                          order.status === "completed" ? "bg-green-100 text-green-700" :
+                          order.status === "canceled" ? "bg-red-100 text-red-700" :
+                          "bg-yellow-100 text-yellow-700"}`
+                          }>
                               {order.status === "completed" ? "Hoàn thành" :
-                               order.status === "canceled" ? "Đã hủy" : "Đang xử lý"}
+                            order.status === "canceled" ? "Đã hủy" : "Đang xử lý"}
                             </span>
                           </div>
                         </div>
                       </div>
 
                       <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 space-y-2">
-                        {(order.items || []).map((item) => (
-                          <div key={item.id} className="flex justify-between text-sm">
+                        {(order.items || []).map((item) =>
+                      <div key={item.id} className="flex justify-between text-sm">
                             <div className="text-gray-700 dark:text-gray-300">
                               <span className="font-medium">{item.quantity}x</span> {item.title}
                             </div>
@@ -179,16 +181,16 @@ export default function CustomerDetail() {
                               {formatCurrency(item.unit_price * item.quantity)}
                             </div>
                           </div>
-                        ))}
+                      )}
                       </div>
-                    </div>
-                  )
-                })
-              )}
+                    </div>);
+
+              })
+              }
             </div>
           </div>
         </div>
       </div>
-    </div>
-  )
+    </div>);
+
 }

@@ -1,10 +1,12 @@
-import { useCallback, useState, useEffect } from "react"
-import { Truck, Save, Loader2, LocateIcon, MapPin, Search, AlertCircle } from "lucide-react"
-import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal"
-import { useAdminAuth } from "../../../context/AdminAuthContext"
+import { useCallback, useState, useEffect } from "react";
+import { Truck, Save, Loader2, LocateIcon, MapPin, Search, AlertCircle } from "lucide-react";
+import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal";
+import { useAdminAuth } from "../../../context/AdminAuthContext";
+import { AdminLoading } from "../../../components/admin/AdminStates"
+
 
 export default function ShippingSettings() {
-  const { api } = useAdminAuth()
+  const { api } = useAdminAuth();
   const [settings, setSettings] = useState({
     shipping_base_cost: 30000,
     free_shipping_threshold: 500000,
@@ -18,79 +20,79 @@ export default function ShippingSettings() {
     shipping_min_fee: 18000,
     shipping_max_fee: 60000,
     shipping_non_hanoi_fee: 45000
-  })
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [locating, setLocating] = useState(false)
-  const [message, setMessage] = useState("")
-  const [error, setError] = useState("")
+  });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [locating, setLocating] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
-      alert("Trình duyệt của bạn không hỗ trợ lấy vị trí.")
-      return
+      alert("Trình duyệt của bạn không hỗ trợ lấy vị trí.");
+      return;
     }
-    setLocating(true)
+    setLocating(true);
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
-        const lat = pos.coords.latitude
-        const lng = pos.coords.longitude
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
         try {
-          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=vi`)
-          const data = await res.json()
-          setSettings(prev => ({
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=vi`);
+          const data = await res.json();
+          setSettings((prev) => ({
             ...prev,
             shipping_origin_lat: lat,
             shipping_origin_lng: lng,
             shipping_origin_address: data?.display_name?.replace(/, Việt Nam$/i, "").trim() || ""
-          }))
+          }));
         } catch {
-          setSettings(prev => ({
+          setSettings((prev) => ({
             ...prev,
             shipping_origin_lat: lat,
             shipping_origin_lng: lng
-          }))
+          }));
         }
-        setLocating(false)
+        setLocating(false);
       },
       (err) => {
-        alert("Không thể lấy vị trí: " + err.message)
-        setLocating(false)
+        alert("Không thể lấy vị trí: " + err.message);
+        setLocating(false);
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-    )
-  }
+    );
+  };
 
   const handleGeocodeAddress = async () => {
     if (!settings.shipping_origin_address) {
-      alert("Vui lòng nhập địa chỉ cửa hàng")
-      return
+      alert("Vui lòng nhập địa chỉ cửa hàng");
+      return;
     }
-    setLocating(true)
+    setLocating(true);
     try {
-      const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(settings.shipping_origin_address)}&format=json&limit=1`)
-      const data = await res.json()
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(settings.shipping_origin_address)}&format=json&limit=1`);
+      const data = await res.json();
       if (data && data.length > 0) {
-        setSettings(prev => ({
+        setSettings((prev) => ({
           ...prev,
           shipping_origin_lat: Number(data[0].lat),
           shipping_origin_lng: Number(data[0].lon)
-        }))
-        alert("Đã tìm thấy tọa độ thành công!")
+        }));
+        alert("Đã tìm thấy tọa độ thành công!");
       } else {
-        alert("Không tìm thấy tọa độ cho địa chỉ này.")
+        alert("Không tìm thấy tọa độ cho địa chỉ này.");
       }
     } catch (err) {
-      alert("Lỗi khi tìm tọa độ: " + err.message)
+      alert("Lỗi khi tìm tọa độ: " + err.message);
     } finally {
-      setLocating(false)
+      setLocating(false);
     }
-  }
+  };
 
   const fetchSettings = useCallback(async () => {
     try {
-      setLoading(true)
-      const res = await api("/admin/custom?mode=settings")
+      setLoading(true);
+      const res = await api("/admin/custom?mode=settings");
       if (res?.settings) {
         setSettings({
           shipping_base_cost: res.settings.shipping_base_cost ?? 30000,
@@ -105,25 +107,25 @@ export default function ShippingSettings() {
           shipping_min_fee: res.settings.shipping_min_fee ?? 18000,
           shipping_max_fee: res.settings.shipping_max_fee ?? 60000,
           shipping_non_hanoi_fee: res.settings.shipping_non_hanoi_fee ?? 45000
-        })
+        });
       }
     } catch (error) {
-      console.error("Failed to fetch shipping settings:", error)
+      console.error("Failed to fetch shipping settings:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [api])
+  }, [api]);
 
   useEffect(() => {
-    const timer = window.setTimeout(fetchSettings, 0)
-    return () => window.clearTimeout(timer)
-  }, [fetchSettings])
+    const timer = window.setTimeout(fetchSettings, 0);
+    return () => window.clearTimeout(timer);
+  }, [fetchSettings]);
 
   const handleSave = async () => {
     try {
-      setSaving(true)
-      setMessage("")
-      setError("")
+      setSaving(true);
+      setMessage("");
+      setError("");
       await api("/admin/custom?mode=settings", {
         method: "POST",
         body: {
@@ -141,18 +143,18 @@ export default function ShippingSettings() {
             shipping_non_hanoi_fee: Number(settings.shipping_non_hanoi_fee)
           }
         }
-      })
-      setMessage("Đã lưu cài đặt vận chuyển thành công.")
+      });
+      setMessage("Đã lưu cài đặt vận chuyển thành công.");
     } catch (error) {
-      setError(error.message || "Không thể lưu cài đặt vận chuyển.")
+      setError(error.message || "Không thể lưu cài đặt vận chuyển.");
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
-  if (loading) {
-    return <div className="p-8 text-center text-gray-500">Đang tải cài đặt...</div>
-  }
+
+
+
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
@@ -170,24 +172,24 @@ export default function ShippingSettings() {
       </AdminHeaderPortal>
       <div className="mb-6 flex justify-end">
         <button
-            onClick={handleSave}
-            disabled={saving}
-            className="admin-button-primary px-4 py-2 text-sm flex items-center gap-2"
-          >
+          onClick={handleSave}
+          disabled={saving}
+          className="admin-button-primary px-4 py-2 text-sm flex items-center gap-2">
+          
             <Save className="w-4 h-4" />
             {saving ? "Đang lưu..." : "Lưu cài đặt"}
           </button>
-      </div>
+      </div>{loading ? <AdminLoading /> : <>
 
-      {(message || error) && (
+      {(message || error) &&
         <div className={`rounded-xl border px-4 py-3 text-sm font-medium ${
-          error
-            ? "border-red-200 bg-red-50 text-red-700"
-            : "border-emerald-200 bg-emerald-50 text-emerald-700"
-        }`}>
+        error ?
+        "border-red-200 bg-red-50 text-red-700" :
+        "border-emerald-200 bg-emerald-50 text-emerald-700"}`
+        }>
           {error || message}
         </div>
-      )}
+        }
 
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
         <div className="p-6 space-y-8">
@@ -218,11 +220,11 @@ export default function ShippingSettings() {
                 </label>
                 <div className="relative">
                   <input
-                    type="number"
-                    value={settings.shipping_base_cost}
-                    onChange={(e) => setSettings({ ...settings, shipping_base_cost: e.target.value })}
-                    className="w-full pl-4 pr-12 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                  />
+                      type="number"
+                      value={settings.shipping_base_cost}
+                      onChange={(e) => setSettings({ ...settings, shipping_base_cost: e.target.value })}
+                      className="w-full pl-4 pr-12 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+                    
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">VNĐ</span>
                 </div>
               </div>
@@ -233,11 +235,11 @@ export default function ShippingSettings() {
                 </label>
                 <div className="relative">
                   <input
-                    type="number"
-                    value={settings.free_shipping_threshold}
-                    onChange={(e) => setSettings({ ...settings, free_shipping_threshold: e.target.value })}
-                    className="w-full pl-4 pr-12 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                  />
+                      type="number"
+                      value={settings.free_shipping_threshold}
+                      onChange={(e) => setSettings({ ...settings, free_shipping_threshold: e.target.value })}
+                      className="w-full pl-4 pr-12 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+                    
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">VNĐ</span>
                 </div>
               </div>
@@ -247,12 +249,12 @@ export default function ShippingSettings() {
                   Các khu vực/Quận được Miễn phí giao hàng (cách nhau dấu phẩy)
                 </label>
                 <textarea
-                  value={settings.free_shipping_districts}
-                  onChange={(e) => setSettings({ ...settings, free_shipping_districts: e.target.value })}
-                  rows={2}
-                  placeholder="VD: Hoàn Kiếm, Ba Đình, Đống Đa"
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                />
+                    value={settings.free_shipping_districts}
+                    onChange={(e) => setSettings({ ...settings, free_shipping_districts: e.target.value })}
+                    rows={2}
+                    placeholder="VD: Hoàn Kiếm, Ba Đình, Đống Đa"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+                  
               </div>
             </div>
           </div>
@@ -267,16 +269,16 @@ export default function ShippingSettings() {
                 Tọa độ cửa hàng & Tính phí theo KM
               </h3>
               <button
-                type="button"
-                onClick={handleGetLocation}
-                disabled={locating}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
-              >
-                {locating ? (
-                  <div className="w-3.5 h-3.5 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin"></div>
-                ) : (
+                  type="button"
+                  onClick={handleGetLocation}
+                  disabled={locating}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+                  
+                {locating ?
+                  <div className="w-3.5 h-3.5 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin"></div> :
+
                   <MapPin className="w-3.5 h-3.5" />
-                )}
+                  }
                 {locating ? "Đang lấy..." : "Lấy vị trí hiện tại"}
               </button>
             </div>
@@ -288,18 +290,18 @@ export default function ShippingSettings() {
                 </div>
                 <div className="flex gap-2">
                   <input
-                    type="text"
-                    value={settings.shipping_origin_address}
-                    onChange={(e) => setSettings({ ...settings, shipping_origin_address: e.target.value })}
-                    placeholder="VD: 36 Phố Hoàng Cầu, Đống Đa, Hà Nội..."
-                    className="flex-1 px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                  />
+                      type="text"
+                      value={settings.shipping_origin_address}
+                      onChange={(e) => setSettings({ ...settings, shipping_origin_address: e.target.value })}
+                      placeholder="VD: 36 Phố Hoàng Cầu, Đống Đa, Hà Nội..."
+                      className="flex-1 px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+                    
                   <button
-                    type="button"
-                    onClick={handleGeocodeAddress}
-                    disabled={locating}
-                    className="px-4 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-medium rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 shrink-0"
-                  >
+                      type="button"
+                      onClick={handleGeocodeAddress}
+                      disabled={locating}
+                      className="px-4 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-medium rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 shrink-0">
+                      
                     Tìm tọa độ
                   </button>
                 </div>
@@ -308,52 +310,52 @@ export default function ShippingSettings() {
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Phí cơ bản ban đầu (VNĐ)</label>
                 <input
-                  type="number"
-                  value={settings.shipping_base_fee}
-                  onChange={(e) => setSettings({ ...settings, shipping_base_fee: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                />
+                    type="number"
+                    value={settings.shipping_base_fee}
+                    onChange={(e) => setSettings({ ...settings, shipping_base_fee: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+                  
               </div>
 
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Phí cộng thêm mỗi KM (VNĐ/km)</label>
                 <input
-                  type="number"
-                  value={settings.shipping_fee_per_km}
-                  onChange={(e) => setSettings({ ...settings, shipping_fee_per_km: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                />
+                    type="number"
+                    value={settings.shipping_fee_per_km}
+                    onChange={(e) => setSettings({ ...settings, shipping_fee_per_km: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+                  
               </div>
 
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Mức phí ship tối thiểu (VNĐ)</label>
                 <input
-                  type="number"
-                  min={0}
-                  value={settings.shipping_min_fee}
-                  onChange={(e) => setSettings({ ...settings, shipping_min_fee: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                />
+                    type="number"
+                    min={0}
+                    value={settings.shipping_min_fee}
+                    onChange={(e) => setSettings({ ...settings, shipping_min_fee: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+                  
               </div>
 
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Mức phí ship tối đa (VNĐ)</label>
                 <input
-                  type="number"
-                  value={settings.shipping_max_fee}
-                  onChange={(e) => setSettings({ ...settings, shipping_max_fee: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                />
+                    type="number"
+                    value={settings.shipping_max_fee}
+                    onChange={(e) => setSettings({ ...settings, shipping_max_fee: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+                  
               </div>
 
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Phí cố định ngoại tỉnh (VNĐ)</label>
                 <input
-                  type="number"
-                  value={settings.shipping_non_hanoi_fee}
-                  onChange={(e) => setSettings({ ...settings, shipping_non_hanoi_fee: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                />
+                    type="number"
+                    value={settings.shipping_non_hanoi_fee}
+                    onChange={(e) => setSettings({ ...settings, shipping_non_hanoi_fee: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+                  
               </div>
             </div>
           </div>
@@ -365,15 +367,15 @@ export default function ShippingSettings() {
               Ghi chú hiển thị cho khách hàng ở trang Thanh toán
             </label>
             <textarea
-              value={settings.shipping_note}
-              onChange={(e) => setSettings({ ...settings, shipping_note: e.target.value })}
-              rows={3}
-              placeholder="VD: Giao hàng trong vòng 2h tại khu vực nội thành..."
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-            />
+                value={settings.shipping_note}
+                onChange={(e) => setSettings({ ...settings, shipping_note: e.target.value })}
+                rows={3}
+                placeholder="VD: Giao hàng trong vòng 2h tại khu vực nội thành..."
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+              
           </div>
         </div>
       </div>
-    </div>
-  )
+    </>}</div>);
+
 }

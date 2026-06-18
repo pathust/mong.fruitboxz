@@ -1,49 +1,51 @@
-import { useState, useEffect } from "react"
-import { Link, useNavigate, useParams } from "react-router-dom"
-import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal"
-import { Tags } from "lucide-react"
-import { useAdminAuth } from "../../../context/AdminAuthContext"
-import ImagePicker from "../../../components/admin/ImagePicker"
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal";
+import { Tags } from "lucide-react";
+import { useAdminAuth } from "../../../context/AdminAuthContext";
+import ImagePicker from "../../../components/admin/ImagePicker";
+import { AdminLoading } from "../../../components/admin/AdminStates"
+
 
 function slugify(value) {
-  return String(value || "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/đ/g, "d")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
+  return String(value || "").
+  normalize("NFD").
+  replace(/[\u0300-\u036f]/g, "").
+  toLowerCase().
+  replace(/đ/g, "d").
+  replace(/[^a-z0-9]+/g, "-").
+  replace(/^-+|-+$/g, "");
 }
 
 export default function CategoryForm() {
-  const { api } = useAdminAuth()
-  const navigate = useNavigate()
-  const { id } = useParams()
-  const isNew = !id
-  const [loading, setLoading] = useState(!isNew)
-  const [saving, setSaving] = useState(false)
-  const [form, setForm] = useState({ name: "", slug: "", description: "", image: "" })
-  const [showImagePicker, setShowImagePicker] = useState(false)
+  const { api } = useAdminAuth();
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const isNew = !id;
+  const [loading, setLoading] = useState(!isNew);
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({ name: "", slug: "", description: "", image: "" });
+  const [showImagePicker, setShowImagePicker] = useState(false);
 
   useEffect(() => {
     if (!isNew) {
-      api(`/admin/product-categories/${id}`)
-        .then(d => {
-          const c = d.product_category
-          setForm({
-            name: c.name || "",
-            slug: slugify(c.handle || c.name || ""),
-            description: c.description || "",
-            image: c.metadata?.image || ""
-          })
-        })
-        .finally(() => setLoading(false))
+      api(`/admin/product-categories/${id}`).
+      then((d) => {
+        const c = d.product_category;
+        setForm({
+          name: c.name || "",
+          slug: slugify(c.handle || c.name || ""),
+          description: c.description || "",
+          image: c.metadata?.image || ""
+        });
+      }).
+      finally(() => setLoading(false));
     }
-  }, [id, isNew, api])
+  }, [id, isNew, api]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setSaving(true)
+    e.preventDefault();
+    setSaving(true);
     try {
       const body = {
         name: form.name,
@@ -51,22 +53,22 @@ export default function CategoryForm() {
         description: form.description,
         is_active: true,
         metadata: { image: form.image }
-      }
+      };
 
       if (isNew) {
-        await api("/admin/product-categories", { method: "POST", body: JSON.stringify(body) })
+        await api("/admin/product-categories", { method: "POST", body: JSON.stringify(body) });
       } else {
-        await api(`/admin/product-categories/${id}`, { method: "POST", body: JSON.stringify(body) })
+        await api(`/admin/product-categories/${id}`, { method: "POST", body: JSON.stringify(body) });
       }
-      navigate("/admin/categories")
+      navigate("/admin/categories");
     } catch (err) {
-      alert("Error: " + err.message)
+      alert("Error: " + err.message);
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
-  if (loading) return <div className="text-center py-12 text-secondary-light">Đang tải dữ liệu...</div>
+
 
   return (
     <div className="max-w-2xl">
@@ -80,45 +82,45 @@ export default function CategoryForm() {
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Tạo mới hoặc cập nhật thông tin danh mục.</p>
           </div>
         </div>
-      </AdminHeaderPortal>
+      </AdminHeaderPortal>{loading ? <AdminLoading /> : <>
       <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
         <div>
           <label className="block text-sm font-medium text-secondary mb-1">Tên danh mục</label>
-          <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" required />
+          <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" required />
         </div>
 
         <div>
           <label className="block text-sm font-medium text-secondary mb-1">Ảnh đại diện</label>
           <div className="flex items-center gap-4">
-            {form.image && (
+            {form.image &&
               <img src={form.image} alt="Thumbnail" className="h-16 w-16 rounded-xl object-cover border border-gray-200" />
-            )}
+              }
             <button
-              type="button"
-              onClick={() => setShowImagePicker(true)}
-              className="px-4 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50 text-secondary"
-            >
+                type="button"
+                onClick={() => setShowImagePicker(true)}
+                className="px-4 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50 text-secondary">
+                
               {form.image ? "Change Image" : "Choose Image"}
             </button>
-            {form.image && (
+            {form.image &&
               <button
                 type="button"
                 onClick={() => setForm({ ...form, image: "" })}
-                className="text-red-500 text-sm hover:underline"
-              >
+                className="text-red-500 text-sm hover:underline">
+                
                 Remove
               </button>
-            )}
+              }
           </div>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-secondary mb-1">Slug (đường dẫn)</label>
-          <input value={form.slug} onChange={e => setForm({ ...form, slug: slugify(e.target.value) })} placeholder="hop-qua-trai-cay" className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
+          <input value={form.slug} onChange={(e) => setForm({ ...form, slug: slugify(e.target.value) })} placeholder="hop-qua-trai-cay" className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
         </div>
         <div>
           <label className="block text-sm font-medium text-secondary mb-1">Mô tả danh mục</label>
-          <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={4} placeholder="Giới thiệu ngắn về danh mục — sẽ hiển thị trên trang Danh mục của website..." className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
+          <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={4} placeholder="Giới thiệu ngắn về danh mục — sẽ hiển thị trên trang Danh mục của website..." className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
           <p className="text-xs text-gray-400 mt-1">Mô tả này sẽ hiển thị công khai trên trang danh mục sản phẩm của website.</p>
         </div>
         <div className="flex gap-3 pt-2">
@@ -127,16 +129,16 @@ export default function CategoryForm() {
         </div>
       </form>
 
-      {showImagePicker && (
+      {showImagePicker &&
         <ImagePicker
           onClose={() => setShowImagePicker(false)}
           onSelect={(val) => {
-            setForm({ ...form, image: val })
-            setShowImagePicker(false)
+            setForm({ ...form, image: val });
+            setShowImagePicker(false);
           }}
-          selected={form.image}
-        />
-      )}
-    </div>
-  )
+          selected={form.image} />
+
+        }
+    </>}</div>);
+
 }

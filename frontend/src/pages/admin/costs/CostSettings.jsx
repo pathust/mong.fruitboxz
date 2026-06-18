@@ -1,10 +1,12 @@
-import { useCallback, useState, useEffect } from "react"
-import { Calculator, AlertCircle, Save } from "lucide-react"
-import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal"
-import { useAdminAuth } from "../../../context/AdminAuthContext"
+import { useCallback, useState, useEffect } from "react";
+import { Calculator, AlertCircle, Save } from "lucide-react";
+import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal";
+import { useAdminAuth } from "../../../context/AdminAuthContext";
+import { AdminLoading } from "../../../components/admin/AdminStates"
+
 
 export default function CostSettings() {
-  const { api } = useAdminAuth()
+  const { api } = useAdminAuth();
   const [form, setForm] = useState({
     default_cost_percent: 50,
     packaging_cost: 5000,
@@ -15,34 +17,34 @@ export default function CostSettings() {
     shipping_max_fee: 60000,
     shipping_base_cost: 30000,
     shipping_non_hanoi_fee: 45000,
-    free_shipping_districts: "Hoàn Kiếm, Ba Đình, Đống Đa, Hai Bà Trưng, Cầu Giấy, Tây Hồ",
-  })
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [error, setError] = useState("")
+    free_shipping_districts: "Hoàn Kiếm, Ba Đình, Đống Đa, Hai Bà Trưng, Cầu Giấy, Tây Hồ"
+  });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
   const fetchSettings = useCallback(async () => {
     try {
-      const res = await api("/admin/custom?mode=settings")
+      const res = await api("/admin/custom?mode=settings");
       if (res?.settings) {
-        setForm(prev => ({ ...prev, ...res.settings }))
+        setForm((prev) => ({ ...prev, ...res.settings }));
       }
     } catch (err) {
-      setError(err.message)
+      setError(err.message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [api])
+  }, [api]);
 
   useEffect(() => {
-    const timer = window.setTimeout(fetchSettings, 0)
-    return () => window.clearTimeout(timer)
-  }, [fetchSettings])
+    const timer = window.setTimeout(fetchSettings, 0);
+    return () => window.clearTimeout(timer);
+  }, [fetchSettings]);
 
   const handleSave = async (e) => {
-    e.preventDefault()
-    setSaving(true)
-    setError("")
+    e.preventDefault();
+    setSaving(true);
+    setError("");
     try {
       await api("/admin/custom?mode=settings", {
         method: "POST",
@@ -57,19 +59,19 @@ export default function CostSettings() {
             shipping_max_fee: form.shipping_max_fee,
             shipping_base_cost: form.shipping_base_cost,
             shipping_non_hanoi_fee: form.shipping_non_hanoi_fee,
-            free_shipping_districts: form.free_shipping_districts,
+            free_shipping_districts: form.free_shipping_districts
           }
         }
-      })
-      alert("Cost and Shipping settings saved successfully!")
+      });
+      alert("Cost and Shipping settings saved successfully!");
     } catch (err) {
-      setError(err.message)
+      setError(err.message);
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
-  if (loading) return <div className="p-6">Đang tải dữ liệu...</div>
+
 
   return (
     <div className="max-w-3xl">
@@ -84,28 +86,28 @@ export default function CostSettings() {
           </div>
           
         </div>
-      </AdminHeaderPortal>
+      </AdminHeaderPortal>{loading ? <AdminLoading /> : <>
 
-      {error && (
+      {error &&
         <div className="mb-6 rounded-xl bg-red-50 p-4 text-sm text-red-600 flex items-center gap-2 border border-red-100">
           <AlertCircle className="h-4 w-4" /> {error}
         </div>
-      )}
+        }
 
       <form onSubmit={handleSave} className="space-y-6 bg-white p-6 rounded-2xl shadow-sm border border-[#eadfcd]">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-secondary mb-1">Tỷ lệ giá vốn mặc định (%)</label>
-            <input type="number" min={0} max={100} value={form.default_cost_percent} onChange={e => setForm({ ...form, default_cost_percent: Number(e.target.value) || 0 })} className="admin-input w-full px-4 py-2.5" />
+            <input type="number" min={0} max={100} value={form.default_cost_percent} onChange={(e) => setForm({ ...form, default_cost_percent: Number(e.target.value) || 0 })} className="admin-input w-full px-4 py-2.5" />
             <p className="mt-1 text-xs text-[#8a7a67]">Dùng để ước tính nhanh giá vốn nếu sản phẩm chưa có định mức nguyên liệu cụ thể.</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-secondary mb-1">Chi phí đóng gói / sản phẩm (₫)</label>
-            <input type="number" min={0} value={form.packaging_cost} onChange={e => setForm({ ...form, packaging_cost: Number(e.target.value) || 0 })} className="admin-input w-full px-4 py-2.5" />
+            <input type="number" min={0} value={form.packaging_cost} onChange={(e) => setForm({ ...form, packaging_cost: Number(e.target.value) || 0 })} className="admin-input w-full px-4 py-2.5" />
           </div>
           <div>
             <label className="block text-sm font-medium text-secondary mb-1">Chi phí nhân công / đơn hàng (₫)</label>
-            <input type="number" min={0} value={form.labor_cost_per_order} onChange={e => setForm({ ...form, labor_cost_per_order: Number(e.target.value) || 0 })} className="admin-input w-full px-4 py-2.5" />
+            <input type="number" min={0} value={form.labor_cost_per_order} onChange={(e) => setForm({ ...form, labor_cost_per_order: Number(e.target.value) || 0 })} className="admin-input w-full px-4 py-2.5" />
           </div>
         </div>
 
@@ -113,32 +115,32 @@ export default function CostSettings() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-secondary mb-1">Phí cơ bản 3km đầu (₫)</label>
-            <input type="number" min={0} value={form.shipping_base_fee} onChange={e => setForm({ ...form, shipping_base_fee: Number(e.target.value) || 0 })} className="admin-input w-full px-4 py-2.5" />
+            <input type="number" min={0} value={form.shipping_base_fee} onChange={(e) => setForm({ ...form, shipping_base_fee: Number(e.target.value) || 0 })} className="admin-input w-full px-4 py-2.5" />
           </div>
           <div>
             <label className="block text-sm font-medium text-secondary mb-1">Phí mỗi km tiếp theo (₫)</label>
-            <input type="number" min={0} value={form.shipping_fee_per_km} onChange={e => setForm({ ...form, shipping_fee_per_km: Number(e.target.value) || 0 })} className="admin-input w-full px-4 py-2.5" />
+            <input type="number" min={0} value={form.shipping_fee_per_km} onChange={(e) => setForm({ ...form, shipping_fee_per_km: Number(e.target.value) || 0 })} className="admin-input w-full px-4 py-2.5" />
           </div>
           <div>
             <label className="block text-sm font-medium text-secondary mb-1">Phí tối thiểu / Min Fee (₫)</label>
-            <input type="number" min={0} value={form.shipping_min_fee} onChange={e => setForm({ ...form, shipping_min_fee: Number(e.target.value) || 0 })} className="admin-input w-full px-4 py-2.5" />
+            <input type="number" min={0} value={form.shipping_min_fee} onChange={(e) => setForm({ ...form, shipping_min_fee: Number(e.target.value) || 0 })} className="admin-input w-full px-4 py-2.5" />
           </div>
           <div>
             <label className="block text-sm font-medium text-secondary mb-1">Phí tối đa / Max Fee (₫)</label>
-            <input type="number" min={0} value={form.shipping_max_fee} onChange={e => setForm({ ...form, shipping_max_fee: Number(e.target.value) || 0 })} className="admin-input w-full px-4 py-2.5" />
+            <input type="number" min={0} value={form.shipping_max_fee} onChange={(e) => setForm({ ...form, shipping_max_fee: Number(e.target.value) || 0 })} className="admin-input w-full px-4 py-2.5" />
           </div>
           <div>
             <label className="block text-sm font-medium text-secondary mb-1">Phí dự phòng nội thành HN (₫)</label>
-            <input type="number" min={0} value={form.shipping_base_cost} onChange={e => setForm({ ...form, shipping_base_cost: Number(e.target.value) || 0 })} className="admin-input w-full px-4 py-2.5" />
+            <input type="number" min={0} value={form.shipping_base_cost} onChange={(e) => setForm({ ...form, shipping_base_cost: Number(e.target.value) || 0 })} className="admin-input w-full px-4 py-2.5" />
             <p className="mt-1 text-xs text-[#8a7a67]">Áp dụng khi không tính được khoảng cách tự động do lỗi địa chỉ.</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-secondary mb-1">Phí ngoại tỉnh / Non-Hanoi (₫)</label>
-            <input type="number" min={0} value={form.shipping_non_hanoi_fee} onChange={e => setForm({ ...form, shipping_non_hanoi_fee: Number(e.target.value) || 0 })} className="admin-input w-full px-4 py-2.5" />
+            <input type="number" min={0} value={form.shipping_non_hanoi_fee} onChange={(e) => setForm({ ...form, shipping_non_hanoi_fee: Number(e.target.value) || 0 })} className="admin-input w-full px-4 py-2.5" />
           </div>
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-secondary mb-1">Các quận được Freeship nội thành (cách nhau bởi dấu phẩy)</label>
-            <input type="text" value={form.free_shipping_districts} onChange={e => setForm({ ...form, free_shipping_districts: e.target.value })} className="admin-input w-full px-4 py-2.5" />
+            <input type="text" value={form.free_shipping_districts} onChange={(e) => setForm({ ...form, free_shipping_districts: e.target.value })} className="admin-input w-full px-4 py-2.5" />
           </div>
         </div>
 
@@ -154,6 +156,6 @@ export default function CostSettings() {
           </button>
         </div>
       </form>
-    </div>
-  )
+    </>}</div>);
+
 }

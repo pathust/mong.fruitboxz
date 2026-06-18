@@ -1,41 +1,43 @@
-import { useMemo, useState, useEffect } from "react"
-import { Link } from "react-router-dom"
-import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal"
-import { Image, ImageIcon, Pencil, Trash2, X } from "lucide-react"
-import { useAdminAuth } from "../../../context/AdminAuthContext"
-import { AdminListFilters, filterBySearch } from "../../../components/admin/AdminListFilters"
+import { useMemo, useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal";
+import { Image, ImageIcon, Pencil, Trash2, X } from "lucide-react";
+import { useAdminAuth } from "../../../context/AdminAuthContext";
+import { AdminListFilters, filterBySearch } from "../../../components/admin/AdminListFilters";
+import { AdminLoading } from "../../../components/admin/AdminStates"
+
 
 export default function BannersList() {
-  const { api } = useAdminAuth()
-  const [banners, setBanners] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [query, setQuery] = useState("")
-  const [active, setActive] = useState("all")
-  const [previewImage, setPreviewImage] = useState(null)
+  const { api } = useAdminAuth();
+  const [banners, setBanners] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState("");
+  const [active, setActive] = useState("all");
+  const [previewImage, setPreviewImage] = useState(null);
 
   useEffect(() => {
-    api("/admin/banners")
-      .then(d => setBanners(d.banners || []))
-      .catch(() => {})
-      .finally(() => setLoading(false))
-  }, [api])
+    api("/admin/banners").
+    then((d) => setBanners(d.banners || [])).
+    catch(() => {}).
+    finally(() => setLoading(false));
+  }, [api]);
 
   const deleteBanner = async (id) => {
-    if (!confirm("Delete this banner?")) return
-    await api(`/admin/banners/${id}`, { method: "DELETE" })
-    setBanners(prev => prev.filter(b => b.id !== id))
-  }
+    if (!confirm("Delete this banner?")) return;
+    await api(`/admin/banners/${id}`, { method: "DELETE" });
+    setBanners((prev) => prev.filter((b) => b.id !== id));
+  };
 
   const filteredBanners = useMemo(() => {
     return banners.filter((banner) => {
       return (
-        filterBySearch(banner, query, ["title", "subtitle", "link"]) &&
-        (active === "all" || (active === "active" ? banner.active : !banner.active))
-      )
-    })
-  }, [banners, query, active])
+        filterBySearch(banner, query, ["title", "subtitle", "link"]) && (
+        active === "all" || (active === "active" ? banner.active : !banner.active)));
 
-  if (loading) return <div className="text-center py-12 text-secondary-light">Đang tải dữ liệu...</div>
+    });
+  }, [banners, query, active]);
+
+
 
   return (
     <div>
@@ -53,7 +55,7 @@ export default function BannersList() {
       </AdminHeaderPortal>
       <AdminListFilters
         actions={
-          <>
+        <>
             <Link to="/admin/banners/new" className="admin-button-primary px-4 py-2 text-sm">+ Add Banner</Link>
           </>
         }
@@ -63,22 +65,22 @@ export default function BannersList() {
         showing={filteredBanners.length}
         total={banners.length}
         onReset={() => {
-          setQuery("")
-          setActive("all")
+          setQuery("");
+          setActive("all");
         }}
         filters={[
-          {
-            label: "Active",
-            value: active,
-            onChange: setActive,
-            options: [
-              { value: "all", label: "Tất cả trạng thái" },
-              { value: "active", label: "Active" },
-              { value: "inactive", label: "Inactive" },
-            ],
-          },
-        ]}
-      />
+        {
+          label: "Active",
+          value: active,
+          onChange: setActive,
+          options: [
+          { value: "all", label: "Tất cả trạng thái" },
+          { value: "active", label: "Active" },
+          { value: "inactive", label: "Inactive" }]
+
+        }]
+        } />{loading ? <AdminLoading /> : <>
+        
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 text-secondary-light">
@@ -91,23 +93,23 @@ export default function BannersList() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {filteredBanners.map(b => (
+            {filteredBanners.map((b) =>
               <tr key={b.id} className="hover:bg-gray-50">
                 <td className="px-4 py-3">
-                  {b.image ? (
-                    <button
-                      type="button"
-                      onClick={() => setPreviewImage({ src: b.image, title: b.title })}
-                      className="group block h-16 w-28 overflow-hidden rounded-xl border border-gray-200 bg-gray-50 transition hover:border-primary hover:shadow-sm"
-                      title="Xem ảnh banner"
-                    >
+                  {b.image ?
+                  <button
+                    type="button"
+                    onClick={() => setPreviewImage({ src: b.image, title: b.title })}
+                    className="group block h-16 w-28 overflow-hidden rounded-xl border border-gray-200 bg-gray-50 transition hover:border-primary hover:shadow-sm"
+                    title="Xem ảnh banner">
+                    
                       <img src={b.image} alt={b.title} className="h-full w-full object-cover transition group-hover:scale-105" />
-                    </button>
-                  ) : (
-                    <div className="flex h-16 w-28 items-center justify-center rounded-xl border border-dashed border-gray-200 bg-gray-50 text-gray-300">
+                    </button> :
+
+                  <div className="flex h-16 w-28 items-center justify-center rounded-xl border border-dashed border-gray-200 bg-gray-50 text-gray-300">
                       <ImageIcon className="h-5 w-5" />
                     </div>
-                  )}
+                  }
                 </td>
                 <td className="px-4 py-3 font-medium text-secondary">{b.title}</td>
                 <td className="px-4 py-3 text-secondary-light">{b.subtitle}</td>
@@ -125,12 +127,12 @@ export default function BannersList() {
                   </div>
                 </td>
               </tr>
-            ))}
+              )}
           </tbody>
         </table>
       </div>
 
-      {previewImage && (
+      {previewImage &&
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setPreviewImage(null)}>
           <div className="relative max-h-[88vh] w-full max-w-5xl overflow-hidden rounded-2xl bg-white shadow-2xl" onClick={(event) => event.stopPropagation()}>
             <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
@@ -144,9 +146,7 @@ export default function BannersList() {
             </div>
           </div>
         </div>
-      )}
-    </div>
-  )
+        }
+    </>}</div>);
+
 }
-
-
