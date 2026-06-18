@@ -110,7 +110,14 @@ export default function InventoryList() {
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Quản lý số lượng tồn kho của các nguyên liệu thô.</p>
           </div>
         
-        {Object.keys(updates).length > 0 && (
+        
+      </div>
+      </AdminHeaderPortal>
+
+      <AdminListFilters
+        actions={
+          <>
+            {Object.keys(updates).length > 0 && (
           <button
             onClick={handleSaveAll}
             className="admin-button-primary px-6 py-2.5 text-sm flex items-center gap-2 shadow-lg shadow-primary/20 animate-in fade-in slide-in-from-bottom-2"
@@ -118,10 +125,8 @@ export default function InventoryList() {
             <Save className="w-4 h-4" /> Lưu Thay Đổi ({Object.keys(updates).length})
           </button>
         )}
-      </div>
-      </AdminHeaderPortal>
-
-      <AdminListFilters
+          </>
+        }
         search={searchTerm}
         onSearchChange={setSearchTerm}
         searchPlaceholder="Tìm theo tên nguyên liệu, SKU..."

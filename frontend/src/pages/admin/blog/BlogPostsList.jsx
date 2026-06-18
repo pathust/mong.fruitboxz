@@ -82,11 +82,16 @@ export default function BlogPostsList() {
             </h1>
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Quản lý các bài viết trên trang tin tức, blog.</p>
           </div>
-        <Link to="/admin/blog/new" className="admin-button-primary px-4 py-2 text-sm">Thêm bài viết</Link>
+        
       </div>
       </AdminHeaderPortal>
 
       <AdminListFilters
+        actions={
+          <>
+            <Link to="/admin/blog/new" className="admin-button-primary px-4 py-2 text-sm">Thêm bài viết</Link>
+          </>
+        }
         search={query}
         onSearchChange={setQuery}
         searchPlaceholder="Tìm theo tiêu đề, slug, tác giả..."

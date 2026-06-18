@@ -48,10 +48,15 @@ export default function BannersList() {
             </h1>
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Quản lý hình ảnh và nội dung banner hiển thị trên trang chủ.</p>
           </div>
-          <Link to="/admin/banners/new" className="admin-button-primary px-4 py-2 text-sm">+ Add Banner</Link>
+          
         </div>
       </AdminHeaderPortal>
       <AdminListFilters
+        actions={
+          <>
+            <Link to="/admin/banners/new" className="admin-button-primary px-4 py-2 text-sm">+ Add Banner</Link>
+          </>
+        }
         search={query}
         onSearchChange={setQuery}
         searchPlaceholder="Tìm theo title, subtitle, link..."

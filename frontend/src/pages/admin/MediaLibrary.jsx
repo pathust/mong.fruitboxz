@@ -108,13 +108,7 @@ export default function MediaLibrary() {
             </h1>
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Quản lý và lưu trữ tất cả hình ảnh của cửa hàng.</p>
           </div>
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <input ref={fileRef} type="file" accept="image/*" onChange={handleUpload} className="hidden" />
-          <button type="button" onClick={() => fileRef.current?.click()} className="admin-button-primary px-5 py-3 text-sm">
-            {uploading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <ImagePlus className="h-4 w-4" />}
-            {uploading ? 'Đang tải...' : 'Tải ảnh lên'}
-          </button>
-        </div>
+        
       </div>
       </AdminHeaderPortal>
 
@@ -128,6 +122,17 @@ export default function MediaLibrary() {
       ) : (
         <>
         <AdminListFilters
+        actions={
+          <>
+            <div className="flex flex-col gap-3 sm:flex-row">
+          <input ref={fileRef} type="file" accept="image/*" onChange={handleUpload} className="hidden" />
+          <button type="button" onClick={() => fileRef.current?.click()} className="admin-button-primary px-5 py-3 text-sm">
+            {uploading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <ImagePlus className="h-4 w-4" />}
+            {uploading ? 'Đang tải...' : 'Tải ảnh lên'}
+          </button>
+        </div>
+          </>
+        }
           search={query}
           onSearchChange={setQuery}
           searchPlaceholder="Tìm theo tên file..."

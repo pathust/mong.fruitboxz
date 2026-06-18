@@ -56,13 +56,7 @@ export default function Settings() {
             </h1>
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Cấu hình các thông tin cơ bản của hệ thống.</p>
           </div>
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="admin-button-primary px-4 py-2 text-sm flex items-center gap-2 shadow-lg shadow-primary/20 disabled:opacity-60"
-          >
-            <Save className="w-4 h-4" /> {saving ? "Đang lưu..." : "Lưu"}
-          </button>
+          
         </div>
       </AdminHeaderPortal>
 
@@ -122,6 +116,16 @@ export default function Settings() {
               <input value={form.tiktok || ""} onChange={e => setForm({ ...form, tiktok: e.target.value })} className="w-full rounded-xl border border-[#eadfcd] bg-white px-4 py-3 text-[15px] font-medium text-secondary outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20" placeholder="https://tiktok.com/..." />
             </div>
           </div>
+        </div>
+      
+        <div className="pt-6 mt-6 border-t border-[#eadfcd] flex justify-end gap-3">
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="admin-button-primary px-4 py-2 text-sm flex items-center gap-2 shadow-lg shadow-primary/20 disabled:opacity-60"
+          >
+            <Save className="w-4 h-4" /> {saving ? "Đang lưu..." : "Lưu"}
+          </button>
         </div>
       </form>
     </div>

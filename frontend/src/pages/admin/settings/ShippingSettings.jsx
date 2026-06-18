@@ -165,7 +165,11 @@ export default function ShippingSettings() {
             </h1>
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Cấu hình phí vận chuyển mặc định và biểu phí theo khoảng cách.</p>
           </div>
-          <button
+          
+        </div>
+      </AdminHeaderPortal>
+      <div className="mb-6 flex justify-end">
+        <button
             onClick={handleSave}
             disabled={saving}
             className="admin-button-primary px-4 py-2 text-sm flex items-center gap-2"
@@ -173,8 +177,7 @@ export default function ShippingSettings() {
             <Save className="w-4 h-4" />
             {saving ? "Đang lưu..." : "Lưu cài đặt"}
           </button>
-        </div>
-      </AdminHeaderPortal>
+      </div>
 
       {(message || error) && (
         <div className={`rounded-xl border px-4 py-3 text-sm font-medium ${

@@ -201,6 +201,10 @@ export default function FinanceDashboard() {
             </h1>
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Theo dõi doanh thu, lợi nhuận và các báo cáo tài chính tổng quan.</p>
           </div>
+        
+      </div>
+      </AdminHeaderPortal>
+      <div className="mb-6 flex justify-end">
         <div className="flex gap-3">
           <button className="admin-button-secondary px-5 py-3 text-sm">
             <Download className="h-4 w-4" />
@@ -208,7 +212,6 @@ export default function FinanceDashboard() {
           </button>
         </div>
       </div>
-      </AdminHeaderPortal>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
         <div className="admin-card p-5 transition hover:-translate-y-0.5 hover:border-primary/45 xl:col-span-1">

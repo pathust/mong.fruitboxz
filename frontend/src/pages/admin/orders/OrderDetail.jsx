@@ -146,9 +146,12 @@ export default function OrderDetail() {
             </h1>
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Xem thông tin chi tiết và xử lý đơn hàng.</p>
           </div>
-          <Link to="/admin/orders" className="admin-button-secondary px-4 py-2 text-sm">&larr; Quay lại danh sách</Link>
+          
         </div>
       </AdminHeaderPortal>
+      <div className="mb-6 flex justify-end">
+        <Link to="/admin/orders" className="admin-button-secondary px-4 py-2 text-sm">&larr; Quay lại danh sách</Link>
+      </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
           <h2 className="font-semibold text-secondary mb-3">Trạng thái (Status)</h2>

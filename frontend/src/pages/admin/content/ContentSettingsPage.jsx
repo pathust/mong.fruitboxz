@@ -248,7 +248,7 @@ export default function ContentSettingsPage({ type }) {
           </h1>
           <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">{config.description}</p>
         </div>
-        <Link to={config.preview} target="_blank" className="admin-button-secondary px-4 py-2 text-sm">Xem storefront</Link>
+        
       </div>
       </AdminHeaderPortal>
 
@@ -289,6 +289,10 @@ export default function ContentSettingsPage({ type }) {
           <button type="submit" disabled={saving} className="admin-button-primary px-6 py-2.5 text-sm disabled:opacity-50">
             {saving ? "Đang lưu..." : "Lưu nội dung"}
           </button>
+        </div>
+      
+        <div className="pt-6 mt-6 border-t border-[#eadfcd] flex justify-end gap-3">
+          <Link to={config.preview} target="_blank" className="admin-button-secondary px-4 py-2 text-sm">Xem storefront</Link>
         </div>
       </form>
 

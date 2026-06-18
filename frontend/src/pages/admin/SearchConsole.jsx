@@ -80,15 +80,7 @@ export default function SearchConsole() {
             </h1>
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Quản lý công cụ tìm kiếm, đồng bộ dữ liệu.</p>
           </div>
-          <button
-            type="button"
-            onClick={handleReindex}
-            disabled={reindexing}
-            className="admin-button-primary px-5 py-3 text-sm disabled:opacity-60 flex items-center gap-2 shadow-lg shadow-primary/20"
-          >
-            {reindexing ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <RefreshCcw className="h-4 w-4" />}
-            {reindexing ? 'Đang đồng bộ...' : 'Đồng bộ lại dữ liệu'}
-          </button>
+          
         </div>
       </AdminHeaderPortal>
 
@@ -174,7 +166,19 @@ export default function SearchConsole() {
                 >
                   {isSearching ? <LoaderCircle className="w-4 h-4 animate-spin" /> : 'Tìm thử'}
                 </button>
-              </form>
+              
+        <div className="pt-6 mt-6 border-t border-[#eadfcd] flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={handleReindex}
+            disabled={reindexing}
+            className="admin-button-primary px-5 py-3 text-sm disabled:opacity-60 flex items-center gap-2 shadow-lg shadow-primary/20"
+          >
+            {reindexing ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <RefreshCcw className="h-4 w-4" />}
+            {reindexing ? 'Đang đồng bộ...' : 'Đồng bộ lại dữ liệu'}
+          </button>
+        </div>
+      </form>
             </div>
 
             <div className="p-6 bg-white flex-1 min-h-[300px]">

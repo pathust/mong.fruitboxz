@@ -39,10 +39,15 @@ export default function CategoriesList() {
             </h1>
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Quản lý các danh mục sản phẩm.</p>
           </div>
-          <Link to="/admin/categories/new" className="admin-button-primary px-4 py-2 text-sm">+ Thêm danh mục</Link>
+          
         </div>
       </AdminHeaderPortal>
       <AdminListFilters
+        actions={
+          <>
+            <Link to="/admin/categories/new" className="admin-button-primary px-4 py-2 text-sm">+ Thêm danh mục</Link>
+          </>
+        }
         search={query}
         onSearchChange={setQuery}
         searchPlaceholder="Tìm theo tên hoặc mô tả..."

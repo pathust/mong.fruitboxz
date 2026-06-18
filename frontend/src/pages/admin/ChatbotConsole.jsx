@@ -95,7 +95,11 @@ export default function ChatbotConsole() {
             </h1>
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Huấn luyện dữ liệu và theo dõi cấu hình trợ lý AI.</p>
           </div>
-          <div className="flex items-center gap-3">
+          
+        </div>
+      </AdminHeaderPortal>
+      <div className="mb-6 flex justify-end">
+        <div className="flex items-center gap-3">
             <div className="flex items-center gap-3 bg-[#fffaf4] px-3 py-1.5 rounded-full border border-[#efe4d4]">
               <div className={`w-2.5 h-2.5 rounded-full ${enabled ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-red-400'}`} />
               <button
@@ -115,8 +119,7 @@ export default function ChatbotConsole() {
               {saving ? "Đang lưu..." : "Lưu cấu hình"}
             </button>
           </div>
-        </div>
-      </AdminHeaderPortal>
+      </div>
 
       {/* Guide Section */}
       <div className="bg-white rounded-[24px] border border-[#efe4d4] shadow-sm p-6 md:p-8 relative overflow-hidden group">

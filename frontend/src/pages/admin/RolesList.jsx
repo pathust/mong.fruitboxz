@@ -185,16 +185,7 @@ export default function RolesList() {
             </h1>
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Thiết lập các nhóm quyền hạn cho quản trị viên.</p>
           </div>
-        <RequirePermission perm="roles.create">
-          <button
-            type="button"
-            onClick={startCreate}
-            className="admin-button-primary px-5 py-2.5 text-sm flex items-center gap-2 shadow-lg shadow-primary/20"
-          >
-            <Plus className="h-4 w-4" />
-            Thêm Vai Trò
-          </button>
-        </RequirePermission>
+        
       </div>
       </AdminHeaderPortal>
 
@@ -254,6 +245,20 @@ export default function RolesList() {
       )}
 
       <AdminListFilters
+        actions={
+          <>
+            <RequirePermission perm="roles.create">
+          <button
+            type="button"
+            onClick={startCreate}
+            className="admin-button-primary px-5 py-2.5 text-sm flex items-center gap-2 shadow-lg shadow-primary/20"
+          >
+            <Plus className="h-4 w-4" />
+            Thêm Vai Trò
+          </button>
+        </RequirePermission>
+          </>
+        }
         search={query}
         onSearchChange={setQuery}
         searchPlaceholder="Tìm theo tên vai trò hoặc mô tả..."

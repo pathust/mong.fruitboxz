@@ -221,9 +221,6 @@ export default function ProductForm() {
             </h1>
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Tạo mới hoặc cập nhật thông tin sản phẩm.</p>
           </div>
-          <button type="button" onClick={handleSubmit} disabled={saving} className="admin-button-primary px-4 py-2 text-sm">
-            {saving ? "Đang lưu..." : "Lưu sản phẩm"}
-          </button>
         </div>
       </AdminHeaderPortal>
       <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">

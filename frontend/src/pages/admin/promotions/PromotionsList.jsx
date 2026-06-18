@@ -294,18 +294,23 @@ export default function PromotionsList() {
             </h1>
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Quản lý các chương trình khuyến mãi và mã giảm giá.</p>
           </div>
-          <button
-            onClick={openNew}
-            className="admin-button-primary px-4 py-2 text-sm flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" /> Thêm Voucher
-          </button>
+          
         </div>
       </AdminHeaderPortal>
 
       <div className="bg-white rounded-2xl shadow-sm border border-[#eadfcd] overflow-hidden">
         <div className="p-4 border-b border-[#eadfcd]">
           <AdminListFilters
+        actions={
+          <>
+            <button
+            onClick={openNew}
+            className="admin-button-primary px-4 py-2 text-sm flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" /> Thêm Voucher
+          </button>
+          </>
+        }
             search={query}
             onSearchChange={setQuery}
             searchPlaceholder="Tìm theo mã giảm giá..."

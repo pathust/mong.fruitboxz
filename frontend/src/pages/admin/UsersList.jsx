@@ -98,12 +98,7 @@ export default function UsersList() {
             </h1>
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Quản lý tài khoản quản trị và phân quyền truy cập.</p>
           </div>
-        <button 
-          onClick={() => setIsCreating(true)} 
-          className="admin-button-primary px-5 py-2.5 text-sm flex items-center gap-2 shadow-lg shadow-primary/20"
-        >
-          <UserPlus className="w-4 h-4" /> Thêm tài khoản
-        </button>
+        
       </div>
       </AdminHeaderPortal>
 
@@ -135,6 +130,16 @@ export default function UsersList() {
       )}
 
       <AdminListFilters
+        actions={
+          <>
+            <button 
+          onClick={() => setIsCreating(true)} 
+          className="admin-button-primary px-5 py-2.5 text-sm flex items-center gap-2 shadow-lg shadow-primary/20"
+        >
+          <UserPlus className="w-4 h-4" /> Thêm tài khoản
+        </button>
+          </>
+        }
         search={query}
         onSearchChange={setQuery}
         searchPlaceholder="Tìm theo email, tên..."

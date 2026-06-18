@@ -23,12 +23,13 @@ export function AdminListFilters({
   onReset,
   total = 0,
   showing = 0,
+  actions = null,
 }) {
   const hasActiveFilter = Boolean(search) || filters.some((filter) => filter.value && filter.value !== "all")
 
   return (
     <div className="mb-4 rounded-2xl border border-[#eadfcd] bg-white p-4 shadow-sm">
-      <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+      <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
         <div className="flex flex-1 flex-col gap-3 md:flex-row md:flex-wrap">
           {onSearchChange && (
             <label className="relative min-w-[240px] flex-1">
@@ -60,8 +61,14 @@ export function AdminListFilters({
           ))}
         </div>
 
-        <div className="flex items-center justify-between gap-3 xl:justify-end">
-          <p className="text-sm font-semibold text-[#8a7a67]">
+        <div className="flex flex-col gap-3 shrink-0 sm:flex-row sm:items-center sm:justify-between xl:justify-end">
+          {actions && (
+            <div className="flex items-center gap-2">
+              {actions}
+            </div>
+          )}
+          <div className="flex items-center gap-3">
+            <p className="text-sm font-semibold text-[#8a7a67]">
             Hiển thị {showing}/{total}
           </p>
           {onReset && (
@@ -75,6 +82,7 @@ export function AdminListFilters({
               Xóa lọc
             </button>
           )}
+          </div>
         </div>
       </div>
     </div>

@@ -82,9 +82,7 @@ export default function CostSettings() {
             </h1>
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Cấu hình tỷ lệ chi phí tiêu chuẩn cho hệ thống.</p>
           </div>
-          <button onClick={handleSave} disabled={saving} className="admin-button-primary px-4 py-2 text-sm flex items-center gap-2">
-            <Save className="w-4 h-4" /> {saving ? "Đang lưu..." : "Lưu cài đặt"}
-          </button>
+          
         </div>
       </AdminHeaderPortal>
 
@@ -147,6 +145,12 @@ export default function CostSettings() {
         <div className="pt-4 border-t border-[#eadfcd] flex justify-end">
           <button type="submit" disabled={saving} className="admin-button-primary px-6 py-2.5 text-sm disabled:opacity-50 flex items-center gap-2">
             <Save className="h-4 w-4" /> {saving ? "Saving..." : "Save Settings"}
+          </button>
+        </div>
+      
+        <div className="pt-6 mt-6 border-t border-[#eadfcd] flex justify-end gap-3">
+          <button onClick={handleSave} disabled={saving} className="admin-button-primary px-4 py-2 text-sm flex items-center gap-2">
+            <Save className="w-4 h-4" /> {saving ? "Đang lưu..." : "Lưu cài đặt"}
           </button>
         </div>
       </form>

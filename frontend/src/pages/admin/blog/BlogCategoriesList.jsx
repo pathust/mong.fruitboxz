@@ -54,11 +54,14 @@ export default function BlogCategoriesList() {
             </h1>
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Phân loại và quản lý danh mục bài viết.</p>
           </div>
-          <Link to="/admin/blog-categories/new" className="admin-button-primary px-4 py-2 text-sm w-fit">
-            Thêm danh mục
-          </Link>
+          
         </div>
       </AdminHeaderPortal>
+      <div className="mb-6 flex justify-end">
+        <Link to="/admin/blog-categories/new" className="admin-button-primary px-4 py-2 text-sm w-fit">
+            Thêm danh mục
+          </Link>
+      </div>
 
       {categories.length === 0 ? (
         <AdminEmpty

@@ -104,12 +104,15 @@ export default function AdminDashboard() {
             </h1>
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Theo dõi sản phẩm, đơn hàng và các dịch vụ vận hành chính của hệ thống.</p>
           </div>
-          <Link to="/admin/orders" className="admin-button-primary px-5 py-3 text-sm">
+          
+        </div>
+      </AdminHeaderPortal>
+      <div className="mb-6 flex justify-end">
+        <Link to="/admin/orders" className="admin-button-primary px-5 py-3 text-sm">
             Xem đơn hàng
             <ArrowUpRight className="h-4 w-4" />
           </Link>
-        </div>
-      </AdminHeaderPortal>
+      </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {cards.map(card => (

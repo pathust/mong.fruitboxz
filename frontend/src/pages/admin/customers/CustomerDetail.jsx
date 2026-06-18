@@ -69,12 +69,15 @@ export default function CustomerDetail() {
             </h1>
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Xem thông tin và phân tích dữ liệu mua sắm của khách.</p>
           </div>
-          <Link to="/admin/customers" className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors">
+          
+        </div>
+      </AdminHeaderPortal>
+      <div className="mb-6 flex justify-end">
+        <Link to="/admin/customers" className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors">
             <ArrowLeft className="w-4 h-4" />
             Quay lại danh sách
           </Link>
-        </div>
-      </AdminHeaderPortal>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Profile Card */}

@@ -151,14 +151,19 @@ export default function ProductsList() {
             </h1>
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Quản lý danh mục và các sản phẩm của cửa hàng.</p>
           </div>
-        <Link to="/admin/products/new" className="admin-button-primary px-5 py-3 text-sm">
-          <PackagePlus className="h-4 w-4" />
-          Thêm sản phẩm
-        </Link>
+        
       </div>
       </AdminHeaderPortal>
 
       <AdminListFilters
+        actions={
+          <>
+            <Link to="/admin/products/new" className="admin-button-primary px-5 py-3 text-sm">
+          <PackagePlus className="h-4 w-4" />
+          Thêm sản phẩm
+        </Link>
+          </>
+        }
         search={query}
         onSearchChange={setQuery}
         searchPlaceholder="Tìm theo tên sản phẩm..."
