@@ -141,12 +141,16 @@ export default function AdminLayout() {
 
       <div className="flex-1 flex flex-col min-w-0">
         <header className="shrink-0 sticky top-0 z-30 flex items-center gap-4 border-b border-[#eadfcd] bg-[#fffaf4]/86 px-4 py-4 backdrop-blur-xl lg:px-6">
-          <button type="button" className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#eadfcd] bg-white text-[#5d5246] lg:hidden" onClick={() => setSidebarOpen(true)}>
+          <button type="button" className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#eadfcd] bg-white text-[#5d5246] lg:hidden" onClick={() => setSidebarOpen(true)}>
             <Menu className="h-5 w-5" />
           </button>
-          <div className="flex-1">
-            <p className="text-sm font-extrabold text-[#4d4339]">Trang quản trị</p>
-            <p className="text-xs font-semibold text-[#8d7f6f]">Quản lý sản phẩm, đơn hàng, nội dung và cấu hình hệ thống</p>
+          
+          <div id="admin-header-portal" className="flex-1 flex items-center justify-between min-w-0">
+            {/* Pages will inject their header here */}
+            <div className="hidden empty:block">
+              <p className="text-sm font-extrabold text-[#4d4339]">Trang quản trị</p>
+              <p className="text-xs font-semibold text-[#8d7f6f]">Quản lý hệ thống</p>
+            </div>
           </div>
           <div className="relative" ref={userMenuRef}>
             <button 

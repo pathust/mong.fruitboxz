@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { AdminHeaderPortal } from "../components/admin/AdminHeaderPortal"
 import { LoaderCircle, RefreshCcw, SearchCheck, Search, Database, Zap, Clock, Box } from 'lucide-react'
 import { useAdminAuth } from '../../context/AdminAuthContext'
 import { useToast } from '../../components/ui/ToastProvider'
@@ -70,12 +71,13 @@ export default function SearchConsole() {
 
   return (
     <div className="space-y-6">
-      <div className="admin-panel px-6 py-6">
+      <AdminHeaderPortal>
+        <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="product-meta text-[12px] uppercase tracking-[0.14em] text-[#a08d79] mb-2">Hệ Thống</p>
-            <h1 className="page-title text-[30px]">Search Console</h1>
-            <p className="product-meta mt-2 text-[14px] text-[#766957]">Quản lý công cụ tìm kiếm, đồng bộ dữ liệu và kiểm tra kết quả thực tế.</p>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Hệ Thống</p>
+            <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">Search Console</h1>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Quản lý công cụ tìm kiếm, đồng bộ dữ liệu và kiểm tra kết quả thực tế.</p>
           </div>
           <button
             type="button"
@@ -88,6 +90,7 @@ export default function SearchConsole() {
           </button>
         </div>
       </div>
+      </AdminHeaderPortal>
 
       {loading ? (
         <AdminLoading title="Đang kiểm tra kết nối Search Engine..." description="Đang đọc trạng thái từ Meilisearch." />

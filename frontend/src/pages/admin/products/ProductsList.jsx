@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { AdminHeaderPortal } from "../../components/admin/AdminHeaderPortal"
 import { Link } from "react-router-dom"
 import { PackagePlus, ChevronLeft, ChevronRight, Pencil, Trash2 } from "lucide-react"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
@@ -141,11 +142,12 @@ export default function ProductsList() {
 
   return (
     <div className="space-y-6">
-      <div className="admin-panel flex flex-col gap-4 p-6 md:flex-row md:items-end md:justify-between">
+      <AdminHeaderPortal>
+        <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
         <div>
-          <p className="product-meta text-[12px] uppercase tracking-[0.14em] text-[#a08d79]">Danh mục</p>
-          <h1 className="page-title mt-2 text-[30px]">Sản phẩm</h1>
-          <p className="product-meta mt-2 text-[14px]">
+          <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Danh mục</p>
+          <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">Sản phẩm</h1>
+          <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">
             {total} sản phẩm
           </p>
         </div>
@@ -154,6 +156,7 @@ export default function ProductsList() {
           Thêm sản phẩm
         </Link>
       </div>
+      </AdminHeaderPortal>
 
       <AdminListFilters
         search={query}

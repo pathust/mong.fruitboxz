@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { AdminHeaderPortal } from "../../components/admin/AdminHeaderPortal"
 import { Link } from "react-router-dom"
 import { AlertTriangle, ArrowUpRight, BadgeDollarSign, BarChart3, Download, PieChart, TrendingUp, WalletCards } from "lucide-react"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
@@ -191,11 +192,12 @@ export default function FinanceDashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="admin-panel p-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+      <AdminHeaderPortal>
+        <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
         <div>
-          <p className="product-meta text-[12px] uppercase tracking-[0.14em] text-[#a08d79]">Finance Management</p>
-          <h1 className="page-title mt-2 text-[30px]">Doanh thu & Công nợ</h1>
-          <p className="product-meta mt-2 max-w-2xl text-[14px] text-[#766957]">
+          <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Finance Management</p>
+          <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">Doanh thu & Công nợ</h1>
+          <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">
             Thống kê tài chính, theo dõi lợi nhuận và quản lý các khoản công nợ của khách hàng.
           </p>
         </div>
@@ -206,6 +208,7 @@ export default function FinanceDashboard() {
           </button>
         </div>
       </div>
+      </AdminHeaderPortal>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
         <div className="admin-card p-5 transition hover:-translate-y-0.5 hover:border-primary/45 xl:col-span-1">

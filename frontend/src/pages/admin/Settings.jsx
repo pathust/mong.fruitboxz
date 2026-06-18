@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { Save, Settings as SettingsIcon, Link as LinkIcon, MapPin, Phone, Mail, Clock, ShieldCheck, Truck, CreditCard } from "lucide-react"
 import { useAdminAuth } from "../../context/AdminAuthContext"
+import { AdminHeaderPortal } from "../../components/admin/AdminHeaderPortal"
 
 export default function Settings() {
   const { api } = useAdminAuth()
@@ -46,20 +47,23 @@ export default function Settings() {
 
   return (
     <div className="space-y-6 pb-20">
-      <div className="admin-panel px-6 py-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <p className="product-meta text-[12px] uppercase tracking-[0.14em] text-[#a08d79] mb-2">System</p>
-          <h1 className="page-title text-[28px]">Cài đặt chung</h1>
-          <p className="product-meta mt-2 text-[14px] text-[#766957]">Quản lý thông tin liên hệ của cửa hàng và các chính sách dành cho khách hàng.</p>
+      <AdminHeaderPortal>
+        <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
+          <div>
+            <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
+              <SettingsIcon className="w-5 h-5 text-primary" /> Cài đặt chung
+            </h1>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Quản lý thông tin liên hệ của cửa hàng.</p>
+          </div>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="admin-button-primary px-4 py-2 text-sm flex items-center gap-2 shadow-lg shadow-primary/20 disabled:opacity-60"
+          >
+            <Save className="w-4 h-4" /> {saving ? "Đang lưu..." : "Lưu"}
+          </button>
         </div>
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="admin-button-primary px-6 py-2.5 text-sm flex items-center gap-2 shadow-lg shadow-primary/20 disabled:opacity-60"
-        >
-          <Save className="w-4 h-4" /> {saving ? "Đang lưu..." : "Lưu Thay Đổi"}
-        </button>
-      </div>
+      </AdminHeaderPortal>
 
       {success && (
         <div className="admin-card p-4 bg-green-50/50 border-green-200 text-green-700 font-bold flex items-center gap-2 animate-in fade-in slide-in-from-top-4">

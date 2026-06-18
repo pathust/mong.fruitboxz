@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { AdminHeaderPortal } from "../../components/admin/AdminHeaderPortal"
 import { useNavigate, useParams } from "react-router-dom"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
 import { useToast } from "../../../components/ui/ToastProvider"
@@ -68,10 +69,12 @@ export default function BlogCategoryForm() {
 
   return (
     <div className="max-w-2xl space-y-6">
-      <div className="admin-panel p-6">
-        <p className="product-meta text-[12px] uppercase tracking-[0.14em] text-[#a08d79]">CMS / Danh mục Blog</p>
-        <h1 className="page-title mt-2 text-[30px]">{isNew ? "Thêm danh mục" : "Sửa danh mục"}</h1>
+      <AdminHeaderPortal>
+        <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
+        <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">CMS / Danh mục Blog</p>
+        <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">{isNew ? "Thêm danh mục" : "Sửa danh mục"}</h1>
       </div>
+      </AdminHeaderPortal>
 
       <form onSubmit={handleSubmit} className="admin-card space-y-5 p-6">
         <div>

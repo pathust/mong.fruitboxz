@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { AdminHeaderPortal } from "../components/admin/AdminHeaderPortal"
 import { Link } from "react-router-dom"
 import { AlertTriangle, ArrowUpRight, Bot, Image as ImageIcon, Package, Plus, SearchCheck, ShoppingCart, TrendingUp, Users, WalletCards } from "lucide-react"
 import { useAdminAuth } from "../../context/AdminAuthContext"
@@ -94,12 +95,13 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="admin-panel p-6">
+      <AdminHeaderPortal>
+        <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="product-meta text-[12px] uppercase tracking-[0.14em] text-[#a08d79]">Mọng operations</p>
-            <h1 className="page-title mt-2 text-[30px]">Dashboard</h1>
-            <p className="product-meta mt-2 max-w-2xl text-[14px] text-[#766957]">Theo dõi catalog, đơn hàng và các service vận hành chính trong cùng một giao diện với storefront.</p>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Mọng operations</p>
+            <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">Dashboard</h1>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Theo dõi catalog, đơn hàng và các service vận hành chính trong cùng một giao diện với storefront.</p>
           </div>
           <Link to="/admin/orders" className="admin-button-primary px-5 py-3 text-sm">
             View orders
@@ -107,6 +109,7 @@ export default function AdminDashboard() {
           </Link>
         </div>
       </div>
+      </AdminHeaderPortal>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {cards.map(card => (

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
 import { useToast } from "../../../components/ui/ToastProvider"
 import { AdminLoading, AdminEmpty, AdminError } from "../../../components/admin/AdminStates"
+import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal"
 
 export default function BlogCategoriesList() {
   const { api } = useAdminAuth()
@@ -43,15 +44,17 @@ export default function BlogCategoriesList() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between admin-panel p-6">
-        <div>
-          <h1 className="page-title text-[30px]">Danh mục Blog</h1>
-          <p className="product-meta mt-2 text-[14px]">Quản lý các chủ đề bài viết</p>
+      <AdminHeaderPortal>
+        <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
+          <div>
+            <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">Danh mục Blog</h1>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Quản lý các chủ đề bài viết</p>
+          </div>
+          <Link to="/admin/blog-categories/new" className="admin-button-primary px-4 py-2 text-sm w-fit">
+            Thêm danh mục
+          </Link>
         </div>
-        <Link to="/admin/blog-categories/new" className="admin-button-primary px-6 py-2.5 text-sm w-fit">
-          Thêm danh mục
-        </Link>
-      </div>
+      </AdminHeaderPortal>
 
       {categories.length === 0 ? (
         <AdminEmpty

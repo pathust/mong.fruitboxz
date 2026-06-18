@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
+import { AdminHeaderPortal } from "../../components/admin/AdminHeaderPortal"
 import { Link } from "react-router-dom"
 import { Plus, Trash2 } from "lucide-react"
 import ImagePicker from "../../../components/admin/ImagePicker"
@@ -238,14 +239,16 @@ export default function ContentSettingsPage({ type }) {
 
   return (
     <div className="max-w-5xl space-y-6">
-      <div className="admin-panel flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
+      <AdminHeaderPortal>
+        <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
         <div>
-          <p className="product-meta text-[12px] uppercase tracking-[0.14em] text-[#a08d79]">{config.eyebrow}</p>
-          <h1 className="page-title mt-2 text-[30px]">{config.title}</h1>
-          <p className="product-meta mt-2 max-w-2xl text-[14px]">{config.description}</p>
+          <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">{config.eyebrow}</p>
+          <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">{config.title}</h1>
+          <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">{config.description}</p>
         </div>
         <Link to={config.preview} target="_blank" className="admin-button-secondary px-4 py-2 text-sm">Xem storefront</Link>
       </div>
+      </AdminHeaderPortal>
 
       <form onSubmit={handleSubmit} className="admin-card space-y-5 p-6">
         {config.fields.map((field) => (

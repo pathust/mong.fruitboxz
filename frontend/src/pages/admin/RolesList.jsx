@@ -1,4 +1,5 @@
 import { RequirePermission } from "../../components/admin/RequirePermission"
+import { AdminHeaderPortal } from "../components/admin/AdminHeaderPortal"
 import { useMemo, useState, useEffect } from "react"
 import { Pencil, Plus, Save, Trash2, X, ShieldCheck } from "lucide-react"
 import { useAdminAuth } from "../../context/AdminAuthContext"
@@ -175,11 +176,12 @@ export default function RolesList() {
 
   return (
     <div className="space-y-6 pb-20">
-      <div className="admin-panel px-6 py-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <AdminHeaderPortal>
+        <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
         <div>
-          <p className="product-meta text-[12px] uppercase tracking-[0.14em] text-[#a08d79] mb-2">Access</p>
-          <h1 className="page-title text-[28px]">Phân Quyền (RBAC)</h1>
-          <p className="product-meta mt-2 text-[14px] text-[#766957]">Thiết lập vai trò và cấu hình quyền hạn qua Ma trận trực quan.</p>
+          <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Access</p>
+          <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">Phân Quyền (RBAC)</h1>
+          <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Thiết lập vai trò và cấu hình quyền hạn qua Ma trận trực quan.</p>
         </div>
         <RequirePermission perm="roles.create">
           <button
@@ -192,6 +194,7 @@ export default function RolesList() {
           </button>
         </RequirePermission>
       </div>
+      </AdminHeaderPortal>
 
       {error && (
         <div className="mb-4 rounded-xl border border-red-200 bg-red-50/50 px-4 py-3 text-sm font-medium text-red-600 flex items-center gap-2">

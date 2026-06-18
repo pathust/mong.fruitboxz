@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
+import { AdminHeaderPortal } from "../../components/admin/AdminHeaderPortal"
 import { Link } from "react-router-dom"
 import { Pencil, Trash2 } from "lucide-react"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
@@ -71,14 +72,16 @@ export default function BlogPostsList() {
 
   return (
     <div className="space-y-6">
-      <div className="admin-panel flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
+      <AdminHeaderPortal>
+        <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
         <div>
-          <p className="product-meta text-[12px] uppercase tracking-[0.14em] text-[#a08d79]">CMS</p>
-          <h1 className="page-title mt-2 text-[30px]">Blog</h1>
-          <p className="product-meta mt-2 text-[14px]">Quản lý bài viết đang hiển thị ở trang Blog storefront.</p>
+          <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">CMS</p>
+          <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">Blog</h1>
+          <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Quản lý bài viết đang hiển thị ở trang Blog storefront.</p>
         </div>
         <Link to="/admin/blog/new" className="admin-button-primary px-4 py-2 text-sm">Thêm bài viết</Link>
       </div>
+      </AdminHeaderPortal>
 
       <AdminListFilters
         search={query}

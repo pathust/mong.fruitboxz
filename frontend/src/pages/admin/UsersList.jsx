@@ -1,4 +1,5 @@
 import { useMemo, useState, useEffect } from "react"
+import { AdminHeaderPortal } from "../components/admin/AdminHeaderPortal"
 import { Shield, UserPlus, X, Mail, ShieldAlert, BadgeCheck } from "lucide-react"
 import { useAdminAuth } from "../../context/AdminAuthContext"
 import { AdminListFilters, filterBySearch } from "../../components/admin/AdminListFilters"
@@ -88,11 +89,12 @@ export default function UsersList() {
 
   return (
     <div className="space-y-6">
-      <div className="admin-panel px-6 py-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <AdminHeaderPortal>
+        <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
         <div>
-          <p className="product-meta text-[12px] uppercase tracking-[0.14em] text-[#a08d79] mb-2">Access</p>
-          <h1 className="page-title text-[28px]">Quản trị viên</h1>
-          <p className="product-meta mt-2 text-[14px] text-[#766957]">Quản lý tài khoản đăng nhập Admin và phân quyền hệ thống.</p>
+          <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Access</p>
+          <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">Quản trị viên</h1>
+          <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Quản lý tài khoản đăng nhập Admin và phân quyền hệ thống.</p>
         </div>
         <button 
           onClick={() => setIsCreating(true)} 
@@ -101,6 +103,7 @@ export default function UsersList() {
           <UserPlus className="w-4 h-4" /> Thêm tài khoản
         </button>
       </div>
+      </AdminHeaderPortal>
 
       {isCreating && (
         <div className="admin-card p-6 bg-gradient-to-br from-[#fffaf4] to-white border-primary/20">

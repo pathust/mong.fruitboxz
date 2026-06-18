@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { AdminHeaderPortal } from "../components/admin/AdminHeaderPortal"
 import { Copy, ImagePlus, LoaderCircle, Trash2 } from 'lucide-react'
 import { useAdminAuth } from '../../context/AdminAuthContext'
 import { useToast } from '../../components/ui/ToastProvider'
@@ -98,10 +99,11 @@ export default function MediaLibrary() {
 
   return (
     <div className="space-y-6">
-      <div className="admin-panel flex flex-col gap-4 px-6 py-6 lg:flex-row lg:items-end lg:justify-between">
+      <AdminHeaderPortal>
+        <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
         <div>
-          <h1 className="page-title text-[28px]">Media Library</h1>
-          <p className="product-meta mt-2 text-[14px] text-[#766957]">
+          <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">Media Library</h1>
+          <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">
             {objectStorage ? 'Đang dùng MinIO object storage.' : 'Đang dùng local media fallback.'}
           </p>
         </div>
@@ -113,6 +115,7 @@ export default function MediaLibrary() {
           </button>
         </div>
       </div>
+      </AdminHeaderPortal>
 
       {loading ? (
         <AdminLoading title="Đang tải media library..." description="Đang đọc danh sách ảnh từ MinIO hoặc local storage." />

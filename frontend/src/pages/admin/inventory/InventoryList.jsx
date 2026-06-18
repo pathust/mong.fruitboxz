@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState, useEffect } from "react"
+import { AdminHeaderPortal } from "../../components/admin/AdminHeaderPortal"
 import { Package, Save, AlertCircle, Leaf } from "lucide-react"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
 import { AdminListFilters, filterBySearch } from "../../../components/admin/AdminListFilters"
@@ -99,14 +100,15 @@ export default function InventoryList() {
 
   return (
     <div className="space-y-6 pb-20">
-      <div className="admin-panel px-6 py-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <AdminHeaderPortal>
+        <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
         <div>
-          <p className="product-meta text-[12px] uppercase tracking-[0.14em] text-[#a08d79] mb-2">Inventory Management</p>
-          <h1 className="page-title text-[28px] flex items-center gap-3">
+          <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Inventory Management</p>
+          <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
             <Package className="w-8 h-8 text-primary" />
             Tồn kho Nguyên liệu
           </h1>
-          <p className="product-meta mt-2 text-[14px] text-[#766957]">
+          <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">
             Quản lý số lượng tồn kho của các nguyên liệu thô (Trái cây, bao bì, gia vị...)
           </p>
         </div>
@@ -120,6 +122,7 @@ export default function InventoryList() {
           </button>
         )}
       </div>
+      </AdminHeaderPortal>
 
       <AdminListFilters
         search={searchTerm}
