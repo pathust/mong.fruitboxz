@@ -5,31 +5,35 @@ import { useAdminAuth } from "../../context/AdminAuthContext"
 
 const navGroups = [
   {
-    label: "Vận hành",
+    label: "Tổng quan",
     items: [
-      { label: "Tổng quan", path: "/admin", icon: Gauge, permission: null },
+      { label: "Bảng điều khiển", path: "/admin", icon: Gauge, permission: null },
       { label: "Tài chính", path: "/admin/finance", icon: WalletCards, permission: null },
+    ],
+  },
+  {
+    label: "Bán hàng",
+    items: [
       { label: "Đơn hàng", path: "/admin/orders", icon: ShoppingCart, permission: "orders.read" },
       { label: "Sản phẩm", path: "/admin/products", icon: Package, permission: "products.read" },
-      { label: "Nguyên liệu", path: "/admin/ingredients", icon: Leaf, permission: "products.read" },
-      { label: "Tồn kho", path: "/admin/inventory", icon: Package, permission: "products.read" },
       { label: "Danh mục", path: "/admin/categories", icon: FolderKanban, permission: "categories.read" },
       { label: "Khuyến mãi", path: "/admin/promotions", icon: Tag, permission: "products.read" },
       { label: "Hộp tự chọn", path: "/admin/content/custom-box", icon: Gift, permission: "settings.read" },
+    ],
+  },
+  {
+    label: "Kho & Chi phí",
+    items: [
+      { label: "Nguyên liệu", path: "/admin/ingredients", icon: Leaf, permission: "products.read" },
+      { label: "Tồn kho", path: "/admin/inventory", icon: Package, permission: "products.read" },
+      { label: "Cài đặt Cost", path: "/admin/settings/costs", icon: Calculator, permission: "users.read" },
+    ],
+  },
+  {
+    label: "Nội dung & Media",
+    items: [
       { label: "Banners", path: "/admin/banners", icon: LayoutTemplate, permission: "banners.read" },
-    ],
-  },
-  {
-    label: "Trải nghiệm",
-    items: [
       { label: "Thư viện ảnh", path: "/admin/media", icon: ImageIcon, permission: "media.read" },
-      { label: "Chatbot", path: "/admin/chatbot", icon: Bot, permission: "chatbot.read" },
-
-    ],
-  },
-  {
-    label: "Nội dung",
-    items: [
       { label: "Bài viết Blog", path: "/admin/blog", icon: FileText, permission: "settings.read" },
       { label: "Danh mục Blog", path: "/admin/blog-categories", icon: FolderKanban, permission: "settings.read" },
       { label: "CS Thanh toán", path: "/admin/content/payment-policy", icon: FileText, permission: "orders.read" },
@@ -38,19 +42,19 @@ const navGroups = [
     ],
   },
   {
-    label: "Cấu hình hệ thống",
+    label: "AI & Khám phá",
     items: [
-      { label: "Cài đặt phí ship", path: "/admin/settings/shipping", icon: Truck, permission: "users.read" },
-      { label: "Cài đặt định mức Cost", path: "/admin/settings/costs", icon: Calculator, permission: "users.read" },
-      { label: "Cấu hình Tìm kiếm", path: "/admin/search", icon: Search, permission: "users.read" },
-      { label: "Cài đặt chung", path: "/admin/settings", icon: Settings, permission: "users.read" },
+      { label: "Chatbot AI", path: "/admin/chatbot", icon: Bot, permission: "chatbot.read" },
+      { label: "Tìm kiếm", path: "/admin/search", icon: Search, permission: "users.read" },
     ],
   },
   {
-    label: "Phân quyền",
+    label: "Hệ thống",
     items: [
       { label: "Quản trị viên", path: "/admin/users", icon: Users, permission: "users.read" },
       { label: "Phân quyền", path: "/admin/roles", icon: Shield, permission: "roles.read" },
+      { label: "Cài đặt phí ship", path: "/admin/settings/shipping", icon: Truck, permission: "users.read" },
+      { label: "Cài đặt chung", path: "/admin/settings", icon: Settings, permission: "users.read" },
     ],
   },
 ]
@@ -176,7 +180,7 @@ export default function AdminLayout() {
                   className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold text-[#5f5548] transition-colors hover:bg-[#fffaf4] hover:text-primary"
                 >
                   <ExternalLink className="h-4 w-4" />
-                  Storefront
+                  Xem cửa hàng
                 </Link>
                 <div className="my-1 h-[1px] w-full bg-gray-100" />
                 <button 
