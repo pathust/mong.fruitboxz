@@ -44,7 +44,6 @@ const navGroups = [
       { label: "Cài đặt phí ship", path: "/admin/settings/shipping", icon: Truck, permission: "users.read" },
       { label: "Cài đặt định mức Cost", path: "/admin/settings/costs", icon: Calculator, permission: "users.read" },
       { label: "Cấu hình Tìm kiếm", path: "/admin/search", icon: Search, permission: "users.read" },
-      { label: "Cấu hình AI Chatbot", path: "/admin/chatbot", icon: MessageSquare, permission: "users.read" },
       { label: "Cài đặt chung", path: "/admin/settings", icon: Settings, permission: "users.read" },
     ],
   },
