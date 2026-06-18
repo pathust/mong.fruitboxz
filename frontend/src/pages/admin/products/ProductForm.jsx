@@ -280,22 +280,13 @@ export default function ProductForm() {
             <div className="space-y-3">
               {form.variants.map((v, i) =>
                 <div key={i} className="flex flex-wrap gap-3 bg-gray-50 p-4 rounded-xl border border-gray-200 relative group">
-                  <div className="flex-1 min-w-[150px]">
-                    <label className="block text-xs font-medium text-gray-500 mb-1">Tên phân loại (VD: Hộp 1kg)</label>
-                    <input value={v.title} onChange={(e) => updateVariant(i, 'title', e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" placeholder="Standard" required />
-                  </div>
-                  <div className="w-32">
+                  <div className="w-1/2">
                     <label className="block text-xs font-medium text-gray-500 mb-1">Giá bán (₫)</label>
                     <input type="number" min={0} value={v.price} onChange={(e) => updateVariant(i, 'price', Number(e.target.value) || 0)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                   </div>
-                  <div className="w-32">
-                    <label className="block text-xs font-medium text-gray-500 mb-1">Giá vốn (₫)</label>
-                    <input type="number" min={0} value={v.cost_price} onChange={(e) => updateVariant(i, 'cost_price', Number(e.target.value) || 0)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
-                  </div>
-                  <div className="flex-1 min-w-[100px]">
-                    <label className="block text-xs font-medium text-gray-500 mb-1">SKU (mã tồn kho)</label>
-                    <input value={v.sku} onChange={(e) => updateVariant(i, 'sku', slugify(e.target.value))} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" placeholder="Tự tạo nếu trống" />
-                    <p className="mt-1 text-[11px] text-gray-400">Tự chuẩn hóa như slug.</p>
+                  
+                  <div className="flex-1 flex flex-col justify-center px-4">
+                    <p className="text-xs text-gray-400">SKU và Giá vốn được quản lý tự động qua BOM.</p>
                   </div>
 
                   {form.variants.length > 1 &&
@@ -308,11 +299,7 @@ export default function ProductForm() {
                     </button>
                   }
 
-                  {v.price > 0 && v.cost_price > 0 &&
-                  <div className="w-full text-xs text-green-600 mt-1">
-                      Biên lợi nhuận: {Math.round((1 - v.cost_price / v.price) * 100)}% • Lãi gộp {(v.price - v.cost_price).toLocaleString()}₫/sp
-                    </div>
-                  }
+
 
                   <div className="w-full mt-2 pt-2 border-t border-gray-200">
                     {!isNew && v.id ?
