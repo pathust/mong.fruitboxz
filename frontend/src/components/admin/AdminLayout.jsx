@@ -151,9 +151,17 @@ export default function AdminLayout() {
           
           <div id="admin-header-portal" className="flex-1 flex items-center justify-between min-w-0">
             {/* Pages will inject their header here */}
-            <div className="hidden empty:block">
-              <p className="text-sm font-extrabold text-[#4d4339]">Trang quản trị</p>
-              <p className="text-xs font-semibold text-[#8d7f6f]">Quản lý hệ thống</p>
+            <div className="hidden empty:block w-full">
+              <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
+                <div className="space-y-1.5">
+                  <div className="h-3 w-20 bg-gray-200/60 animate-pulse rounded hidden md:block" />
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 bg-gray-200/60 animate-pulse rounded-full" />
+                    <div className="h-5 w-32 bg-gray-200/60 animate-pulse rounded" />
+                  </div>
+                  <div className="h-3 w-64 bg-gray-200/60 animate-pulse rounded hidden md:block" />
+                </div>
+              </div>
             </div>
           </div>
           <div className="relative" ref={userMenuRef}>
