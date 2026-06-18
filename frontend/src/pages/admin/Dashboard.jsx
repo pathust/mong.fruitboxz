@@ -78,19 +78,19 @@ export default function AdminDashboard() {
   }, [api])
 
   const cards = [
-    { label: "Products", value: stats.products, icon: Package, link: "/admin/products" },
-    { label: "Orders", value: stats.orders, icon: ShoppingCart, link: "/admin/orders" },
-    { label: "Users", value: stats.users, icon: Users, link: "/admin/users" },
+    { label: "Sản phẩm", value: stats.products, icon: Package, link: "/admin/products" },
+    { label: "Đơn hàng", value: stats.orders, icon: ShoppingCart, link: "/admin/orders" },
+    { label: "Khách hàng", value: stats.users, icon: Users, link: "/admin/users" },
     { label: "Doanh thu", value: formatVnd(stats.revenue), icon: WalletCards, link: "/admin/finance" },
     { label: "Lợi nhuận", value: formatVnd(stats.profit), icon: TrendingUp, link: "/admin/finance" },
     { label: "Công nợ", value: formatVnd(stats.unpaid), icon: AlertTriangle, link: "/admin/finance" },
   ]
 
   const quickActions = [
-    { label: "Add Product", to: "/admin/products/new", icon: Package },
-    { label: "Add Category", to: "/admin/categories/new", icon: Plus },
-    { label: "Add Banner", to: "/admin/banners/new", icon: ImageIcon },
-    { label: "Tune Search", to: "/admin/search", icon: SearchCheck },
+    { label: "Thêm sản phẩm", to: "/admin/products/new", icon: Package },
+    { label: "Thêm danh mục", to: "/admin/categories/new", icon: Plus },
+    { label: "Thêm Banner", to: "/admin/banners/new", icon: ImageIcon },
+    { label: "Cấu hình tìm kiếm", to: "/admin/search", icon: SearchCheck },
   ]
 
   return (
@@ -99,14 +99,14 @@ export default function AdminDashboard() {
         <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Mọng operations</p>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Tổng quan</p>
             <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
-              <LayoutDashboard className="w-5 h-5 text-primary" /> Dashboard
+              <LayoutDashboard className="w-5 h-5 text-primary" /> Bảng điều khiển
             </h1>
-            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Theo dõi catalog, đơn hàng và các service vận hành chính trong cùng một giao diện với storefront.</p>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Theo dõi sản phẩm, đơn hàng và các dịch vụ vận hành chính của hệ thống.</p>
           </div>
           <Link to="/admin/orders" className="admin-button-primary px-5 py-3 text-sm">
-            View orders
+            Xem đơn hàng
             <ArrowUpRight className="h-4 w-4" />
           </Link>
         </div>
@@ -130,7 +130,7 @@ export default function AdminDashboard() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="admin-card p-6">
-          <h2 className="section-title mb-4 text-[20px]">Quick Actions</h2>
+          <h2 className="section-title mb-4 text-[20px]">Thao tác nhanh</h2>
           <div className="grid grid-cols-2 gap-3">
             {quickActions.map((action) => (
               <Link key={action.to} to={action.to} className="admin-button-secondary px-4 py-3 text-sm">
@@ -141,7 +141,7 @@ export default function AdminDashboard() {
           </div>
         </div>
         <div className="admin-card p-6">
-          <h2 className="section-title mb-4 text-[20px]">Sales Snapshot</h2>
+          <h2 className="section-title mb-4 text-[20px]">Tổng quan doanh thu</h2>
           <div className="space-y-3 text-sm text-[#766957]">
             <p><span className="font-bold text-[#43382b]">Đơn hôm nay:</span> {stats.ordersToday}</p>
             <p><span className="font-bold text-[#43382b]">AOV:</span> {formatVnd(stats.avgOrderValue)}</p>
@@ -153,7 +153,7 @@ export default function AdminDashboard() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="admin-card p-6">
-          <h2 className="section-title mb-4 text-[20px]">Top Products</h2>
+          <h2 className="section-title mb-4 text-[20px]">Sản phẩm bán chạy</h2>
           <div className="space-y-2">
             {stats.topProducts.length === 0 && <p className="text-sm text-[#8a7a67]">Chưa có dữ liệu</p>}
             {stats.topProducts.map((p) => (
@@ -165,7 +165,7 @@ export default function AdminDashboard() {
           </div>
         </div>
         <div className="admin-card p-6">
-          <h2 className="section-title mb-4 text-[20px]">Revenue 7 Ngày</h2>
+          <h2 className="section-title mb-4 text-[20px]">Doanh thu 7 ngày qua</h2>
           <div className="space-y-2">
             {stats.revenue7d.length === 0 && <p className="text-sm text-[#8a7a67]">Chưa có dữ liệu</p>}
             {stats.revenue7d.map((d) => (
@@ -177,11 +177,11 @@ export default function AdminDashboard() {
           </div>
         </div>
         <div className="admin-card p-6 lg:col-span-2">
-          <h2 className="section-title mb-4 text-[20px]">Service Snapshot</h2>
+          <h2 className="section-title mb-4 text-[20px]">Trạng thái hệ thống</h2>
           <div className="grid gap-3 md:grid-cols-3">
             {[
-              { label: "MeiliSearch", value: services.online || services.enabled ? `Online, ${services.indexed_documents} docs` : "Fallback mode", icon: SearchCheck },
-              { label: "Media storage", value: services.object_storage ? "MinIO" : "Local fallback", icon: ImageIcon },
+              { label: "MeiliSearch", value: services.online || services.enabled ? `Online, ${services.indexed_documents} docs` : "Chế độ dự phòng", icon: SearchCheck },
+              { label: "Lưu trữ hình ảnh", value: services.object_storage ? "MinIO" : "Lưu trữ nội bộ", icon: ImageIcon },
               { label: "Chatbot", value: "FAQ + catalog", icon: Bot },
             ].map((item) => (
               <div key={item.label} className="rounded-2xl border border-[#efe4d4] bg-[#fffaf4] p-4">
