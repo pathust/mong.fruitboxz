@@ -89,12 +89,11 @@ export default function ChatbotConsole() {
       <AdminHeaderPortal>
         <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
           <div>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">AI & Khám phá</p>
             <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
-              <Bot className="w-5 h-5 text-primary" /> AI Chatbot Console
+              <Bot className="w-5 h-5 text-primary" /> Chatbot AI
             </h1>
-            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">
-              Trung tâm điều khiển trợ lý AI tích hợp
-            </p>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Huấn luyện dữ liệu và theo dõi cấu hình trợ lý AI.</p>
           </div>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-3 bg-[#fffaf4] px-3 py-1.5 rounded-full border border-[#efe4d4]">

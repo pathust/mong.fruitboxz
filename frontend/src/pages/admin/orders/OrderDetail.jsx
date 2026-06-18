@@ -140,9 +140,11 @@ export default function OrderDetail() {
       <AdminHeaderPortal>
         <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
           <div>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Bán hàng</p>
             <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
               <ShoppingCart className="w-5 h-5 text-primary" /> Đơn hàng {getOrderCode(order)}
             </h1>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Xem thông tin chi tiết và xử lý đơn hàng.</p>
           </div>
           <Link to="/admin/orders" className="admin-button-secondary px-4 py-2 text-sm">&larr; Quay lại danh sách</Link>
         </div>

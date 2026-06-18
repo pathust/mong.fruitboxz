@@ -64,7 +64,7 @@ function DonutChart({ items, total, centerLabel }) {
     : "#eadfcd 0deg 360deg"
 
   return (
-    <div className="flex flex-col items-center gap-5 md:flex-row">
+    <div className="flex w-full min-w-0 flex-col items-center gap-5 md:flex-row">
       <div
         className="relative flex h-40 w-40 shrink-0 items-center justify-center rounded-full"
         style={{ background: `conic-gradient(${gradient})` }}
@@ -74,10 +74,10 @@ function DonutChart({ items, total, centerLabel }) {
           <span className="text-lg font-extrabold text-[#3e3528]">{formatShortVnd(total)}</span>
         </div>
       </div>
-      <div className="w-full space-y-3">
+      <div className="flex-1 w-full min-w-0 space-y-3">
         {items.map((item) => (
-          <div key={item.label} className="flex items-center justify-between gap-3 text-sm">
-            <span className="flex min-w-0 items-center gap-2 font-semibold text-[#43382b]">
+          <div key={item.label} className="flex w-full min-w-0 items-center justify-between gap-3 text-sm">
+            <span className="flex flex-1 min-w-0 items-center gap-2 font-semibold text-[#43382b]">
               <span className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: item.color }} />
               <span className="truncate">{item.label}</span>
             </span>
@@ -195,14 +195,12 @@ export default function FinanceDashboard() {
       <AdminHeaderPortal>
         <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
         <div>
-          <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Finance Management</p>
-          <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
-            <PieChart className="w-5 h-5 text-primary" /> Doanh thu & Công nợ
-          </h1>
-          <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">
-            Thống kê tài chính, theo dõi lợi nhuận và quản lý các khoản công nợ của khách hàng.
-          </p>
-        </div>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Tổng quan</p>
+            <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
+              <PieChart className="w-5 h-5 text-primary" /> Tài chính
+            </h1>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Theo dõi doanh thu, lợi nhuận và các báo cáo tài chính tổng quan.</p>
+          </div>
         <div className="flex gap-3">
           <button className="admin-button-secondary px-5 py-3 text-sm">
             <Download className="h-4 w-4" />

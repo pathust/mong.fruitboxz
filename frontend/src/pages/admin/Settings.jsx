@@ -50,10 +50,11 @@ export default function Settings() {
       <AdminHeaderPortal>
         <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
           <div>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Hệ thống</p>
             <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
               <SettingsIcon className="w-5 h-5 text-primary" /> Cài đặt chung
             </h1>
-            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Quản lý thông tin liên hệ của cửa hàng.</p>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Cấu hình các thông tin cơ bản của hệ thống.</p>
           </div>
           <button
             onClick={handleSave}

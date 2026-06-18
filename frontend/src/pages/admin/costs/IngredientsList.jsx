@@ -180,10 +180,11 @@ export default function IngredientsList() {
       <AdminHeaderPortal>
         <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
           <div>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Kho & Chi phí</p>
             <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
-              <Leaf className="w-5 h-5 text-primary" /> Nguyên liệu (Inventory)
+              <Leaf className="w-5 h-5 text-primary" /> Nguyên liệu
             </h1>
-            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Quản lý nguyên liệu qua hệ thống Tồn kho</p>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Quản lý danh sách nguyên liệu và công thức cấu thành.</p>
           </div>
           <button onClick={openNew} className="admin-button-primary px-4 py-2 text-sm flex items-center gap-2">
             <Plus className="w-4 h-4" /> Thêm nguyên liệu

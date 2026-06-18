@@ -288,12 +288,11 @@ export default function PromotionsList() {
       <AdminHeaderPortal>
         <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
           <div>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Bán hàng</p>
             <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
-              <Tag className="w-5 h-5 text-primary" /> Voucher / Mã giảm giá
+              <Tag className="w-5 h-5 text-primary" /> Khuyến mãi
             </h1>
-            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">
-              Quản lý các chương trình khuyến mãi và voucher của cửa hàng
-            </p>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Quản lý các chương trình khuyến mãi và mã giảm giá.</p>
           </div>
           <button
             onClick={openNew}

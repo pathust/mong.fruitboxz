@@ -72,11 +72,14 @@ export default function BlogCategoryForm() {
     <div className="max-w-2xl space-y-6">
       <AdminHeaderPortal>
         <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
-        <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">CMS / Danh mục Blog</p>
-        <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
-          <FolderKanban className="w-5 h-5 text-primary" /> {isNew ? "Thêm danh mục" : "Sửa danh mục"}
-        </h1>
-      </div>
+          <div>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Nội dung & Media</p>
+            <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
+              <FolderKanban className="w-5 h-5 text-primary" /> {isNew ? "Thêm danh mục" : "Sửa danh mục"}
+            </h1>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Cập nhật tên và mô tả danh mục blog.</p>
+          </div>
+        </div>
       </AdminHeaderPortal>
 
       <form onSubmit={handleSubmit} className="admin-card space-y-5 p-6">

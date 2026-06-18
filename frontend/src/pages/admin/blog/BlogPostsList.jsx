@@ -76,12 +76,12 @@ export default function BlogPostsList() {
       <AdminHeaderPortal>
         <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
         <div>
-          <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">CMS</p>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Nội dung & Media</p>
             <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
-              <FileText className="w-5 h-5 text-primary" /> Blog
+              <FileText className="w-5 h-5 text-primary" /> Bài viết Blog
             </h1>
-          <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Quản lý bài viết đang hiển thị ở trang Blog storefront.</p>
-        </div>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Quản lý các bài viết trên trang tin tức, blog.</p>
+          </div>
         <Link to="/admin/blog/new" className="admin-button-primary px-4 py-2 text-sm">Thêm bài viết</Link>
       </div>
       </AdminHeaderPortal>

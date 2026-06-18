@@ -159,10 +159,11 @@ export default function ShippingSettings() {
       <AdminHeaderPortal>
         <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
           <div>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Hệ thống</p>
             <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
-              <Truck className="w-5 h-5 text-primary" /> Cài đặt vận chuyển
+              <Truck className="w-5 h-5 text-primary" /> Cài đặt phí ship
             </h1>
-            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Cấu hình phí ship mặc định, phí tính theo km và chính sách freeship</p>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Cấu hình phí vận chuyển mặc định và biểu phí theo khoảng cách.</p>
           </div>
           <button
             onClick={handleSave}

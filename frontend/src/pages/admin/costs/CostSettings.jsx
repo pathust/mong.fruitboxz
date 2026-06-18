@@ -76,10 +76,11 @@ export default function CostSettings() {
       <AdminHeaderPortal>
         <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
           <div>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Kho & Chi phí</p>
             <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
-              <Calculator className="w-5 h-5 text-primary" /> Chi phí & Định giá
+              <Calculator className="w-5 h-5 text-primary" /> Cài đặt Cost
             </h1>
-            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Quản lý chi phí vĩ mô áp dụng chung</p>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Cấu hình tỷ lệ chi phí tiêu chuẩn cho hệ thống.</p>
           </div>
           <button onClick={handleSave} disabled={saving} className="admin-button-primary px-4 py-2 text-sm flex items-center gap-2">
             <Save className="w-4 h-4" /> {saving ? "Đang lưu..." : "Lưu cài đặt"}

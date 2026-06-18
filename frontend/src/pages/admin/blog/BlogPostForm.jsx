@@ -100,12 +100,14 @@ export default function BlogPostForm() {
     <div className="max-w-5xl space-y-6">
       <AdminHeaderPortal>
         <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
-        <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">CMS / Blog</p>
-        <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
-          <FileText className="w-5 h-5 text-primary" /> {isNew ? "Thêm bài viết" : "Sửa bài viết"}
-        </h1>
-        <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Đường dẫn storefront: /blog/{previewPath || "slug"}</p>
-      </div>
+          <div>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Nội dung & Media</p>
+            <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
+              <FileText className="w-5 h-5 text-primary" /> {isNew ? "Thêm bài viết" : "Sửa bài viết"}
+            </h1>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Soạn thảo nội dung bài viết.</p>
+          </div>
+        </div>
       </AdminHeaderPortal>
 
       <form onSubmit={handleSubmit} className="admin-card space-y-5 p-6">
