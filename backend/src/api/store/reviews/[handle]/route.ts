@@ -16,9 +16,20 @@ function getCustomerId(req: MedusaRequest): string | undefined {
 }
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
-  const siteService = req.scope.resolve("site") as any
+  const remoteQuery = req.scope.resolve("remoteQuery") as any
   const handle = (req.params.handle || "").toString()
-  const [reviews] = await siteService.listAndCountReviews({ handle, approved: true })
+  
+  const query = {
+    site_review: {
+      __args: { filters: { handle, approved: true } },
+      fields: [
+        "id", "rating", "comment", "created_at",
+        "customer.first_name", "customer.last_name", "customer.email"
+      ]
+    }
+  }
+
+  const { data: reviews } = await remoteQuery(query)
 
   const count = reviews.length
   const average = count ? reviews.reduce((sum, r) => sum + Number(r.rating || 0), 0) / count : 0

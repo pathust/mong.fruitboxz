@@ -5,6 +5,7 @@ import { AdminAuthProvider } from './context/AdminAuthContext'
 import AdminLayout from './components/admin/AdminLayout'
 import ProtectedRoute from './components/admin/ProtectedRoute'
 import AdminLoginCheck from './components/admin/AdminLoginCheck'
+import { RequirePermission } from './components/admin/RequirePermission'
 
 const Home = lazy(() => import('./pages/Home'))
 const Products = lazy(() => import('./pages/Products'))
@@ -44,8 +45,7 @@ const OrderDetail = lazy(() => import('./pages/admin/orders/OrderDetail'))
 const ShippingSettings = lazy(() => import('./pages/admin/settings/ShippingSettings'))
 const UsersList = lazy(() => import('./pages/admin/UsersList'))
 const RolesList = lazy(() => import('./pages/admin/RolesList'))
-const PermissionsList = lazy(() => import('./pages/admin/PermissionsList'))
-const ReviewsList = lazy(() => import('./pages/admin/ReviewsList'))
+
 const Settings = lazy(() => import('./pages/admin/Settings'))
 const CostSettings = lazy(() => import('./pages/admin/costs/CostSettings'))
 const IngredientsList = lazy(() => import('./pages/admin/costs/IngredientsList'))
@@ -90,6 +90,7 @@ export default function App() {
       <Route path="/blog" element={<PublicPage><Blog /></PublicPage>} />
       <Route path="/blog/:id" element={<PublicPage><BlogPost /></PublicPage>} />
       <Route path="/search" element={<PublicPage><Search /></PublicPage>} />
+      <Route path="/custom-box" element={<PublicPage><CustomBox /></PublicPage>} />
       <Route path="/custom-box/:slug" element={<PublicPage><CustomBox /></PublicPage>} />
       <Route path="/payment-policy" element={<PublicPage><PaymentPolicy /></PublicPage>} />
       <Route path="/shipping-policy" element={<PublicPage><ShippingPolicy /></PublicPage>} />
@@ -115,10 +116,9 @@ export default function App() {
           <Route path="banners/:id" element={<Suspense fallback={<ScreenLoader />}><BannerForm /></Suspense>} />
           <Route path="orders" element={<Suspense fallback={<ScreenLoader />}><OrdersList /></Suspense>} />
           <Route path="orders/:id" element={<Suspense fallback={<ScreenLoader />}><OrderDetail /></Suspense>} />
-          <Route path="users" element={<Suspense fallback={<ScreenLoader />}><UsersList /></Suspense>} />
-          <Route path="roles" element={<Suspense fallback={<ScreenLoader />}><RolesList /></Suspense>} />
-          <Route path="permissions" element={<Suspense fallback={<ScreenLoader />}><PermissionsList /></Suspense>} />
-          <Route path="reviews" element={<Suspense fallback={<ScreenLoader />}><ReviewsList /></Suspense>} />
+          <Route path="users" element={<Suspense fallback={<ScreenLoader />}><RequirePermission perm="users.read"><UsersList /></RequirePermission></Suspense>} />
+          <Route path="roles" element={<Suspense fallback={<ScreenLoader />}><RequirePermission perm="roles.read"><RolesList /></RequirePermission></Suspense>} />
+
           <Route path="ingredients" element={<Suspense fallback={<ScreenLoader />}><IngredientsList /></Suspense>} />
           <Route path="settings/shipping" element={<Suspense fallback={<ScreenLoader />}><ShippingSettings /></Suspense>} />
           <Route path="settings/costs" element={<Suspense fallback={<ScreenLoader />}><CostSettings /></Suspense>} />
@@ -133,6 +133,9 @@ export default function App() {
           <Route path="blog-categories/:id/edit" element={<Suspense fallback={<ScreenLoader />}><BlogCategoryForm /></Suspense>} />
           <Route path="content/about" element={<Suspense fallback={<ScreenLoader />}><ContentSettingsPage type="about" /></Suspense>} />
           <Route path="content/contact" element={<Suspense fallback={<ScreenLoader />}><ContentSettingsPage type="contact" /></Suspense>} />
+          <Route path="content/payment-policy" element={<Suspense fallback={<ScreenLoader />}><ContentSettingsPage type="paymentPolicy" /></Suspense>} />
+          <Route path="content/privacy-policy" element={<Suspense fallback={<ScreenLoader />}><ContentSettingsPage type="privacyPolicy" /></Suspense>} />
+          <Route path="content/shipping-policy" element={<Suspense fallback={<ScreenLoader />}><ContentSettingsPage type="shippingPolicy" /></Suspense>} />
           <Route path="content/custom-box" element={<Suspense fallback={<ScreenLoader />}><ContentSettingsPage type="customBox" /></Suspense>} />
           <Route path="content/blog" element={<Suspense fallback={<ScreenLoader />}><ContentSettingsPage type="blog" /></Suspense>} />
           <Route path="settings" element={<Suspense fallback={<ScreenLoader />}><Settings /></Suspense>} />

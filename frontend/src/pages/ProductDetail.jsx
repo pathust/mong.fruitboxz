@@ -13,10 +13,7 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1)
   const [addedToCart, setAddedToCart] = useState(false)
   const [ingredients, setIngredients] = useState([])
-  const [reviewSummary, setReviewSummary] = useState({ count: 0, average: 0 })
-  const [reviews, setReviews] = useState([])
-  const [reviewForm, setReviewForm] = useState({ rating: 5, comment: '' })
-  const [reviewError, setReviewError] = useState('')
+
   const heroRef = useRef(null)
   const buyButtonRef = useRef(null)
   const { products } = useCatalog() // we'll use this for related fallback or just ignore
@@ -27,11 +24,13 @@ export default function ProductDetail() {
     let mounted = true
     const timer = window.setTimeout(() => {
       setLoading(true)
-      apiFetch(`/store/products?handle=${slug}&fields=id,handle,title,thumbnail,*images,*variants,*variants.prices,*categories,description`)
+      apiFetch(`/store/products?handle=${slug}&fields=id,handle,title,thumbnail,*images,*variants,*variants.prices,+variants.inventory_quantity,*categories,description`)
         .then((res) => {
           if (mounted && res.products && res.products.length > 0) {
             const p = mapProduct(res.products[0])
             setProduct({ ...p, description: res.products[0].description })
+            const firstInStock = p.variants?.findIndex(v => v.inStock !== false) ?? 0
+            setSelectedVariant(firstInStock >= 0 ? firstInStock : 0)
           } else if (mounted) {
             setProduct(null)
           }
@@ -55,15 +54,7 @@ export default function ProductDetail() {
       .then((data) => setIngredients(data.ingredients || []))
       .catch(() => setIngredients([]))
 
-    apiFetch(`/store/reviews/${productSlug}`)
-      .then((data) => {
-        setReviews(data.reviews || [])
-        setReviewSummary(data.summary || { count: 0, average: 0 })
-      })
-      .catch(() => {
-        setReviews([])
-        setReviewSummary({ count: 0, average: 0 })
-      })
+
   }, [product])
   useEffect(() => {
     if (!product) return
@@ -112,7 +103,8 @@ export default function ProductDetail() {
       </div>
     )
   }
-  const images = product.images?.length > 0 ? product.images : [product.thumbnail]
+  const validImages = product.images?.filter(Boolean) || []
+  const images = validImages.length > 0 ? validImages : (product.thumbnail ? [product.thumbnail] : ['/mong_logo-removebg.png'])
   const currentImage = images[selectedImage] || images[0]
   const variants = product.variants || []
   const currentVariant = variants[selectedVariant] || variants[0] || {}
@@ -139,43 +131,10 @@ export default function ProductDetail() {
     setTimeout(() => setAddedToCart(false), 2000)
   }
   const variantLabel = (v) => v.label || v.title || (v.size ? `Size ${v.size}${v.weight ? ` ${v.weight}` : ''}` : '')
-  const submitReview = async (e) => {
-    e.preventDefault()
-    setReviewError('')
-    try {
-      const token = localStorage.getItem('customer_token')
-      if (!token) {
-        setReviewError('Vui lòng đăng nhập để đánh giá')
-        return
-      }
-      const productSlug = product.slug || product.id
-      await apiFetch(`/store/reviews/${productSlug}`, {
-        method: 'POST',
-        token,
-        body: JSON.stringify({
-          rating: reviewForm.rating,
-          comment: reviewForm.comment,
-          product_id: product.id,
-          product_title: product.title,
-        }),
-      })
-      const latest = await apiFetch(`/store/reviews/${productSlug}`)
-      setReviews(latest.reviews || [])
-      setReviewSummary(latest.summary || { count: 0, average: 0 })
-      setReviewForm({ rating: 5, comment: '' })
-    } catch (err) {
-      setReviewError(err.message || 'Không gửi được đánh giá')
-    }
-  }
+
   return (
     <div className="max-w-[1240px] mx-auto px-4 py-6 md:py-8 animate-fadeIn">
-      <nav className="flex items-center gap-2 text-sm text-gray-400 mb-8">
-        <Link to="/" className="hover:text-primary">Trang chủ</Link>
-        <span>/</span>
-        <Link to="/products" className="hover:text-primary">Sản phẩm</Link>
-        <span>/</span>
-        <span className="text-secondary font-medium">{product.title}</span>
-      </nav>
+      
       <div ref={heroRef} className="grid md:grid-cols-2 gap-6 md:gap-8 mb-12 scroll-mt-24 animate-product-hero">
         <div>
           <div className="aspect-square bg-white rounded-2xl overflow-hidden border border-[#efe7dc] mb-3">
@@ -208,9 +167,11 @@ export default function ProductDetail() {
           <h1 className="product-title text-[30px] md:text-[38px] text-secondary mb-4">{product.title}</h1>
           <div className="flex items-baseline gap-3 mb-6">
             <span className="product-price text-[30px] leading-none text-primary">
-              {hasPrice ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price) : 'Hết hàng'}
+              {product.variants[selectedVariant]?.inStock === false 
+                ? 'Hết hàng' 
+                : (hasPrice ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price) : 'Liên hệ')}
             </span>
-            {hasPrice && originalPrice && originalPrice > price && (
+            {hasPrice && originalPrice && originalPrice > price && product.variants[selectedVariant]?.inStock !== false && (
               <>
                 <span className="text-gray-400 line-through text-lg">
                   {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(originalPrice)}
@@ -223,22 +184,32 @@ export default function ProductDetail() {
             <div className="mb-6">
               <p className="product-meta text-sm text-secondary mb-2.5 font-semibold">Chọn loại:</p>
               <div className="flex flex-wrap gap-2">
-                {variants.map((v, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setSelectedVariant(i)}
-                    className={`product-meta px-4 py-2.5 rounded-lg border text-sm transition-colors ${
-                      selectedVariant === i
-                        ? 'border-primary bg-primary/5 text-primary shadow-sm'
-                        : 'border-gray-200 text-gray-600 hover:border-primary/50'
-                    }`}
-                  >
-                    {variantLabel(v) || `Size ${i + 1}`}
-                    <span className="block text-xs text-gray-400 mt-0.5">
-                      {(v.price ?? v.prices?.[0]?.amount) ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(v.price ?? v.prices?.[0]?.amount) : 'Hết hàng'}
-                    </span>
-                  </button>
-                ))}
+                {variants.map((v, i) => {
+                  const isOutOfStock = v.inStock === false;
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => {
+                        if (!isOutOfStock) setSelectedVariant(i);
+                      }}
+                      disabled={isOutOfStock}
+                      className={`product-meta px-4 py-2.5 rounded-lg border text-sm transition-colors ${
+                        isOutOfStock 
+                          ? 'border-[#e8e2d9] bg-gray-50 opacity-60 cursor-not-allowed'
+                          : selectedVariant === i
+                            ? 'border-primary bg-primary/5 text-primary shadow-sm'
+                            : 'border-gray-200 text-gray-600 hover:border-primary/50'
+                      }`}
+                    >
+                      <div className={`font-medium ${isOutOfStock ? 'text-gray-400 line-through' : ''}`}>
+                        {variantLabel(v) || `Size ${i + 1}`}
+                      </div>
+                      <span className={`block text-xs mt-0.5 ${isOutOfStock ? 'text-gray-400 font-bold' : 'text-gray-500'}`}>
+                        {isOutOfStock ? 'Hết hàng' : ((v.price ?? v.prices?.[0]?.amount) ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(v.price ?? v.prices?.[0]?.amount) : 'Liên hệ')}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -263,14 +234,14 @@ export default function ProductDetail() {
             <button
               ref={buyButtonRef}
               onClick={handleAddToCart}
-              disabled={!hasPrice}
+              disabled={!hasPrice || product.variants[selectedVariant]?.inStock === false}
               className={`flex-1 h-12 rounded-xl font-semibold text-center transition-all flex items-center justify-center gap-2 ${
                 addedToCart
                   ? 'bg-green-500 text-white'
-                  : hasPrice ? 'bg-primary text-white hover:bg-primary-dark shadow-md hover:shadow-lg' : 'bg-gray-100 text-gray-400'
+                  : hasPrice && product.variants[selectedVariant]?.inStock !== false ? 'bg-primary text-white hover:bg-primary-dark shadow-md hover:shadow-lg' : 'bg-gray-100 text-gray-400 cursor-not-allowed'
               }`}
             >
-              {addedToCart ? '✓ Đã thêm vào giỏ' : hasPrice ? (
+              {addedToCart ? '✓ Đã thêm vào giỏ' : (hasPrice && product.variants[selectedVariant]?.inStock !== false) ? (
                 <>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
                   Thêm vào giỏ hàng
@@ -300,7 +271,7 @@ export default function ProductDetail() {
           )}
         </div>
       </div>
-      <div className="grid md:grid-cols-2 gap-6 mb-12">
+      <div className="grid grid-cols-1 gap-6 mb-12">
         <section className="bg-white rounded-xl p-5 border border-[#efe7dc]">
           <h2 className="section-title text-[22px] mb-3">Thành phần</h2>
           {ingredients.length === 0 ? (
@@ -313,37 +284,7 @@ export default function ProductDetail() {
             </ul>
           )}
         </section>
-        <section className="bg-white rounded-xl p-5 border border-[#efe7dc]">
-          <h2 className="section-title text-[22px] mb-1">Đánh giá</h2>
-          <p className="text-sm text-gray-500 mb-3">⭐ {reviewSummary.average || 0}/5 ({reviewSummary.count} đánh giá)</p>
-          <form onSubmit={submitReview} className="space-y-2 mb-4">
-            <select
-              value={reviewForm.rating}
-              onChange={(e) => setReviewForm({ ...reviewForm, rating: Number(e.target.value) })}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
-            >
-              {[5, 4, 3, 2, 1].map((star) => <option key={star} value={star}>{star} sao</option>)}
-            </select>
-            <textarea
-              value={reviewForm.comment}
-              onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
-              rows={3}
-              placeholder="Chia sẻ cảm nhận sau khi mua"
-            />
-            {reviewError && <p className="text-xs text-red-500">{reviewError}</p>}
-            <button type="submit" className="px-4 py-2 rounded-lg bg-primary text-white text-sm">Gửi đánh giá</button>
-          </form>
-          <div className="space-y-2 max-h-52 overflow-auto">
-            {reviews.map((r) => (
-              <div key={r.id} className="border border-gray-100 rounded-lg p-2.5">
-                <p className="text-xs text-gray-500">{"⭐".repeat(r.rating)} • {new Date(r.created_at).toLocaleDateString('vi-VN')}</p>
-                <p className="text-sm text-secondary">{r.comment || 'Không có bình luận'}</p>
-              </div>
-            ))}
-            {reviews.length === 0 && <p className="text-sm text-gray-500">Chưa có đánh giá nào</p>}
-          </div>
-        </section>
+
       </div>
       {related.length > 0 && (
         <div>
