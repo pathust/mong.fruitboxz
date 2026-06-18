@@ -160,9 +160,9 @@ export default function RecipeManager({ productId, variantId }) {
               <input
                 type="number"
                 min={0}
-                step="0.01"
+                step={['kg', 'lít', 'l'].includes(selectedIng?.metadata?.unit?.toLowerCase()) ? "0.001" : "1"}
                 value={item.required_quantity}
-                onChange={e => updateItem(idx, "required_quantity", Number(e.target.value) || 0)}
+                onChange={e => updateItem(idx, "required_quantity", e.target.value)}
                 className="w-20 px-3 py-2 border border-gray-200 rounded-lg text-sm text-center focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
               />
 
