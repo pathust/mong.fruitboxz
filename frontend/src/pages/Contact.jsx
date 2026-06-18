@@ -25,11 +25,12 @@ export default function Contact() {
     }
   }
 
+  const { settings } = useSiteSettings()
+  
   const contactItems = [
-    { value: '165 Phương Mai, Đống Đa, Hà Nội', label: 'Cơ sở 1', icon: MapPin },
-    { value: '23 Ngô Tất Tố, Đống Đa, Hà Nội', label: 'Cơ sở 2', icon: MapPin },
-    { value: '0869 277 365', detail: '8:00 - 22:00 hàng ngày', icon: Phone },
-    { value: 'ume.fruits@gmail.com', icon: Mail },
+    { value: settings?.address || '165 Phương Mai, Đống Đa, Hà Nội', label: 'Cửa hàng chính', icon: MapPin },
+    { value: settings?.phone || '0869 277 365', detail: settings?.opening_hours || '8:00 - 22:00 hàng ngày', icon: Phone },
+    { value: settings?.email || 'ume.fruits@gmail.com', icon: Mail },
   ]
 
   return (
@@ -84,12 +85,16 @@ export default function Contact() {
             <div className="bg-gradient-to-br from-primary to-primary-dark rounded-[2rem] p-8 md:p-10 text-white shadow-lg shadow-primary/20">
               <h3 className="font-bold text-xl mb-6">Kết nối với Mọng</h3>
               <div className="flex gap-4">
-                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="w-12 h-12 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center transition-colors">
-                  <Facebook className="h-5 w-5" />
-                </a>
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-12 h-12 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center transition-colors">
-                  <Instagram className="h-5 w-5" />
-                </a>
+                {settings?.facebook && (
+                  <a href={settings.facebook} target="_blank" rel="noopener noreferrer" className="w-12 h-12 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center transition-colors">
+                    <Facebook className="h-5 w-5" />
+                  </a>
+                )}
+                {settings?.instagram && (
+                  <a href={settings.instagram} target="_blank" rel="noopener noreferrer" className="w-12 h-12 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center transition-colors">
+                    <Instagram className="h-5 w-5" />
+                  </a>
+                )}
               </div>
             </div>
           </div>

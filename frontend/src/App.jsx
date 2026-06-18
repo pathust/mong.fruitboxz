@@ -131,7 +131,6 @@ export default function App() {
           <Route path="blog-categories" element={<Suspense fallback={<ScreenLoader />}><BlogCategoriesList /></Suspense>} />
           <Route path="blog-categories/new" element={<Suspense fallback={<ScreenLoader />}><BlogCategoryForm /></Suspense>} />
           <Route path="blog-categories/:id/edit" element={<Suspense fallback={<ScreenLoader />}><BlogCategoryForm /></Suspense>} />
-          <Route path="content/contact" element={<Suspense fallback={<ScreenLoader />}><ContentSettingsPage type="contact" /></Suspense>} />
           <Route path="content/payment-policy" element={<Suspense fallback={<ScreenLoader />}><ContentSettingsPage type="paymentPolicy" /></Suspense>} />
           <Route path="content/privacy-policy" element={<Suspense fallback={<ScreenLoader />}><ContentSettingsPage type="privacyPolicy" /></Suspense>} />
           <Route path="content/shipping-policy" element={<Suspense fallback={<ScreenLoader />}><ContentSettingsPage type="shippingPolicy" /></Suspense>} />
