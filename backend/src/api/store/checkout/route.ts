@@ -144,16 +144,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
       variantTitle = variant.title || variantTitle
       productTitle = variant.product?.title || productTitle
 
-      // --- Inventory check: kiểm tra tồn kho trước khi tạo order ---
-      if (variant.manage_inventory) {
-        const availableQty = variant.inventory_quantity ?? 0
-        if (availableQty < item.quantity) {
-          return res.status(400).json({
-            message: `Sản phẩm "${productTitle}" không đủ tồn kho (còn ${availableQty}, yêu cầu ${item.quantity})`
-          })
-        }
-      }
-
+      // --- Inventory check đã bị loại bỏ vì hiện tại sử dụng cơ chế BOM ---
       if (variant.metadata?.cost_price) {
         costPrice = Number(variant.metadata.cost_price)
       }
