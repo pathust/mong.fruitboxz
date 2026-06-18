@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect } from "react"
 import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal"
 import { Link } from "react-router-dom"
+
 import { ShoppingCart, Eye } from "lucide-react"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
 import { AdminListFilters, filterBySearch } from "../../../components/admin/AdminListFilters"
@@ -63,7 +64,9 @@ export default function OrdersList() {
           </div>
           <div>
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Fulfillment</p>
-            <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">Orders</h1>
+            <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
+              <ShoppingCart className="w-5 h-5 text-primary" /> Orders
+            </h1>
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Theo dõi đơn hàng, trạng thái và thông tin khách.</p>
           </div>
         </div>

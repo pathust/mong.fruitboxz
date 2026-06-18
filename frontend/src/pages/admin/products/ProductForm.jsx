@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useParams } from "react-router-dom"
+import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal"
+import { Package, Plus, Trash2 } from "lucide-react"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
 import ImagePicker from "../../../components/admin/ImagePicker"
 import RecipeManager from "./RecipeManager"
-import { Plus, Trash2 } from "lucide-react"
 
 function slugify(value) {
   return String(value || "")
@@ -211,7 +212,18 @@ export default function ProductForm() {
 
   return (
     <div className="max-w-4xl">
-      <h1 className="text-2xl font-bold text-secondary mb-6">{isNew ? "Tạo sản phẩm mới" : "Chỉnh sửa sản phẩm"}</h1>
+      <AdminHeaderPortal>
+        <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
+          <div>
+            <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
+              <Package className="w-5 h-5 text-primary" /> {isNew ? "Tạo sản phẩm mới" : "Chỉnh sửa sản phẩm"}
+            </h1>
+          </div>
+          <button type="button" onClick={handleSubmit} disabled={saving} className="admin-button-primary px-4 py-2 text-sm">
+            {saving ? "Đang lưu..." : "Lưu sản phẩm"}
+          </button>
+        </div>
+      </AdminHeaderPortal>
       <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="md:col-span-2">

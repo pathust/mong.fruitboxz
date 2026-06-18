@@ -1,7 +1,7 @@
 import { RequirePermission } from "../../components/admin/RequirePermission"
 import { AdminHeaderPortal } from "../../components/admin/AdminHeaderPortal"
 import { useMemo, useState, useEffect } from "react"
-import { Pencil, Plus, Save, Trash2, X, ShieldCheck } from "lucide-react"
+import { Shield, LoaderCircle, CheckCircle, Search, Edit2, Trash2, Pencil, Plus, Save, X, ShieldCheck } from "lucide-react"
 import { useAdminAuth } from "../../context/AdminAuthContext"
 import { AdminListFilters, filterBySearch } from "../../components/admin/AdminListFilters"
 
@@ -180,7 +180,9 @@ export default function RolesList() {
         <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
         <div>
           <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Access</p>
-          <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">Phân Quyền (RBAC)</h1>
+          <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
+            <Shield className="w-5 h-5 text-primary" /> Phân Quyền (RBAC)
+          </h1>
           <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Thiết lập vai trò và cấu hình quyền hạn qua Ma trận trực quan.</p>
         </div>
         <RequirePermission perm="roles.create">

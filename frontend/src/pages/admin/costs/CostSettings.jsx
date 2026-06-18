@@ -1,5 +1,6 @@
 import { useCallback, useState, useEffect } from "react"
-import { Calculator, Save, AlertCircle } from "lucide-react"
+import { Calculator, AlertCircle, Save } from "lucide-react"
+import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
 
 export default function CostSettings() {
@@ -72,14 +73,19 @@ export default function CostSettings() {
 
   return (
     <div className="max-w-3xl">
-      <div className="mb-6 flex items-end justify-between">
-        <div>
-          <h1 className="text-2xl font-extrabold text-primary flex items-center gap-2">
-            <Calculator className="h-6 w-6" /> Chi phí & Định giá
-          </h1>
-          <p className="mt-1 text-sm font-semibold text-secondary">Quản lý chi phí vĩ mô áp dụng chung</p>
+      <AdminHeaderPortal>
+        <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
+          <div>
+            <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
+              <Calculator className="w-5 h-5 text-primary" /> Chi phí & Định giá
+            </h1>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Quản lý chi phí vĩ mô áp dụng chung</p>
+          </div>
+          <button onClick={handleSave} disabled={saving} className="admin-button-primary px-4 py-2 text-sm flex items-center gap-2">
+            <Save className="w-4 h-4" /> {saving ? "Đang lưu..." : "Lưu Thay Đổi"}
+          </button>
         </div>
-      </div>
+      </AdminHeaderPortal>
 
       {error && (
         <div className="mb-6 rounded-xl bg-red-50 p-4 text-sm text-red-600 flex items-center gap-2 border border-red-100">

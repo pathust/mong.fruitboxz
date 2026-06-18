@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect } from "react"
-import { Link, useNavigate, useParams } from "react-router-dom"
-import { ImageIcon, Pencil, Trash2, X } from "lucide-react"
+import { Link } from "react-router-dom"
+import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal"
+import { Image, ImageIcon, Pencil, Trash2, X } from "lucide-react"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
 import { AdminListFilters, filterBySearch } from "../../../components/admin/AdminListFilters"
 
@@ -38,10 +39,16 @@ export default function BannersList() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-secondary">Banners</h1>
-        <Link to="/admin/banners/new" className="bg-primary text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-primary-dark">+ Add Banner</Link>
-      </div>
+      <AdminHeaderPortal>
+        <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
+          <div>
+            <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
+              <Image className="w-5 h-5 text-primary" /> Banners
+            </h1>
+          </div>
+          <Link to="/admin/banners/new" className="admin-button-primary px-4 py-2 text-sm">+ Add Banner</Link>
+        </div>
+      </AdminHeaderPortal>
       <AdminListFilters
         search={query}
         onSearchChange={setQuery}

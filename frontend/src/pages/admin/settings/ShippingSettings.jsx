@@ -1,5 +1,6 @@
 import { useCallback, useState, useEffect } from "react"
-import { Truck, Save, AlertCircle, MapPin } from "lucide-react"
+import { Truck, Save, Loader2, LocateIcon, MapPin, Search, AlertCircle } from "lucide-react"
+import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
 
 export default function ShippingSettings() {
@@ -155,25 +156,24 @@ export default function ShippingSettings() {
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            <Truck className="w-6 h-6 text-blue-500" />
-            Cài đặt vận chuyển
-          </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">
-            Cấu hình phí ship mặc định, phí tính theo km và chính sách freeship
-          </p>
+      <AdminHeaderPortal>
+        <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
+          <div>
+            <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
+              <Truck className="w-5 h-5 text-primary" /> Cài đặt vận chuyển
+            </h1>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Cấu hình phí ship mặc định, phí tính theo km và chính sách freeship</p>
+          </div>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="admin-button-primary px-4 py-2 text-sm flex items-center gap-2"
+          >
+            <Save className="w-4 h-4" />
+            {saving ? "Đang lưu..." : "Lưu cài đặt"}
+          </button>
         </div>
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2 disabled:opacity-50 shrink-0"
-        >
-          <Save className="w-5 h-5" />
-          {saving ? "Đang lưu..." : "Lưu cài đặt"}
-        </button>
-      </div>
+      </AdminHeaderPortal>
 
       {(message || error) && (
         <div className={`rounded-xl border px-4 py-3 text-sm font-medium ${

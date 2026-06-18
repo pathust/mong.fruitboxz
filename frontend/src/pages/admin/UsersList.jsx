@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from "react"
 import { AdminHeaderPortal } from "../../components/admin/AdminHeaderPortal"
-import { Shield, UserPlus, X, Mail, ShieldAlert, BadgeCheck } from "lucide-react"
+import { Shield, UserPlus, X, Mail, ShieldAlert, BadgeCheck, Users } from "lucide-react"
 import { useAdminAuth } from "../../context/AdminAuthContext"
 import { AdminListFilters, filterBySearch } from "../../components/admin/AdminListFilters"
 
@@ -93,7 +93,9 @@ export default function UsersList() {
         <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
         <div>
           <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Access</p>
-          <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">Quản trị viên</h1>
+          <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
+            <Users className="w-5 h-5 text-primary" /> Quản trị viên
+          </h1>
           <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Quản lý tài khoản đăng nhập Admin và phân quyền hệ thống.</p>
         </div>
         <button 

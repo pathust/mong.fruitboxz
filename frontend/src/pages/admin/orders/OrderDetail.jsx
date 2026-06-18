@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react"
-import { useParams, Link } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
+import { ShoppingCart } from "lucide-react"
+import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
 import { getOrderCode } from "../../../lib/orderCodes"
 
@@ -135,10 +137,16 @@ export default function OrderDetail() {
 
   return (
     <div>
-      <Link to="/admin/orders" className="text-primary hover:text-primary-dark text-sm mb-4 inline-block">&larr; Back to Orders</Link>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-secondary">Order {getOrderCode(order)}</h1>
-      </div>
+      <AdminHeaderPortal>
+        <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
+          <div>
+            <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
+              <ShoppingCart className="w-5 h-5 text-primary" /> Order {getOrderCode(order)}
+            </h1>
+          </div>
+          <Link to="/admin/orders" className="admin-button-secondary px-4 py-2 text-sm">&larr; Back to Orders</Link>
+        </div>
+      </AdminHeaderPortal>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
           <h2 className="font-semibold text-secondary mb-3">Trạng thái (Status)</h2>

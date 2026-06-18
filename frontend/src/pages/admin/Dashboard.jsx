@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { AdminHeaderPortal } from "../../components/admin/AdminHeaderPortal"
 import { Link } from "react-router-dom"
-import { AlertTriangle, ArrowUpRight, Bot, Image as ImageIcon, Package, Plus, SearchCheck, ShoppingCart, TrendingUp, Users, WalletCards } from "lucide-react"
+import { AlertTriangle, ArrowUpRight, Bot, Image as ImageIcon, LayoutDashboard, Package, Plus, SearchCheck, ShoppingCart, TrendingUp, Users, WalletCards } from "lucide-react"
 import { useAdminAuth } from "../../context/AdminAuthContext"
 
 function formatVnd(n) {
@@ -100,7 +100,9 @@ export default function AdminDashboard() {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Mọng operations</p>
-            <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">Dashboard</h1>
+            <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
+              <LayoutDashboard className="w-5 h-5 text-primary" /> Dashboard
+            </h1>
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Theo dõi catalog, đơn hàng và các service vận hành chính trong cùng một giao diện với storefront.</p>
           </div>
           <Link to="/admin/orders" className="admin-button-primary px-5 py-3 text-sm">

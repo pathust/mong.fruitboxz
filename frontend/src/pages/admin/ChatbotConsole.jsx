@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Bot, CirclePlus, LoaderCircle, Trash2, Info, KeySquare, Sparkles, MessageSquareWarning } from 'lucide-react'
+import { Bot, Save, AlertCircle, CheckCircle2, History, Trash2, Power, PowerOff, Sparkles, SlidersHorizontal, Info, KeySquare, MessageSquareWarning, CirclePlus, LoaderCircle } from "lucide-react"
+import { AdminHeaderPortal } from "../../components/admin/AdminHeaderPortal"
 import { useAdminAuth } from '../../context/AdminAuthContext'
 import { useToast } from '../../components/ui/ToastProvider'
 import { AdminEmpty, AdminError, AdminLoading } from '../../components/admin/AdminStates'
@@ -85,35 +86,38 @@ export default function ChatbotConsole() {
 
   return (
     <div className="space-y-6 max-w-[1200px] mx-auto pb-12">
-      {/* Header Section */}
-      <div className="bg-white rounded-[24px] p-6 md:p-8 shadow-sm border border-[#efe4d4] flex flex-col md:flex-row md:items-center md:justify-between gap-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-[#fff4ea]/50 to-transparent pointer-events-none" />
-        <div className="flex items-start gap-5 relative z-10">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-white shadow-md shadow-primary/20 shrink-0">
-            <Bot className="h-7 w-7" />
-          </div>
+      <AdminHeaderPortal>
+        <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
           <div>
-            <h1 className="text-[28px] font-bold text-[#3f352b] tracking-tight">AI Chatbot Console</h1>
-            <p className="mt-1.5 text-[15px] text-[#766957] font-medium max-w-lg">
-              Quản lý kịch bản, quy tắc trả lời (FAQ) và theo dõi các câu hỏi mà AI chưa xử lý tốt để huấn luyện thêm.
+            <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
+              <Bot className="w-5 h-5 text-primary" /> AI Chatbot Console
+            </h1>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">
+              Trung tâm điều khiển trợ lý AI tích hợp
             </p>
           </div>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 bg-[#fffaf4] px-3 py-1.5 rounded-full border border-[#efe4d4]">
+              <div className={`w-2.5 h-2.5 rounded-full ${enabled ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-red-400'}`} />
+              <button
+                type="button"
+                onClick={() => setEnabled((value) => !value)}
+                className={`relative h-6 w-10 rounded-full transition-colors duration-300 ease-in-out ${enabled ? 'bg-primary' : 'bg-[#d9cbbc]'}`}
+              >
+                <span className={`absolute top-1 h-4 w-4 rounded-full bg-white transition-all duration-300 ease-in-out shadow-sm ${enabled ? 'left-5' : 'left-1'}`} />
+              </button>
+            </div>
+            <button
+              onClick={saveSettings}
+              disabled={saving}
+              className="admin-button-primary px-4 py-2 text-sm flex items-center gap-2"
+            >
+              <Save className="w-4 h-4" />
+              {saving ? "Đang lưu..." : "Lưu cấu hình"}
+            </button>
+          </div>
         </div>
-        
-        <div className="relative z-10 flex items-center gap-4 bg-[#fffaf4] p-2 pr-5 rounded-full border border-[#efe4d4]">
-          <div className={`w-3 h-3 rounded-full ml-3 ${enabled ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-red-400'}`} />
-          <span className="text-sm font-semibold text-[#4f453b]">
-            {enabled ? 'Chatbot đang hoạt động' : 'Đã tắt Chatbot'}
-          </span>
-          <button
-            type="button"
-            onClick={() => setEnabled((value) => !value)}
-            className={`relative ml-2 h-7 w-12 rounded-full transition-colors duration-300 ease-in-out ${enabled ? 'bg-primary' : 'bg-[#d9cbbc]'}`}
-          >
-            <span className={`absolute top-1 h-5 w-5 rounded-full bg-white transition-all duration-300 ease-in-out shadow-sm ${enabled ? 'left-6' : 'left-1'}`} />
-          </button>
-        </div>
-      </div>
+      </AdminHeaderPortal>
 
       {/* Guide Section */}
       <div className="bg-white rounded-[24px] border border-[#efe4d4] shadow-sm p-6 md:p-8 relative overflow-hidden group">
@@ -231,7 +235,7 @@ export default function ChatbotConsole() {
             <div className="mt-8 pt-6 border-t border-[#efe4d4] flex justify-end">
               <button
                 type="button"
-                onClick={handleSave}
+                onClick={saveSettings}
                 disabled={saving}
                 className="inline-flex items-center gap-2 px-8 py-3.5 bg-primary hover:bg-primary-dark text-white font-bold text-[15px] rounded-xl transition-all shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed"
               >

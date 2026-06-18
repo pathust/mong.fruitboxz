@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal"
 import { Link } from "react-router-dom"
-import { PackagePlus, ChevronLeft, ChevronRight, Pencil, Trash2 } from "lucide-react"
+import { PackagePlus, ChevronLeft, ChevronRight, Pencil, Trash2, Package } from "lucide-react"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
 import { AdminListFilters } from "../../../components/admin/AdminListFilters"
 
@@ -146,7 +146,9 @@ export default function ProductsList() {
         <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
         <div>
           <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Danh mục</p>
-          <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">Sản phẩm</h1>
+          <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
+            <Package className="w-5 h-5 text-primary" /> Sản phẩm
+          </h1>
           <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">
             {total} sản phẩm
           </p>

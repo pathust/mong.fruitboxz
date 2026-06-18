@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import ImagePicker from "../../../components/admin/ImagePicker"
 import RichTextEditor from "../../../components/admin/RichTextEditor"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
+import { FileText } from "lucide-react"
 import { useToast } from "../../../components/ui/ToastProvider"
 import { AdminLoading } from "../../../components/admin/AdminStates"
 
@@ -100,7 +101,9 @@ export default function BlogPostForm() {
       <AdminHeaderPortal>
         <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
         <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">CMS / Blog</p>
-        <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">{isNew ? "Thêm bài viết" : "Sửa bài viết"}</h1>
+        <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
+          <FileText className="w-5 h-5 text-primary" /> {isNew ? "Thêm bài viết" : "Sửa bài viết"}
+        </h1>
         <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Đường dẫn storefront: /blog/{previewPath || "slug"}</p>
       </div>
       </AdminHeaderPortal>

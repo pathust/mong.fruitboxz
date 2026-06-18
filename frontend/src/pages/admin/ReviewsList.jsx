@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
-import { EyeOff, Check, Trash2 } from "lucide-react"
+import { Star, EyeOff, Check, Trash2 } from "lucide-react"
+import { AdminHeaderPortal } from "../../components/admin/AdminHeaderPortal"
 import { useAdminAuth } from "../../context/AdminAuthContext"
 import { AdminListFilters } from "../../components/admin/AdminListFilters"
 
@@ -55,10 +56,18 @@ export default function ReviewsList() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-secondary">Reviews</h1>
-        <div className="text-sm text-secondary-light">{filtered.length} review(s)</div>
-      </div>
+      <AdminHeaderPortal>
+        <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
+          <div>
+            <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
+              <Star className="w-5 h-5 text-primary" /> Reviews
+            </h1>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">
+              {filtered.length} review(s)
+            </p>
+          </div>
+        </div>
+      </AdminHeaderPortal>
 
       <AdminListFilters
         search={query}

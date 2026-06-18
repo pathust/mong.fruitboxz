@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState, useEffect } from "react"
-import { Tag, Plus, Edit2, Trash2 } from "lucide-react"
+import { Tag, Plus, CheckCircle, Search, Edit2, Trash2 } from "lucide-react"
+import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
 import { AdminListFilters, filterBySearch } from "../../../components/admin/AdminListFilters"
 
@@ -284,23 +285,24 @@ export default function PromotionsList() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-extrabold text-primary flex items-center gap-2">
-            <Tag className="h-6 w-6" /> Voucher / Mã giảm giá
-          </h1>
-          <p className="mt-1 text-sm font-semibold text-secondary">
-            Quản lý các chương trình khuyến mãi và voucher của cửa hàng
-          </p>
+      <AdminHeaderPortal>
+        <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
+          <div>
+            <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
+              <Tag className="w-5 h-5 text-primary" /> Voucher / Mã giảm giá
+            </h1>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">
+              Quản lý các chương trình khuyến mãi và voucher của cửa hàng
+            </p>
+          </div>
+          <button
+            onClick={openNew}
+            className="admin-button-primary px-4 py-2 text-sm flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" /> Thêm Voucher
+          </button>
         </div>
-        <button
-          onClick={openNew}
-          className="admin-button-primary px-4 py-2 flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          Tạo mã mới
-        </button>
-      </div>
+      </AdminHeaderPortal>
 
       <div className="bg-white rounded-2xl shadow-sm border border-[#eadfcd] overflow-hidden">
         <div className="p-4 border-b border-[#eadfcd]">

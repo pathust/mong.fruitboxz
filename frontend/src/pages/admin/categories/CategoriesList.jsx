@@ -1,5 +1,7 @@
 import { useMemo, useState, useEffect } from "react"
 import { Link } from "react-router-dom"
+import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal"
+import { Tags } from "lucide-react"
 import { Pencil, Trash2 } from "lucide-react"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
 import { AdminListFilters, filterBySearch } from "../../../components/admin/AdminListFilters"
@@ -28,10 +30,16 @@ export default function CategoriesList() {
   if (loading) return <div className="text-center py-12 text-secondary-light">Loading...</div>
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-secondary">Categories</h1>
-        <Link to="/admin/categories/new" className="bg-primary text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-primary-dark">+ Add Category</Link>
-      </div>
+      <AdminHeaderPortal>
+        <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
+          <div>
+            <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
+              <Tags className="w-5 h-5 text-primary" /> Categories
+            </h1>
+          </div>
+          <Link to="/admin/categories/new" className="admin-button-primary px-4 py-2 text-sm">+ Add Category</Link>
+        </div>
+      </AdminHeaderPortal>
       <AdminListFilters
         search={query}
         onSearchChange={setQuery}

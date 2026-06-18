@@ -76,7 +76,9 @@ export default function SearchConsole() {
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Hệ Thống</p>
-            <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">Search Console</h1>
+            <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
+              <Search className="w-5 h-5 text-primary" /> Search Console
+            </h1>
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Quản lý công cụ tìm kiếm, đồng bộ dữ liệu và kiểm tra kết quả thực tế.</p>
           </div>
           <button

@@ -105,7 +105,7 @@ export default function InventoryList() {
         <div>
           <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Inventory Management</p>
           <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
-            <Package className="w-8 h-8 text-primary" />
+            <Package className="w-5 h-5 text-primary" />
             Tồn kho Nguyên liệu
           </h1>
           <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">

@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
+import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal"
 import { Users, MoreVertical, Mail, Phone, Calendar } from "lucide-react"
 import { AdminListFilters, filterBySearch } from "../../../components/admin/AdminListFilters"
 
@@ -74,17 +75,16 @@ export default function CustomersList() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            <Users className="w-6 h-6 text-blue-500" />
-            Khách hàng
-          </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">
-            Quản lý thông tin và lịch sử mua hàng của khách hàng
-          </p>
+      <AdminHeaderPortal>
+        <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
+          <div>
+            <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
+              <Users className="w-5 h-5 text-primary" /> Khách hàng
+            </h1>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Quản lý thông tin và lịch sử mua hàng</p>
+          </div>
         </div>
-      </div>
+      </AdminHeaderPortal>
 
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
         <div className="p-4 border-b border-gray-100 dark:border-gray-700">

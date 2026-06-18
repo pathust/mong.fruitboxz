@@ -1,6 +1,7 @@
 import { useCallback, useState, useEffect } from "react"
 import { useParams, Link } from "react-router-dom"
-import { ArrowLeft, Mail, Phone, Calendar, ShoppingBag } from "lucide-react"
+import { ArrowLeft, Mail, Phone, Calendar, ShoppingBag, MapPin, LoaderCircle, Users } from "lucide-react"
+import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
 import { getOrderCode } from "../../../lib/orderCodes"
 
@@ -59,15 +60,19 @@ export default function CustomerDetail() {
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
-      <div className="flex items-center gap-4">
-        <Link
-          to="/admin/customers"
-          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-gray-500"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Link>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Chi tiết khách hàng</h1>
-      </div>
+      <AdminHeaderPortal>
+        <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
+          <div>
+            <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
+              <Users className="w-5 h-5 text-primary" /> Chi tiết khách hàng
+            </h1>
+          </div>
+          <Link to="/admin/customers" className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors">
+            <ArrowLeft className="w-4 h-4" />
+            Quay lại danh sách
+          </Link>
+        </div>
+      </AdminHeaderPortal>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Profile Card */}

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal"
 import { Link } from "react-router-dom"
-import { Plus, Trash2 } from "lucide-react"
+import { Plus, Trash2, Save, Settings } from "lucide-react"
 import ImagePicker from "../../../components/admin/ImagePicker"
 import RichTextEditor from "../../../components/admin/RichTextEditor"
 import { AdminError, AdminLoading } from "../../../components/admin/AdminStates"
@@ -243,7 +243,9 @@ export default function ContentSettingsPage({ type }) {
         <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
         <div>
           <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">{config.eyebrow}</p>
-          <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">{config.title}</h1>
+          <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
+            <Settings className="w-5 h-5 text-primary" /> {config.title}
+          </h1>
           <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">{config.description}</p>
         </div>
         <Link to={config.preview} target="_blank" className="admin-button-secondary px-4 py-2 text-sm">Xem storefront</Link>

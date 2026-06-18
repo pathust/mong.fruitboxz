@@ -102,7 +102,9 @@ export default function MediaLibrary() {
       <AdminHeaderPortal>
         <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
         <div>
-          <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">Media Library</h1>
+          <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
+            <Image className="w-5 h-5 text-primary" /> Media Library
+          </h1>
           <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">
             {objectStorage ? 'Đang dùng MinIO object storage.' : 'Đang dùng local media fallback.'}
           </p>

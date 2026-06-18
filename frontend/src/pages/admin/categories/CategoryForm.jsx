@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react"
-import { useNavigate, useParams } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
+import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal"
+import { Tags } from "lucide-react"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
 import ImagePicker from "../../../components/admin/ImagePicker"
 
@@ -68,7 +70,18 @@ export default function CategoryForm() {
 
   return (
     <div className="max-w-2xl">
-      <h1 className="text-2xl font-bold text-secondary mb-6">{isNew ? "Thêm danh mục" : "Chỉnh sửa danh mục"}</h1>
+      <AdminHeaderPortal>
+        <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
+          <div>
+            <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
+              <Tags className="w-5 h-5 text-primary" /> {isNew ? "Thêm danh mục" : "Chỉnh sửa danh mục"}
+            </h1>
+          </div>
+          <button type="button" onClick={handleSubmit} disabled={saving} className="admin-button-primary px-4 py-2 text-sm">
+            {saving ? "Saving..." : "Save Category"}
+          </button>
+        </div>
+      </AdminHeaderPortal>
       <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
         <div>
           <label className="block text-sm font-medium text-secondary mb-1">Tên danh mục</label>
