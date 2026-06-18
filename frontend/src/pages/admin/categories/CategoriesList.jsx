@@ -14,11 +14,10 @@ export default function CategoriesList() {
   const [query, setQuery] = useState("");
 
   useEffect(() => {
-    api("/admin/product-categories?limit=50").
-    then((d) => setCategories(d.product_categories || [])).
-
-    catch(() => {}).
-    finally(() => setLoading(false));
+    api("/admin/product-categories")
+      .then((d) => setCategories(d.product_categories || []))
+      .catch((err) => console.error("Failed to load categories:", err))
+      .finally(() => setLoading(false));
   }, [api]);
 
   const deleteCategory = async (id) => {
