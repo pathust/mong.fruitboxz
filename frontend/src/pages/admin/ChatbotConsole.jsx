@@ -107,7 +107,7 @@ export default function ChatbotConsole() {
               </button>
             </div>
             <button
-              onClick={saveSettings}
+              onClick={handleSave}
               disabled={saving}
               className="admin-button-primary px-4 py-2 text-sm flex items-center gap-2"
             >
@@ -234,7 +234,7 @@ export default function ChatbotConsole() {
             <div className="mt-8 pt-6 border-t border-[#efe4d4] flex justify-end">
               <button
                 type="button"
-                onClick={saveSettings}
+                onClick={handleSave}
                 disabled={saving}
                 className="inline-flex items-center gap-2 px-8 py-3.5 bg-primary hover:bg-primary-dark text-white font-bold text-[15px] rounded-xl transition-all shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed"
               >
