@@ -69,7 +69,7 @@ export default function CostSettings() {
     }
   }
 
-  if (loading) return <div className="p-6">Loading...</div>
+  if (loading) return <div className="p-6">Đang tải dữ liệu...</div>
 
   return (
     <div className="max-w-3xl">
@@ -82,7 +82,7 @@ export default function CostSettings() {
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Quản lý chi phí vĩ mô áp dụng chung</p>
           </div>
           <button onClick={handleSave} disabled={saving} className="admin-button-primary px-4 py-2 text-sm flex items-center gap-2">
-            <Save className="w-4 h-4" /> {saving ? "Đang lưu..." : "Lưu Thay Đổi"}
+            <Save className="w-4 h-4" /> {saving ? "Đang lưu..." : "Lưu cài đặt"}
           </button>
         </div>
       </AdminHeaderPortal>

@@ -42,7 +42,7 @@ export default function BannerForm() {
     }
   }
 
-  if (loading) return <div className="text-center py-12 text-secondary-light">Loading...</div>
+  if (loading) return <div className="text-center py-12 text-secondary-light">Đang tải dữ liệu...</div>
 
   return (
     <div className="max-w-2xl">
@@ -50,17 +50,16 @@ export default function BannerForm() {
         <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
           <div>
             <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
-              <Image className="w-5 h-5 text-primary" /> {isNew ? "Add Banner" : "Edit Banner"}
+              <Image className="w-5 h-5 text-primary" /> {isNew ? "Thêm Banner" : "Chỉnh sửa Banner"}
             </h1>
           </div>
-          <button onClick={handleSubmit} disabled={saving} className="admin-button-primary px-4 py-2 text-sm">
-            {saving ? "Saving..." : "Save Banner"}
+          <button type="button" onClick={handleSubmit} disabled={saving} className="admin-button-primary px-4 py-2 text-sm">
+            {saving ? "Đang lưu..." : "Lưu Banner"}
           </button>
         </div>
       </AdminHeaderPortal>
       <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
         <div>
-          <label className="block text-sm font-medium text-secondary mb-1">Banner Name (Internal)</label>
           <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" required placeholder="e.g. Khuyến mãi Cam vàng" />
         </div>
         <div>

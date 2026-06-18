@@ -66,7 +66,7 @@ export default function CategoryForm() {
     }
   }
 
-  if (loading) return <div className="text-center py-12 text-secondary-light">Loading...</div>
+  if (loading) return <div className="text-center py-12 text-secondary-light">Đang tải dữ liệu...</div>
 
   return (
     <div className="max-w-2xl">
@@ -78,7 +78,7 @@ export default function CategoryForm() {
             </h1>
           </div>
           <button type="button" onClick={handleSubmit} disabled={saving} className="admin-button-primary px-4 py-2 text-sm">
-            {saving ? "Saving..." : "Save Category"}
+            {saving ? "Đang lưu..." : "Lưu danh mục"}
           </button>
         </div>
       </AdminHeaderPortal>

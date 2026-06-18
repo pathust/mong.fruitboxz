@@ -27,17 +27,17 @@ export default function CategoriesList() {
   const filteredCategories = useMemo(() => {
     return categories.filter((category) => filterBySearch(category, query, ["name", "description"]))
   }, [categories, query])
-  if (loading) return <div className="text-center py-12 text-secondary-light">Loading...</div>
+  if (loading) return <div className="text-center py-12 text-secondary-light">Đang tải dữ liệu...</div>
   return (
     <div>
       <AdminHeaderPortal>
         <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
           <div>
             <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
-              <Tags className="w-5 h-5 text-primary" /> Categories
+              <Tags className="w-5 h-5 text-primary" /> Danh mục
             </h1>
           </div>
-          <Link to="/admin/categories/new" className="admin-button-primary px-4 py-2 text-sm">+ Add Category</Link>
+          <Link to="/admin/categories/new" className="admin-button-primary px-4 py-2 text-sm">+ Thêm danh mục</Link>
         </div>
       </AdminHeaderPortal>
       <AdminListFilters

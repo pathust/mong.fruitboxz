@@ -35,7 +35,7 @@ export default function BannersList() {
     })
   }, [banners, query, active])
 
-  if (loading) return <div className="text-center py-12 text-secondary-light">Loading...</div>
+  if (loading) return <div className="text-center py-12 text-secondary-light">Đang tải dữ liệu...</div>
 
   return (
     <div>

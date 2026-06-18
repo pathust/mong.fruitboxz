@@ -53,7 +53,7 @@ export default function OrdersList() {
     })
   }, [orders, query, status, paymentStatus, fulfillmentStatus])
 
-  if (loading) return <div className="text-center py-12 text-secondary-light">Loading...</div>
+  if (loading) return <div className="text-center py-12 text-secondary-light">Đang tải dữ liệu...</div>
   return (
     <div className="space-y-6">
       <AdminHeaderPortal>
@@ -63,9 +63,9 @@ export default function OrdersList() {
             <ShoppingCart className="h-5 w-5" />
           </div>
           <div>
-            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Fulfillment</p>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Xử lý đơn</p>
             <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
-              <ShoppingCart className="w-5 h-5 text-primary" /> Orders
+              <ShoppingCart className="w-5 h-5 text-primary" /> Đơn hàng
             </h1>
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Theo dõi đơn hàng, trạng thái và thông tin khách.</p>
           </div>
@@ -191,7 +191,7 @@ export default function OrdersList() {
               )
             })}
             {filteredOrders.length === 0 && (
-              <tr><td colSpan={8} className="px-4 py-8 text-center text-secondary-light">No orders yet</td></tr>
+              <tr><td colSpan={8} className="px-4 py-8 text-center text-secondary-light">Chưa có đơn hàng nào</td></tr>
             )}
           </tbody>
         </table>

@@ -222,7 +222,7 @@ export default function ProductsList() {
       <div className="admin-table">
         <div className="overflow-x-auto">
           {loading ? (
-            <div className="text-center py-12 text-secondary-light">Đang tải...</div>
+            <div className="text-center py-12 text-secondary-light">Đang tải dữ liệu...</div>
           ) : (
             <table className="w-full text-sm">
               <thead>

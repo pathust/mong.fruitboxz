@@ -208,7 +208,7 @@ export default function ProductForm() {
     }
   }
 
-  if (loading) return <div className="text-center py-12 text-secondary-light">Loading...</div>
+  if (loading) return <div className="text-center py-12 text-secondary-light">Đang tải dữ liệu...</div>
 
   return (
     <div className="max-w-4xl">

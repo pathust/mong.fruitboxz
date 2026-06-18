@@ -115,8 +115,8 @@ export default function OrderDetail() {
     }
   }
 
-  if (loading) return <div className="text-center py-12 text-secondary-light">Loading...</div>
-  if (!order) return <div className="text-center py-12 text-red-500">Order not found</div>
+  if (loading) return <div className="text-center py-12 text-secondary-light">Đang tải dữ liệu...</div>
+  if (!order) return <div className="text-center py-12 text-red-500">Không tìm thấy đơn hàng</div>
 
   let orderCost = 0
   const defaultCostPercent = Number(settings.default_cost_percent ?? 50) / 100
@@ -141,10 +141,10 @@ export default function OrderDetail() {
         <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
           <div>
             <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
-              <ShoppingCart className="w-5 h-5 text-primary" /> Order {getOrderCode(order)}
+              <ShoppingCart className="w-5 h-5 text-primary" /> Đơn hàng {getOrderCode(order)}
             </h1>
           </div>
-          <Link to="/admin/orders" className="admin-button-secondary px-4 py-2 text-sm">&larr; Back to Orders</Link>
+          <Link to="/admin/orders" className="admin-button-secondary px-4 py-2 text-sm">&larr; Quay lại danh sách</Link>
         </div>
       </AdminHeaderPortal>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -262,7 +262,7 @@ export default function OrderDetail() {
                 </div>
               ))}
             </div>
-          ) : <p className="text-sm text-secondary-light">No items</p>}
+          ) : <p className="text-sm text-secondary-light">Không có sản phẩm</p>}
         </div>
       </div>
     </div>
