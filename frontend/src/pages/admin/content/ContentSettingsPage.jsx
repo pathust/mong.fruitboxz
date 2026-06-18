@@ -63,7 +63,7 @@ const configs = {
     ],
   },
   paymentPolicy: {
-    eyebrow: "CMS / Chính sách thanh toán",
+    eyebrow: "Nội dung & Media",
     title: "Chính sách thanh toán",
     description: "Quản lý nội dung hiển thị ở trang /payment-policy.",
     preview: "/payment-policy",
@@ -72,7 +72,7 @@ const configs = {
     ],
   },
   privacyPolicy: {
-    eyebrow: "CMS / Chính sách bảo mật",
+    eyebrow: "Nội dung & Media",
     title: "Chính sách bảo mật",
     description: "Quản lý nội dung hiển thị ở trang /privacy-policy.",
     preview: "/privacy-policy",
@@ -81,7 +81,7 @@ const configs = {
     ],
   },
   shippingPolicy: {
-    eyebrow: "CMS / Chính sách vận chuyển",
+    eyebrow: "Nội dung & Media",
     title: "Chính sách vận chuyển",
     description: "Quản lý nội dung hiển thị ở trang /shipping-policy.",
     preview: "/shipping-policy",
