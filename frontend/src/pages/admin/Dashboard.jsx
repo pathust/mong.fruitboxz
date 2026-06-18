@@ -146,7 +146,20 @@ export default function AdminDashboard() {
             <p><span className="font-bold text-[#43382b]">Đơn hôm nay:</span> {stats.ordersToday}</p>
             <p><span className="font-bold text-[#43382b]">AOV:</span> {formatVnd(stats.avgOrderValue)}</p>
             <p><span className="font-bold text-[#43382b]">Biên LN trung bình:</span> {stats.revenue > 0 ? Math.round((stats.profit / stats.revenue) * 100) : 0}%</p>
-            <p><span className="font-bold text-[#43382b]">Trạng thái đơn:</span> {Object.entries(stats.status).map(([k, v]) => `${k}: ${v}`).join(" | ") || "N/A"}</p>
+            <div className="flex flex-col gap-1.5">
+              <span className="font-bold text-[#43382b]">Trạng thái đơn:</span>
+              <div className="flex flex-wrap gap-2">
+                {Object.keys(stats.status).length > 0 ? (
+                  Object.entries(stats.status).map(([k, v]) => (
+                    <span key={k} className="bg-[#fff1e7] text-[#b09c84] px-2 py-0.5 rounded-md text-xs border border-[#efe4d4]">
+                      {k}: <strong className="text-primary">{v}</strong>
+                    </span>
+                  ))
+                ) : (
+                  <span>N/A</span>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>
