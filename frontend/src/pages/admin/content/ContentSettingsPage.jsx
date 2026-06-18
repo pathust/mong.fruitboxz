@@ -10,7 +10,7 @@ import { useToast } from "../../../components/ui/ToastProvider"
 
 const configs = {
   about: {
-    eyebrow: "CMS / Về chúng tôi",
+    eyebrow: "Nội dung & Media",
     title: "Về chúng tôi",
     description: "Quản lý nội dung trang /about-us.",
     preview: "/about-us",
@@ -25,7 +25,7 @@ const configs = {
     ],
   },
   blog: {
-    eyebrow: "CMS / Trang Blog",
+    eyebrow: "Nội dung & Media",
     title: "Trang Blog",
     description: "Quản lý nội dung hiển thị ở phần giới thiệu đầu trang /blog.",
     preview: "/blog",
@@ -36,7 +36,7 @@ const configs = {
     ],
   },
   contact: {
-    eyebrow: "CMS / Liên hệ",
+    eyebrow: "Nội dung & Media",
     title: "Liên hệ",
     description: "Quản lý thông tin hiển thị ở trang /contact và footer.",
     preview: "/contact",
@@ -53,7 +53,7 @@ const configs = {
     ],
   },
   customBox: {
-    eyebrow: "Bán hàng / Hộp tự chọn",
+    eyebrow: "Bán hàng",
     title: "Hộp tự chọn",
     description: "Quản lý loại hộp, giá nền, số món tối đa và danh sách sản phẩm được chọn.",
     preview: "/custom-box/hop-qua-trai-cay-tu-chon",
