@@ -97,7 +97,6 @@ export default function AdminDashboard() {
     <div className="space-y-6">
       <AdminHeaderPortal>
         <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Tổng quan</p>
             <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
@@ -110,7 +109,6 @@ export default function AdminDashboard() {
             <ArrowUpRight className="h-4 w-4" />
           </Link>
         </div>
-      </div>
       </AdminHeaderPortal>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

@@ -58,10 +58,6 @@ export default function OrdersList() {
     <div className="space-y-6">
       <AdminHeaderPortal>
         <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
-        <div className="flex items-start gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#fff1e7] text-primary">
-            <ShoppingCart className="h-5 w-5" />
-          </div>
           <div>
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Xử lý đơn</p>
             <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
@@ -70,7 +66,6 @@ export default function OrdersList() {
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Theo dõi đơn hàng, trạng thái và thông tin khách.</p>
           </div>
         </div>
-      </div>
       </AdminHeaderPortal>
 
       <AdminListFilters

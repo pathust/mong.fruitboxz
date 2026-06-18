@@ -73,7 +73,6 @@ export default function SearchConsole() {
     <div className="space-y-6">
       <AdminHeaderPortal>
         <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Hệ Thống</p>
             <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
@@ -91,7 +90,6 @@ export default function SearchConsole() {
             {reindexing ? 'Đang đồng bộ...' : 'Đồng bộ lại dữ liệu'}
           </button>
         </div>
-      </div>
       </AdminHeaderPortal>
 
       {loading ? (
