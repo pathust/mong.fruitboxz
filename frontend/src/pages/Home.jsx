@@ -8,19 +8,21 @@ import { apiFetch } from '../lib/api'
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '../components/ui/carousel'
 
 function HomeMiniCard({ product, onAdd }) {
+  const { t } = useLanguage()
   const image = product.thumbnail || product.images?.[0] || '/mong_logo-removebg.png'
   const price = product.variants?.[0]?.price ?? product.price ?? null
   const hasPrice = typeof price === 'number' && price > 0
+  const isOutOfStock = product.inStock === false || !hasPrice
   const originalPrice = product.variants?.[0]?.prices?.[1]?.amount || null
   const discount = product.discount || (originalPrice ? Math.round((1 - price / originalPrice) * 100) : 0)
   const productSlug = product.slug || product.id
 
   return (
-    <article className="group glass-panel rounded-2xl p-3 transition-all hover-card flex flex-col h-full bg-white/60">
+    <article className={`group glass-panel rounded-2xl p-3 transition-all hover-card flex flex-col h-full bg-white/60 ${isOutOfStock ? 'opacity-70' : ''}`}>
       <Link to={`/products/${productSlug}`} className="block relative overflow-hidden rounded-xl aspect-[4/5] bg-gradient-to-br from-[#f8f4ed] to-[#fffaf3]">
         <img src={image} alt={product.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-        {discount > 0 && <span className="absolute left-2 top-2 text-[10px] font-bold gradient-badge px-2.5 py-1 rounded-full shadow-sm">-{discount}%</span>}
-        {!hasPrice && <span className="absolute right-2 top-2 text-[10px] font-semibold bg-black/70 backdrop-blur-md text-white px-2 py-1 rounded-full">Hết hàng</span>}
+        {discount > 0 && !isOutOfStock && <span className="absolute left-2 top-2 text-[10px] font-bold gradient-badge px-2.5 py-1 rounded-full shadow-sm">-{discount}%</span>}
+        {isOutOfStock && <span className="absolute right-2 top-2 text-[10px] font-semibold bg-black/70 backdrop-blur-md text-white px-2 py-1 rounded-full">{t('Hết hàng')}</span>}
       </Link>
       <div className="flex flex-col flex-1 mt-3">
         <Link to={`/products/${productSlug}`}>
@@ -28,14 +30,14 @@ function HomeMiniCard({ product, onAdd }) {
         </Link>
         <div className="mt-auto pt-2 flex items-end justify-between gap-2">
           <div className="flex flex-col">
-             <span className={`product-price text-[14px] md:text-[15px] ${hasPrice ? 'text-primary' : 'text-gray-400'}`}>
-              {hasPrice ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price) : 'Liên hệ'}
+             <span className={`product-price text-[14px] md:text-[15px] ${isOutOfStock ? 'text-gray-400 line-through' : 'text-primary'}`}>
+              {hasPrice ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price) : t('Liên hệ')}
              </span>
-             {hasPrice && originalPrice && originalPrice > price && (
+             {hasPrice && originalPrice && originalPrice > price && !isOutOfStock && (
                <span className="product-meta text-[11px] text-gray-400 line-through">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(originalPrice)}</span>
              )}
           </div>
-          <button disabled={!hasPrice} onClick={() => onAdd(product, image, price)} className="h-8 w-8 rounded-full bg-gradient-to-br from-[#ef6840] to-[#d44a1e] text-white text-lg flex items-center justify-center leading-none disabled:opacity-40 transition-transform hover:scale-110 active:scale-95 shadow-md shadow-primary/30">+</button>
+          <button disabled={isOutOfStock} onClick={() => onAdd(product, image, price)} className="h-8 w-8 rounded-full bg-gradient-to-br from-[#ef6840] to-[#d44a1e] text-white text-lg flex items-center justify-center leading-none disabled:opacity-40 transition-transform hover:scale-110 active:scale-95 shadow-md shadow-primary/30">+</button>
         </div>
       </div>
     </article>
@@ -72,8 +74,8 @@ export default function Home() {
 
   const [categoryData, setCategoryData] = useState([])
   const defaultBanner = {
-    title: 'Trái cây tươi theo mùa',
-    subtitle: 'Chọn nhanh hộp trái cây, quà tặng và món cắt sẵn được chuẩn bị mỗi ngày.',
+    title: t('Trái cây tươi theo mùa'),
+    subtitle: t('Chọn nhanh hộp trái cây, quà tặng và món cắt sẵn được chuẩn bị mỗi ngày.'),
     image: '/mong_logo-removebg.png',
     link: '/products'
   }
@@ -81,7 +83,7 @@ export default function Home() {
   const normalizedActiveBanner = activeBanner % heroSlides.length
   const currentBanner = heroSlides[normalizedActiveBanner] || defaultBanner
   const hasMultipleBanners = heroSlides.length > 1
-  const heroPrimaryLabel = currentBanner.link === '/about-us' ? 'Khám phá câu chuyện Mọng' : 'Xem món đặc biệt'
+  const heroPrimaryLabel = currentBanner.link === '/about-us' ? t('Khám phá câu chuyện Mọng') : t('Xem món đặc biệt')
   const featuredProducts = categoryData
     .map(({ products }) => products[0])
     .filter(Boolean)
@@ -127,7 +129,7 @@ export default function Home() {
         })
 
         const promises = sortedCategories.map(cat =>
-          apiFetch(`/store/products?limit=12&category_id[]=${cat.id}&fields=id,handle,title,thumbnail,*images,*variants,*variants.prices,*categories`)
+          apiFetch(`/store/products?limit=12&category_id[]=${cat.id}&fields=id,handle,title,thumbnail,*images,*variants,*variants.prices,+variants.inventory_quantity,*categories`)
         )
         const results = await Promise.all(promises)
 
@@ -204,12 +206,12 @@ export default function Home() {
             </div>
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:gap-4">
-                <Link to={(currentBanner?.link || defaultBanner.link)} className="btn-glow min-h-12 px-7 py-3 rounded-full bg-primary text-white text-[15px] font-bold shadow-lg shadow-primary/25 inline-flex items-center justify-center gap-2 hover:bg-primary-dark">
-                  {heroPrimaryLabel}
+                <Link to="/products" className="min-h-12 px-7 py-3 rounded-full border border-[#d8c7b3] bg-white/75 text-[#544638] text-[15px] font-bold backdrop-blur-md transition-colors hover:bg-white inline-flex items-center justify-center gap-2">
+                  {t('Xem sản phẩm')}
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </Link>
-                <Link to="/products" className="min-h-12 px-7 py-3 rounded-full border border-[#d8c7b3] bg-white/75 text-[#544638] text-[15px] font-bold backdrop-blur-md transition-colors hover:bg-white inline-flex items-center justify-center gap-2">
-                  Xem sản phẩm
+                <Link to={(currentBanner?.link || defaultBanner.link)} className="btn-glow min-h-12 px-7 py-3 rounded-full bg-primary text-white text-[15px] font-bold shadow-lg shadow-primary/25 inline-flex items-center justify-center gap-2 hover:bg-primary-dark">
+                  {heroPrimaryLabel}
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </Link>
             </div>
@@ -219,10 +221,10 @@ export default function Home() {
         {hasMultipleBanners && (
           <>
             <div className="pointer-events-none absolute inset-x-4 top-1/2 z-20 flex -translate-y-1/2 items-center justify-between sm:inset-x-7">
-              <button onClick={() => goToBanner(normalizedActiveBanner - 1)} className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full border border-[#d8c7b3] bg-white/75 text-[#544638] opacity-45 shadow-sm backdrop-blur-md transition-all duration-200 hover:bg-white hover:text-primary hover:opacity-100 focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary group-hover:opacity-100 group-focus-within:opacity-100" aria-label="Banner trước">
+              <button onClick={() => goToBanner(normalizedActiveBanner - 1)} className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full border border-[#d8c7b3] bg-white/75 text-[#544638] opacity-45 shadow-sm backdrop-blur-md transition-all duration-200 hover:bg-white hover:text-primary hover:opacity-100 focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary group-hover:opacity-100 group-focus-within:opacity-100" aria-label={t('Banner trước')}>
                 <ChevronLeft className="h-5 w-5" aria-hidden="true" />
               </button>
-              <button onClick={() => goToBanner(normalizedActiveBanner + 1)} className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full border border-[#d8c7b3] bg-white/75 text-[#544638] opacity-45 shadow-sm backdrop-blur-md transition-all duration-200 hover:bg-white hover:text-primary hover:opacity-100 focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary group-hover:opacity-100 group-focus-within:opacity-100" aria-label="Banner tiếp theo">
+              <button onClick={() => goToBanner(normalizedActiveBanner + 1)} className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full border border-[#d8c7b3] bg-white/75 text-[#544638] opacity-45 shadow-sm backdrop-blur-md transition-all duration-200 hover:bg-white hover:text-primary hover:opacity-100 focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary group-hover:opacity-100 group-focus-within:opacity-100" aria-label={t('Banner tiếp theo')}>
                 <ChevronRight className="h-5 w-5" aria-hidden="true" />
               </button>
             </div>
@@ -241,10 +243,10 @@ export default function Home() {
           <div className="mx-auto max-w-[1240px] px-4">
             <div className="mb-5 flex items-end justify-between gap-4">
               <div>
-                <h2 id="featured-products-title" className="section-title text-[26px] md:text-[32px]">Món nổi bật tại Mọng</h2>
-                <p className="product-meta mt-2 text-sm">Những lựa chọn đang được khách hàng yêu thích.</p>
+                <h2 id="featured-products-title" className="section-title text-[26px] md:text-[32px]">{t('Món nổi bật tại Mọng')}</h2>
+                <p className="product-meta mt-2 text-sm">{t('Những lựa chọn đang được khách hàng yêu thích.')}</p>
               </div>
-              <Link to="/products" className="shrink-0 text-[15px] md:text-base font-bold text-primary hover:text-primary-dark transition-colors">Xem tất cả →</Link>
+              <Link to="/products" className="shrink-0 text-[15px] md:text-base font-bold text-primary hover:text-primary-dark transition-colors">{t('viewAllProducts')} →</Link>
             </div>
             <HomeProductCarousel products={featuredProducts} onAdd={addQuick} />
           </div>
@@ -253,7 +255,7 @@ export default function Home() {
 
       {categoryData.length === 0 ? (
         <div className="py-16 text-center text-gray-400">
-          Đang tải sản phẩm...
+          {t('Đang tải sản phẩm...')}
         </div>
       ) : (
         categoryData.map(({ category, products }, index) => (

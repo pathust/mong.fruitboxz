@@ -9,8 +9,8 @@ export default function Footer() {
 
   return (
     <footer className="bg-gray-800 text-white">
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div className="max-w-[1240px] mx-auto px-4 lg:px-8 py-12">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-[2fr_1fr_1fr_1.5fr] lg:pl-6">
           {/* Column 1 - About */}
           <div>
             <Link to="/" className="flex items-center gap-2 mb-4">
@@ -50,12 +50,12 @@ export default function Footer() {
             <h3 className="font-semibold text-white mb-4 text-sm uppercase tracking-wider">{t('quickLinks')}</h3>
             <ul className="space-y-2">
               {[
-                { to: '/', label: 'Trang chủ' },
-                { to: '/products', label: 'Sản phẩm' },
-                { to: '/categories', label: 'Danh mục' },
-                { to: '/blog', label: 'Blog' },
-                { to: '/about-us', label: 'Về chúng tôi' },
-                { to: '/contact', label: 'Liên hệ' },
+                { to: '/', label: t('home') },
+                { to: '/products', label: t('products') },
+                { to: '/categories', label: t('categories') },
+                { to: '/blog', label: t('blog') },
+                { to: '/about-us', label: t('about') },
+                { to: '/contact', label: t('contact') },
               ].map(link => (
                 <li key={link.to}>
                   <Link to={link.to} className="text-gray-400 hover:text-white text-sm transition-colors">
@@ -71,11 +71,11 @@ export default function Footer() {
             <h3 className="font-semibold text-white mb-4 text-sm uppercase tracking-wider">{t('support')}</h3>
             <ul className="space-y-2">
               {[
-                { to: '/shipping-policy', label: 'Chính sách giao hàng' },
-                { to: '/payment-policy', label: 'Chính sách thanh toán' },
-                { to: '/privacy-policy', label: 'Chính sách bảo mật' },
-                { to: '/order-history', label: 'Tra cứu đơn hàng' },
-                { to: '/contact', label: 'Liên hệ' },
+                { to: '/shipping-policy', label: t('Chính sách giao hàng') },
+                { to: '/payment-policy', label: t('Chính sách thanh toán') },
+                { to: '/privacy-policy', label: t('Chính sách bảo mật') },
+                { to: '/order-history', label: t('Tra cứu đơn hàng') },
+                { to: '/contact', label: t('contact') },
               ].map(link => (
                 <li key={link.to}>
                   <Link to={link.to} className="text-gray-400 hover:text-white text-sm transition-colors">
@@ -102,14 +102,14 @@ export default function Footer() {
             <form onSubmit={e => e.preventDefault()} className="flex">
               <input
                 type="email"
-                placeholder="Email của bạn..."
+                placeholder={t('Email của bạn...')}
                 className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded-l-md text-white text-sm placeholder-gray-400 focus:outline-none focus:border-primary"
               />
               <button
                 type="submit"
                 className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-r-md hover:bg-primary-dark transition-colors"
               >
-                Đăng ký
+                {t('Đăng ký')}
               </button>
             </form>
           </div>

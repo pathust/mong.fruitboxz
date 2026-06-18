@@ -11,8 +11,20 @@ export default function Header() {
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [showCategories, setShowCategories] = useState(false)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
   const catTimeoutRef = useRef(null)
   const cartTimeoutRef = useRef(null)
+  const userMenuRef = useRef(null)
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setUserMenuOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
 
   const handleCatEnter = () => {
     if (catTimeoutRef.current) clearTimeout(catTimeoutRef.current)
@@ -48,7 +60,7 @@ export default function Header() {
   const [cartPreviewOpen, setCartPreviewOpen] = useState(false)
   const { cart, removeItem, updateQuantity } = useCart()
   const { customer, logout } = useAuth()
-  const { lang, setLang, t } = useLanguage()
+  const { t } = useLanguage()
   const { categories } = useCatalog()
   const navigate = useNavigate()
   const location = useLocation()
@@ -123,7 +135,7 @@ export default function Header() {
       <div className="max-w-[1240px] mx-auto px-4">
         <div className="h-[78px] lg:h-[84px] flex items-center justify-between gap-4">
           <Link to="/" className="flex items-center">
-            <img src="/mong_logo-removebg.png" alt="Mọng" className="h-28 w-auto object-contain translate-y-2" />
+            <img src="/mong_logo-removebg.png" alt="Mọng" className="h-24 w-auto object-contain translate-y-1" />
           </Link>
           <nav className="hidden lg:flex items-center gap-1 text-[14px] text-[#5f5548]">
             <Link to="/" className={navLinkClass('/')}>
@@ -135,9 +147,9 @@ export default function Header() {
                 <span className={`text-xs transition-transform duration-300 ${showCategories ? 'rotate-180' : ''}`}>▾</span>
               </Link>
               {showCategories && (
-                <div className="absolute left-0 top-[calc(100%+8px)] w-[720px] glass-panel-darker rounded-3xl border border-white/60 shadow-2xl p-4 grid grid-cols-3 gap-2 animate-fadeIn origin-top-left">
+                <div className="absolute left-0 top-[calc(100%+8px)] w-[720px] bg-white rounded-3xl border border-[#eadfcd] shadow-[0_24px_70px_-34px_rgba(64,42,22,0.55)] p-4 grid grid-cols-3 gap-2 animate-in fade-in zoom-in-95 duration-200 origin-top-left z-50">
                   {menuCategories.map((cat) => (
-                    <Link key={cat.slug} to={`/categories/${cat.slug}`} className="px-4 py-2.5 rounded-xl hover:bg-gradient-to-r hover:from-white/80 hover:to-white/40 text-sm font-semibold text-[#46423d] transition-all hover:translate-x-1">
+                    <Link key={cat.slug} to={`/categories/${cat.slug}`} className="px-4 py-2.5 rounded-xl text-sm font-semibold text-[#5f5548] transition-colors hover:bg-[#fffaf4] hover:text-primary">
                       {cat.label}
                     </Link>
                   ))}
@@ -156,48 +168,66 @@ export default function Header() {
             ))}
           </nav>
           <div className="flex items-center gap-2 text-[#5f5548]">
-            <div className="hidden lg:flex items-center gap-1 mr-1">
-              <button
-                onClick={() => setLang('vi')}
-                className={`h-8 px-2.5 text-xs rounded-md border ${lang === 'vi' ? 'bg-[#f0e2cc] text-[#6f5b3f] border-[#e2d0b3]' : 'border-[#e1d6c6] hover:bg-white/60'}`}
-              >
-                VI
-              </button>
-              <button
-                onClick={() => setLang('en')}
-                className={`h-8 px-2.5 text-xs rounded-md border ${lang === 'en' ? 'bg-[#f0e2cc] text-[#6f5b3f] border-[#e2d0b3]' : 'border-[#e1d6c6] hover:bg-white/60'}`}
-              >
-                EN
-              </button>
-            </div>
-            <button onClick={() => setLang(lang === 'vi' ? 'en' : 'vi')} className="lg:hidden h-8 px-2.5 text-xs border border-[#e1d6c6] rounded-md hover:bg-white/60 font-bold">{lang.toUpperCase()}</button>
             <button onClick={() => setSearchOpen(!searchOpen)} className="h-10 w-10 rounded-full hover:bg-white/60 flex items-center justify-center transition-all hover-card" aria-label="search">
               <Search className="h-5 w-5" />
             </button>
             <div className="h-6 w-[1px] bg-[#e6ded1] mx-1 hidden sm:block"></div>
             {displayUser ? (
-              <Link to={customer ? "/account" : "/admin"} className="hidden sm:flex h-10 items-center gap-2 rounded-full border border-[#eadfcd] bg-[#fffaf4] px-4 text-sm font-bold text-[#5f5548] shadow-[0_10px_24px_-20px_rgba(76,47,22,0.65)] transition-all hover:border-primary/45 hover:bg-white hover:text-primary hover-card" aria-label="account">
-                <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                <span className="max-w-[100px] truncate">{displayUser.email?.split('@')[0] || 'Tài khoản'}</span>
-              </Link>
+              <div className="relative hidden sm:block" ref={userMenuRef}>
+                <button 
+                  onClick={() => setUserMenuOpen(!userMenuOpen)} 
+                  className="flex h-10 items-center gap-2 rounded-full border border-[#eadfcd] bg-[#fffaf4] px-4 text-sm font-bold text-[#5f5548] shadow-[0_10px_24px_-20px_rgba(76,47,22,0.65)] transition-all hover:border-primary/45 hover:bg-white hover:text-primary hover-card" 
+                  aria-label="account"
+                >
+                  <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                  <span className="max-w-[100px] truncate">{displayUser.email?.split('@')[0] || t('account')}</span>
+                </button>
+                
+                {userMenuOpen && (
+                  <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-56 origin-top-right rounded-2xl border border-[#eadfcd] bg-white p-2 shadow-[0_24px_70px_-34px_rgba(64,42,22,0.55)] animate-in fade-in zoom-in-95 duration-200">
+                    <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
+                      {t('accountNav')}
+                    </div>
+                    <Link 
+                      to={customer ? "/account" : "/auth/login"} 
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold text-[#5f5548] transition-colors hover:bg-[#fffaf4] hover:text-primary"
+                    >
+                      {t('accountInfo')}
+                    </Link>
+                    {isAdminAuth && (
+                      <Link 
+                        to="/admin" 
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold text-[#5f5548] transition-colors hover:bg-[#fffaf4] hover:text-primary"
+                      >
+                        {t('goToAdmin')}
+                      </Link>
+                    )}
+                    <div className="my-1 h-[1px] w-full bg-gray-100" />
+                    <button 
+                      onClick={() => {
+                        if (customer) logout();
+                        if (adminUser) {
+                          localStorage.removeItem('admin_token')
+                          localStorage.removeItem('admin_user')
+                        }
+                        setUserMenuOpen(false)
+                        window.location.reload();
+                      }}
+                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold text-red-500 transition-colors hover:bg-red-50"
+                    >
+                      {t('logout')}
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <Link to="/auth/login" className="hidden h-10 w-10 items-center justify-center rounded-full border border-[#eadfcd] bg-[#fffaf4] text-[#5f5548] shadow-[0_10px_24px_-20px_rgba(76,47,22,0.65)] transition-all hover:border-primary/45 hover:bg-white hover:text-primary hover-card sm:flex" aria-label="account">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
               </Link>
             )}
-            {displayUser && (
-              <button onClick={() => {
-                if (customer) logout();
-                if (adminUser) {
-                  localStorage.removeItem('admin_token')
-                  localStorage.removeItem('admin_user')
 
-                }
-                window.location.reload();
-              }} className="hidden h-10 w-10 items-center justify-center rounded-full border border-[#eadfcd] bg-[#fffaf4] text-red-500/80 shadow-[0_10px_24px_-20px_rgba(76,47,22,0.65)] transition-all hover:border-red-200 hover:bg-white hover:text-red-600 hover-card sm:flex" aria-label="logout" title={t('logout')}>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
-              </button>
-            )}
             <div
               className="group/cart relative"
               onMouseEnter={handleCartEnter}
@@ -210,7 +240,7 @@ export default function Header() {
               <Link
                 to="/cart"
                 className="relative h-10 w-10 rounded-full bg-gradient-to-br from-[#ea5a2a] to-[#d44a1e] text-white flex items-center justify-center transition-all hover-card shadow-lg shadow-primary/30"
-                aria-label={`Giỏ hàng với ${cart.count} sản phẩm`}
+                aria-label={`${t('cartTitle')} - ${cart.count}`}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17" /></svg>
                 {cart.count > 0 && (
@@ -220,16 +250,16 @@ export default function Header() {
                 )}
               </Link>
 
-              <div className={`absolute right-0 top-[calc(100%+12px)] z-50 hidden w-[380px] origin-top-right rounded-3xl border border-[#eadfcd] bg-white shadow-[0_24px_70px_-34px_rgba(64,42,22,0.55)] transition-all duration-200 lg:block ${cartPreviewOpen ? 'pointer-events-auto translate-y-0 opacity-100' : 'pointer-events-none -translate-y-2 opacity-0'}`} role="dialog" aria-label="Xem nhanh giỏ hàng">
+              <div className={`absolute right-0 top-[calc(100%+12px)] z-50 hidden w-[380px] origin-top-right rounded-3xl border border-[#eadfcd] bg-white shadow-[0_24px_70px_-34px_rgba(64,42,22,0.55)] transition-all duration-200 lg:block ${cartPreviewOpen ? 'pointer-events-auto translate-y-0 opacity-100' : 'pointer-events-none -translate-y-2 opacity-0'}`} role="dialog" aria-label={t('Xem nhanh giỏ hàng')}>
                 <div className="absolute -top-2 right-5 h-4 w-4 rotate-45 border-l border-t border-[#eadfcd] bg-white" aria-hidden="true" />
                 <div className="relative overflow-hidden rounded-3xl">
                   <div className="flex items-center justify-between border-b border-[#f1e7da] bg-[#fffaf4] px-5 py-4">
                     <div>
-                      <p className="text-sm font-extrabold text-[#43382b]">Giỏ hàng của bạn</p>
-                      <p className="product-meta mt-0.5 text-[12px]">{cart.count} sản phẩm đã thêm</p>
+                      <p className="text-sm font-extrabold text-[#43382b]">{t('cartTitle')}</p>
+                      <p className="product-meta mt-0.5 text-[12px]">{cart.count} {t('sản phẩm đã thêm')}</p>
                     </div>
                     <Link to="/cart" onClick={() => setCartPreviewOpen(false)} className="text-xs font-bold text-primary hover:text-primary-dark">
-                      Xem tất cả
+                      {t('viewAllProducts')}
                     </Link>
                   </div>
 
@@ -238,10 +268,10 @@ export default function Header() {
                       <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[#fff4ea] text-primary">
                         <svg className="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
                       </div>
-                      <p className="font-bold text-[#43382b]">Chưa có món nào trong giỏ</p>
-                      <p className="product-meta mt-1 text-[12px]">Thêm sản phẩm trước, đặt hàng sau.</p>
+                      <p className="font-bold text-[#43382b]">{t('emptyCart')}</p>
+                      <p className="product-meta mt-1 text-[12px]">{t('emptyCartSub')}</p>
                       <Link to="/products" onClick={() => setCartPreviewOpen(false)} className="mt-4 inline-flex min-h-10 items-center justify-center rounded-full bg-primary px-5 text-sm font-bold text-white hover:bg-primary-dark">
-                        Mua sắm ngay
+                        {t('Mua sắm ngay')}
                       </Link>
                     </div>
                   ) : (
@@ -257,23 +287,23 @@ export default function Header() {
                                 <Link to={getCartItemLink(item)} onClick={() => setCartPreviewOpen(false)} className="line-clamp-2 flex-1 text-sm font-bold leading-snug text-[#3f352b] hover:text-primary">
                                   {item.title}
                                 </Link>
-                                <button type="button" onClick={() => removeItem(item.id)} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#b74b2c] transition hover:bg-[#fff1ea]" aria-label={`Xóa ${item.title}`}>
+                                <button type="button" onClick={() => removeItem(item.id)} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#b74b2c] transition hover:bg-[#fff1ea]" aria-label={`${t('Xóa')} ${item.title}`}>
                                   <Trash2 className="h-4 w-4" />
                                 </button>
                               </div>
                               {item.variantLabel && <p className="product-meta mt-1 text-[11px]">{item.variantLabel}</p>}
                               <div className="mt-2 flex items-center justify-between gap-3">
                                 <div className="flex h-8 items-center overflow-hidden rounded-full border border-[#eadfcd] bg-[#fffaf4]">
-                                  <button type="button" onClick={() => item.quantity > 1 ? updateQuantity(item.id, item.quantity - 1) : removeItem(item.id)} className="flex h-full w-8 items-center justify-center text-[#6c5b49] hover:text-primary" aria-label="Giảm số lượng">
+                                  <button type="button" onClick={() => item.quantity > 1 ? updateQuantity(item.id, item.quantity - 1) : removeItem(item.id)} className="flex h-full w-8 items-center justify-center text-[#6c5b49] hover:text-primary" aria-label={t('Giảm số lượng')}>
                                     <Minus className="h-3.5 w-3.5" />
                                   </button>
                                   <span className="min-w-7 text-center text-xs font-bold text-[#43382b]">{item.quantity}</span>
-                                  <button type="button" onClick={() => updateQuantity(item.id, item.quantity + 1)} className="flex h-full w-8 items-center justify-center text-[#6c5b49] hover:text-primary" aria-label="Tăng số lượng">
+                                  <button type="button" onClick={() => updateQuantity(item.id, item.quantity + 1)} className="flex h-full w-8 items-center justify-center text-[#6c5b49] hover:text-primary" aria-label={t('Tăng số lượng')}>
                                     <Plus className="h-3.5 w-3.5" />
                                   </button>
                                 </div>
                                 <div className="text-right">
-                                  <p className="text-[11px] font-semibold text-[#9a8b79]">{formatCurrency(item.price)} / món</p>
+                                  <p className="text-[11px] font-semibold text-[#9a8b79]">{formatCurrency(item.price)} / {t('món')}</p>
                                   <p className="product-price text-sm text-primary">{formatCurrency(item.price * item.quantity)}</p>
                                 </div>
                               </div>
@@ -284,16 +314,16 @@ export default function Header() {
 
                       <div className="border-t border-[#eadfcd] bg-[#fffaf4] px-5 py-4">
                         <div className="mb-3 flex items-end justify-between">
-                          <span className="product-meta text-sm font-bold text-[#5d5246]">Tạm tính</span>
+                          <span className="product-meta text-sm font-bold text-[#5d5246]">{t('subtotal')}</span>
                           <span className="product-price text-[20px] text-primary">{formatCurrency(subtotal)}</span>
                         </div>
-                        <p className="mb-4 text-[12px] font-medium text-[#8b7b68]">Giỏ hàng chỉ để xem và chỉnh món. Đặt hàng sẽ tiếp tục ở bước thanh toán.</p>
+                        <p className="mb-4 text-[12px] font-medium text-[#8b7b68]">{t('Giỏ hàng chỉ để xem và chỉnh món. Đặt hàng sẽ tiếp tục ở bước thanh toán.')}</p>
                         <div className="grid grid-cols-2 gap-2">
                           <Link to="/cart" onClick={() => setCartPreviewOpen(false)} className="flex min-h-11 items-center justify-center rounded-full border border-[#dfcfba] bg-white text-sm font-bold text-[#5d5246] transition hover:border-primary hover:text-primary">
-                            Xem giỏ hàng
+                            {t('viewCart')}
                           </Link>
                           <Link to="/checkout" onClick={() => setCartPreviewOpen(false)} className="flex min-h-11 items-center justify-center rounded-full bg-primary text-sm font-bold text-white shadow-lg shadow-primary/20 transition hover:bg-primary-dark">
-                            Đặt hàng
+                            {t('checkout')}
                           </Link>
                         </div>
                       </div>
@@ -330,7 +360,7 @@ export default function Header() {
             <div className="mt-3 overflow-hidden rounded-[24px] border border-[#eadfcd] bg-white shadow-[0_20px_44px_-32px_rgba(73,48,28,0.45)]">
               {!searchQuery ? (
                 <div className="px-4 py-4">
-                  <p className="product-meta text-[12px] uppercase tracking-[0.14em] text-[#a3907b]">Danh mục nổi bật</p>
+                  <p className="product-meta text-[12px] uppercase tracking-[0.14em] text-[#a3907b]">{t('searchFeatured')}</p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {menuCategories.slice(0, 6).map((category) => (
                       <Link
@@ -347,7 +377,7 @@ export default function Header() {
               ) : searchLoading ? (
                 <div className="flex items-center gap-3 px-4 py-5 text-sm text-[#7d6f5f]">
                   <LoaderCircle className="h-4 w-4 animate-spin text-primary" />
-                  <span>Đang tìm sản phẩm phù hợp...</span>
+                  <span>{t('searchSearching')}</span>
                 </div>
               ) : (searchOpen && deferredSearchQuery ? searchHits : []).length ? (
                 <div className="divide-y divide-[#f1e7da]">
@@ -364,7 +394,7 @@ export default function Header() {
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold text-[#3d342c]">{item.title}</p>
                         <p className="product-meta text-[12px] text-primary">
-                          {item.price_min ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price_min) : 'Xem chi tiết'}
+                          {item.price_min ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price_min) : t('viewDetail')}
                         </p>
                       </div>
                     </Link>
@@ -372,7 +402,7 @@ export default function Header() {
                 </div>
               ) : (
                 <div className="px-4 py-5 text-sm text-[#7d6f5f]">
-                  Không thấy sản phẩm phù hợp. Nhấn Enter để xem trang kết quả đầy đủ.
+                  {t('searchNotFound')}
                 </div>
               )}
             </div>
@@ -392,26 +422,15 @@ export default function Header() {
             <div className="pt-2 border-t border-gray-100" />
 
             {isAdminAuth && (
-              <Link to="/admin" onClick={() => setMenuOpen(false)} className="block px-3 py-2 rounded-lg hover:bg-[#fbf7f1] text-primary font-medium">Quản trị (Admin)</Link>
+              <Link to="/admin" onClick={() => setMenuOpen(false)} className="block px-3 py-2 rounded-lg hover:bg-[#fbf7f1] text-primary font-medium">{t('adminNav')}</Link>
             )}
 
             {displayUser ? (
               <>
                 <Link to={customer ? "/account" : "/admin"} onClick={() => setMenuOpen(false)} className="block px-3 py-2 rounded-lg hover:bg-[#fbf7f1] text-[#5f5548] font-medium">
-                  👤 {displayUser.email?.split('@')[0] || 'Tài khoản'}
+                  👤 {displayUser.email?.split('@')[0] || t('account')}
                 </Link>
-                <button onClick={() => {
-                  if (customer) logout();
-                  if (adminUser) {
-                    localStorage.removeItem('admin_token')
-                    localStorage.removeItem('admin_user')
 
-                  }
-                  setMenuOpen(false)
-                  window.location.reload()
-                }} className="block w-full text-left px-3 py-2 rounded-lg hover:bg-[#fbf7f1] text-red-500">
-                  {t('logout')}
-                </button>
               </>
             ) : (
               <>
