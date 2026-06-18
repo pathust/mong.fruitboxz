@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { LayoutGrid } from 'lucide-react'
 import { useCatalog } from '../context/CatalogContext'
 
 // Alternating section backgrounds for clear visual separation
@@ -13,18 +14,13 @@ export default function Categories() {
   const { loading, categories } = useCatalog()
 
   return (
-    <div className="min-h-screen">
-      {/* Hero header */}
-      <div className="bg-gradient-to-br from-[#fff8f0] to-[#fdefd8] border-b border-[#f0e5d5] py-14 md:py-20">
-        <div className="max-w-[1240px] mx-auto px-4 text-center">
-          <span className="inline-block text-xs font-bold tracking-widest text-primary uppercase mb-4 opacity-80">Danh mục</span>
-          <h1 className="page-title text-[36px] md:text-[52px] text-secondary leading-tight">
-            Chạm vào thế giới<br className="hidden md:block" /> trái ngọt của Mọng
-          </h1>
-          <p className="text-[#8b7b68] mt-4 max-w-2xl mx-auto text-base md:text-[17px] leading-relaxed">
-            Hơn cả một thức quà, mỗi danh mục là một hành trình đầy cảm hứng — từ những nông trại xanh mướt, nơi sương sớm còn vương trên cuống lá, cho đến khi những trái cây căng mọng, tinh tuyển nhất nằm trọn vẹn trong lòng bàn tay bạn.
-          </p>
-        </div>
+    <div className="max-w-[1240px] mx-auto px-4 py-8 md:py-10">
+      {/* Header */}
+      <div className="mb-10 text-center">
+        <h1 className="page-title text-3xl md:text-5xl mb-4 text-secondary">Danh mục</h1>
+        <p className="text-gray-500 max-w-2xl mx-auto text-sm md:text-base">
+          Hơn cả một thức quà, mỗi danh mục là một hành trình đầy cảm hứng — từ những nông trại xanh mướt cho đến khi những trái cây căng mọng tinh tuyển nhất nằm trọn trong tay bạn.
+        </p>
       </div>
 
       {/* Category sections */}
@@ -55,9 +51,9 @@ export default function Categories() {
           return (
             <section
               key={cat.slug}
-              className={`${theme.bg} py-16 md:py-24 border-b border-black/[0.04]`}
+              className={`${theme.bg} py-12 md:py-16 rounded-[24px] mb-8`}
             >
-              <div className={`max-w-[1100px] mx-auto px-4 md:px-8 flex flex-col gap-8 md:gap-14 md:items-center ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
+              <div className={`px-6 md:px-12 flex flex-col gap-8 md:gap-14 md:items-center ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
 
                 {/* Image side */}
                 <Link
