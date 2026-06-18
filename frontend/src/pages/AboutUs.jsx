@@ -28,28 +28,16 @@ export default function AboutUs() {
   }
 
   return (
-    <div className="bg-[#fffaf4] min-h-screen pb-20">
-      {/* Hero header */}
-      <div className="relative pt-16 pb-24 lg:pt-24 lg:pb-32 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#f0e5d5]/50 via-transparent to-[#fff8f0]/80 -z-10"></div>
-        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#eadfcd] to-transparent opacity-50"></div>
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#eadfcd] bg-white/50 backdrop-blur-md mb-8">
-            <Leaf className="w-4 h-4 text-primary" />
-            <span className="text-xs font-bold tracking-[0.2em] text-primary uppercase">
-              Về Chúng Tôi
-            </span>
-          </div>
-          <h1 className="text-[40px] md:text-[56px] font-extrabold text-secondary leading-[1.15] tracking-tight mb-6">
-            Mang thiên nhiên nguyên bản<br className="hidden md:block" /> đến tận tay người trân quý
-          </h1>
-          <p className="text-[#766957] max-w-2xl mx-auto text-lg md:text-xl leading-[1.8] font-medium">
-            Mọng ra đời với niềm tin rằng trái cây ngon nhất là trái cây được hái đúng mùa, chín đúng độ và trọn vẹn hương vị tự nhiên.
-          </p>
-        </div>
+    <div className="max-w-[1240px] mx-auto px-4 py-8 md:py-10">
+      {/* Header */}
+      <div className="mb-10 text-center">
+        <h1 className="page-title text-3xl md:text-5xl mb-4 text-secondary">Về chúng tôi</h1>
+        <p className="text-gray-500 max-w-2xl mx-auto text-sm md:text-base">
+          Mọng ra đời với niềm tin rằng trái cây ngon nhất là trái cây được hái đúng mùa, chín đúng độ và trọn vẹn hương vị tự nhiên.
+        </p>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4">
+      <div className="max-w-6xl mx-auto">
         {/* Story Section */}
         <section className="mb-24">
           <div className="grid lg:grid-cols-[1fr_1.2fr] gap-12 lg:gap-20 items-center">

@@ -209,28 +209,16 @@ export default function CustomBox() {
   const canAddToCart = isPreDesigned ? !!selectedPredesigned : selected.length > 0
 
   return (
-    <div className="bg-[#fcfaf7] min-h-screen pb-32 lg:pb-12">
-      {/* Hero header */}
-      <div className="relative pt-16 pb-24 lg:pt-24 lg:pb-32 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#f0e5d5]/50 via-transparent to-[#fff8f0]/80 -z-10"></div>
-        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#eadfcd] to-transparent opacity-50"></div>
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#eadfcd] bg-white/50 backdrop-blur-md mb-8">
-            <PackageOpen className="w-4 h-4 text-primary" />
-            <span className="text-xs font-bold tracking-[0.2em] text-primary uppercase">
-              Thiết kế hộp quà
-            </span>
-          </div>
-          <h1 className="text-[40px] md:text-[56px] font-extrabold text-secondary leading-[1.15] tracking-tight mb-6">
-            Thiết kế hộp quà<br className="hidden md:block" /> theo ý bạn
-          </h1>
-          <p className="text-[#766957] max-w-2xl mx-auto text-lg md:text-xl leading-[1.8] font-medium">
-            Tự tay chọn kích cỡ hộp và mix các sản phẩm yêu thích để tạo nên một món quà hoàn hảo nhất.
-          </p>
-        </div>
+    <div className="max-w-[1240px] mx-auto px-4 py-8 md:py-10 pb-32 lg:pb-12">
+      {/* Header */}
+      <div className="mb-10 text-center">
+        <h1 className="page-title text-3xl md:text-5xl mb-4 text-secondary">Thiết kế hộp quà</h1>
+        <p className="text-gray-500 max-w-2xl mx-auto text-sm md:text-base">
+          Tự tay chọn kích cỡ hộp và mix các sản phẩm yêu thích để tạo nên một món quà hoàn hảo nhất.
+        </p>
       </div>
 
-      <div className="max-w-[1240px] mx-auto px-4">
+      <div>
 
 
         <div className="flex flex-col lg:flex-row gap-8 items-start">
