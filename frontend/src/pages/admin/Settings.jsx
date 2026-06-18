@@ -1,212 +1,148 @@
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
+import { Save, Settings as SettingsIcon, Link as LinkIcon, MapPin, Phone, Mail, Clock, ShieldCheck, Truck, CreditCard } from "lucide-react"
 import { useAdminAuth } from "../../context/AdminAuthContext"
-import { useToast } from "../../components/ui/ToastProvider"
-import { AdminError, AdminLoading } from "../../components/admin/AdminStates"
 
 export default function Settings() {
   const { api } = useAdminAuth()
-  const { pushToast } = useToast()
+  const [form, setForm] = useState({
+    email: "", phone: "", address: "", opening_hours: "",
+    facebook: "", instagram: "", tiktok: "",
+    shipping_policy_text: "", payment_policy_text: "", privacy_policy_text: ""
+  })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [error, setError] = useState("")
-  const [form, setForm] = useState({
-    site_name: "",
-    tagline: "",
-    footer_about: "",
-    email: "",
-    phone: "",
-    address: "",
-    opening_hours: "",
-    facebook: "",
-    instagram: "",
-    tiktok: "",
-    contact_title: "",
-    contact_intro: "",
-    about_title: "",
-    about_intro: "",
-    about_image: "",
-    about_story_title: "",
-    about_story: "",
-    about_story_secondary: "",
-    about_reasons_title: "",
-    about_reasons_json: "",
-    custom_box_types_json: "",
-    custom_box_product_slugs: "",
-    about_us: "",
-    delivery_info: "",
-    shipping_policy_text: "Mọng giao hàng trong Hà Nội theo khu vực. Phí ship được hiển thị trước khi đặt hàng và có thể thay đổi theo khoảng cách thực tế.",
-    shipping_fee_formula_note: "Quận nội thành tuyến nhanh dùng Fast District Fee. Các quận còn lại tính Base Fee + khoảng cách x Fee Per Km, sau đó kẹp trong Min/Max Fee.",
-    payment_policy_text: "Mọng hỗ trợ COD và chuyển khoản. Đơn hàng được xác nhận trước khi giao.",
-    privacy_policy_text: "Thông tin khách hàng chỉ dùng để xử lý đơn hàng, giao hàng và chăm sóc sau bán.",
-  })
+  const [success, setSuccess] = useState(false)
 
   useEffect(() => {
-    api("/admin/settings")
+    api("/admin/store-settings")
       .then(d => {
-        if (d.settings && Object.keys(d.settings).length > 0) {
-          setForm(prev => ({
-            ...prev,
-            ...d.settings,
-            custom_box_product_slugs: d.settings.custom_box_product_slugs || d.settings.custom_box_product_handles || "",
-          }))
+        if (d.settings) {
+          setForm(prev => ({ ...prev, ...d.settings }))
         }
       })
-      .catch((err) => setError(err?.message || "Không tải được settings."))
+      .catch(() => {})
       .finally(() => setLoading(false))
   }, [api])
 
-  const handleSubmit = async (e) => {
+  const handleSave = async (e) => {
     e.preventDefault()
     setSaving(true)
+    setSuccess(false)
     try {
-      await api("/admin/settings", { method: "PUT", body: JSON.stringify(form) })
-      pushToast("Đã lưu settings.", "success")
+      await api("/admin/store-settings", {
+        method: "POST",
+        body: JSON.stringify(form)
+      })
+      setSuccess(true)
+      setTimeout(() => setSuccess(false), 3000)
     } catch (err) {
-      pushToast(err?.message || "Không lưu được settings.", "error")
+      alert("Lỗi lưu cấu hình: " + err.message)
     } finally {
       setSaving(false)
     }
   }
 
-  if (loading) return <AdminLoading title="Đang tải settings..." description="Đang đọc cấu hình website và shipping engine." />
-  if (error) return <AdminError message={error} onRetry={() => window.location.reload()} />
+  if (loading) return <div className="text-center py-20 text-[#a08d79]"><div className="h-8 w-8 mx-auto rounded-full border-4 border-primary border-t-transparent animate-spin mb-4" />Đang tải dữ liệu...</div>
 
   return (
-    <div className="max-w-5xl space-y-6">
-      <div className="admin-panel p-6">
-        <p className="product-meta text-[12px] uppercase tracking-[0.14em] text-[#a08d79]">Storefront controls</p>
-        <h1 className="page-title mt-2 text-[30px]">Website Settings</h1>
-        <p className="product-meta mt-2 max-w-2xl text-[14px]">Thông tin thương hiệu, liên hệ và shipping engine dùng chung cho website.</p>
+    <div className="space-y-6 pb-20">
+      <div className="admin-panel px-6 py-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <p className="product-meta text-[12px] uppercase tracking-[0.14em] text-[#a08d79] mb-2">System</p>
+          <h1 className="page-title text-[28px]">Cài đặt chung</h1>
+          <p className="product-meta mt-2 text-[14px] text-[#766957]">Quản lý thông tin liên hệ của cửa hàng và các chính sách dành cho khách hàng.</p>
+        </div>
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="admin-button-primary px-6 py-2.5 text-sm flex items-center gap-2 shadow-lg shadow-primary/20 disabled:opacity-60"
+        >
+          <Save className="w-4 h-4" /> {saving ? "Đang lưu..." : "Lưu Thay Đổi"}
+        </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="admin-card space-y-5 p-6">
-        <h2 className="section-title border-b border-[#efe4d4] pb-3 text-[20px]">General</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-secondary mb-1">Site Name</label>
-            <input value={form.site_name} onChange={e => setForm({ ...form, site_name: e.target.value })} className="admin-input w-full px-4 py-2.5" />
+      {success && (
+        <div className="admin-card p-4 bg-green-50/50 border-green-200 text-green-700 font-bold flex items-center gap-2 animate-in fade-in slide-in-from-top-4">
+          <ShieldCheck className="w-5 h-5 text-green-500" /> Cập nhật thông tin thành công!
+        </div>
+      )}
+
+      <form onSubmit={handleSave} className="space-y-6">
+        
+        {/* Thông tin Cửa hàng */}
+        <div className="admin-card overflow-hidden">
+          <div className="border-b border-[#eadfcd] bg-gradient-to-r from-[#fffaf4] to-white px-6 py-5">
+            <h2 className="text-lg font-extrabold text-secondary flex items-center gap-2">
+              <MapPin className="w-5 h-5 text-primary" /> Thông tin Cửa hàng
+            </h2>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-secondary mb-1">Tagline</label>
-            <input value={form.tagline} onChange={e => setForm({ ...form, tagline: e.target.value })} className="admin-input w-full px-4 py-2.5" />
-          </div>
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-secondary mb-1">Footer About</label>
-            <textarea value={form.footer_about} onChange={e => setForm({ ...form, footer_about: e.target.value })} rows={3} className="admin-input w-full px-4 py-2.5" />
+          <div className="p-6 grid gap-6 md:grid-cols-2">
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-[#8a7a67] uppercase tracking-wider flex items-center gap-1.5"><Mail className="w-3.5 h-3.5" /> Email liên hệ</label>
+              <input value={form.email || ""} onChange={e => setForm({ ...form, email: e.target.value })} className="w-full rounded-xl border border-[#eadfcd] bg-white px-4 py-3 text-[15px] font-medium text-secondary outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20" placeholder="contact@fruitboxz.com" />
+            </div>
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-[#8a7a67] uppercase tracking-wider flex items-center gap-1.5"><Phone className="w-3.5 h-3.5" /> Số điện thoại</label>
+              <input value={form.phone || ""} onChange={e => setForm({ ...form, phone: e.target.value })} className="w-full rounded-xl border border-[#eadfcd] bg-white px-4 py-3 text-[15px] font-medium text-secondary outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20" placeholder="090..." />
+            </div>
+            <div className="space-y-1.5 md:col-span-2">
+              <label className="block text-xs font-bold text-[#8a7a67] uppercase tracking-wider flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> Địa chỉ Cửa hàng</label>
+              <input value={form.address || ""} onChange={e => setForm({ ...form, address: e.target.value })} className="w-full rounded-xl border border-[#eadfcd] bg-white px-4 py-3 text-[15px] font-medium text-secondary outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20" placeholder="123 Đường ABC, Quận X..." />
+            </div>
+            <div className="space-y-1.5 md:col-span-2">
+              <label className="block text-xs font-bold text-[#8a7a67] uppercase tracking-wider flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> Giờ mở cửa</label>
+              <input value={form.opening_hours || ""} onChange={e => setForm({ ...form, opening_hours: e.target.value })} className="w-full rounded-xl border border-[#eadfcd] bg-white px-4 py-3 text-[15px] font-medium text-secondary outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20" placeholder="Thứ 2 - Chủ Nhật: 8:00 - 22:00" />
+            </div>
           </div>
         </div>
 
-        <h2 className="section-title border-b border-[#efe4d4] pb-3 pt-4 text-[20px]">Contact</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-secondary mb-1">Email</label>
-            <input value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className="admin-input w-full px-4 py-2.5" />
+        {/* Mạng Xã Hội */}
+        <div className="admin-card overflow-hidden">
+          <div className="border-b border-[#eadfcd] bg-gradient-to-r from-[#fffaf4] to-white px-6 py-5">
+            <h2 className="text-lg font-extrabold text-secondary flex items-center gap-2">
+              <LinkIcon className="w-5 h-5 text-primary" /> Mạng xã hội
+            </h2>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-secondary mb-1">Phone</label>
-            <input value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className="admin-input w-full px-4 py-2.5" />
-          </div>
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-secondary mb-1">Address</label>
-            <input value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} className="admin-input w-full px-4 py-2.5" />
-          </div>
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-secondary mb-1">Opening Hours</label>
-            <input value={form.opening_hours} onChange={e => setForm({ ...form, opening_hours: e.target.value })} className="admin-input w-full px-4 py-2.5" />
-          </div>
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-secondary mb-1">Facebook URL</label>
-            <input value={form.facebook} onChange={e => setForm({ ...form, facebook: e.target.value })} className="admin-input w-full px-4 py-2.5" />
-          </div>
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-secondary mb-1">Instagram URL</label>
-            <input value={form.instagram} onChange={e => setForm({ ...form, instagram: e.target.value })} className="admin-input w-full px-4 py-2.5" />
-          </div>
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-secondary mb-1">TikTok URL</label>
-            <input value={form.tiktok} onChange={e => setForm({ ...form, tiktok: e.target.value })} className="admin-input w-full px-4 py-2.5" />
+          <div className="p-6 grid gap-6 md:grid-cols-2">
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-[#8a7a67] uppercase tracking-wider">Facebook URL</label>
+              <input value={form.facebook || ""} onChange={e => setForm({ ...form, facebook: e.target.value })} className="w-full rounded-xl border border-[#eadfcd] bg-white px-4 py-3 text-[15px] font-medium text-secondary outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20" placeholder="https://facebook.com/..." />
+            </div>
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-[#8a7a67] uppercase tracking-wider">Instagram URL</label>
+              <input value={form.instagram || ""} onChange={e => setForm({ ...form, instagram: e.target.value })} className="w-full rounded-xl border border-[#eadfcd] bg-white px-4 py-3 text-[15px] font-medium text-secondary outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20" placeholder="https://instagram.com/..." />
+            </div>
+            <div className="space-y-1.5 md:col-span-2">
+              <label className="block text-xs font-bold text-[#8a7a67] uppercase tracking-wider">TikTok URL</label>
+              <input value={form.tiktok || ""} onChange={e => setForm({ ...form, tiktok: e.target.value })} className="w-full rounded-xl border border-[#eadfcd] bg-white px-4 py-3 text-[15px] font-medium text-secondary outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20" placeholder="https://tiktok.com/..." />
+            </div>
           </div>
         </div>
 
-        <h2 className="section-title border-b border-[#efe4d4] pb-3 pt-4 text-[20px]">Content</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-secondary mb-1">Contact Title</label>
-            <input value={form.contact_title} onChange={e => setForm({ ...form, contact_title: e.target.value })} className="admin-input w-full px-4 py-2.5" />
+        {/* Các Chính Sách */}
+        <div className="admin-card overflow-hidden">
+          <div className="border-b border-[#eadfcd] bg-gradient-to-r from-[#fffaf4] to-white px-6 py-5">
+            <h2 className="text-lg font-extrabold text-secondary flex items-center gap-2">
+              <ShieldCheck className="w-5 h-5 text-primary" /> Chính sách Khách hàng
+            </h2>
+            <p className="mt-1 text-[13px] font-medium text-[#8a7a67]">Các chính sách này sẽ được hiển thị ở Footer và trang thanh toán.</p>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-secondary mb-1">Contact Intro</label>
-            <input value={form.contact_intro} onChange={e => setForm({ ...form, contact_intro: e.target.value })} className="admin-input w-full px-4 py-2.5" />
+          <div className="p-6 space-y-6">
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-[#8a7a67] uppercase tracking-wider flex items-center gap-1.5"><Truck className="w-3.5 h-3.5" /> Chính sách Vận chuyển & Giao hàng</label>
+              <textarea value={form.shipping_policy_text || ""} onChange={e => setForm({ ...form, shipping_policy_text: e.target.value })} rows={5} className="w-full rounded-xl border border-[#eadfcd] bg-white px-4 py-3 text-[15px] font-medium text-secondary outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 leading-relaxed" placeholder="Nhập nội dung chính sách vận chuyển..." />
+            </div>
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-[#8a7a67] uppercase tracking-wider flex items-center gap-1.5"><CreditCard className="w-3.5 h-3.5" /> Chính sách Thanh toán</label>
+              <textarea value={form.payment_policy_text || ""} onChange={e => setForm({ ...form, payment_policy_text: e.target.value })} rows={5} className="w-full rounded-xl border border-[#eadfcd] bg-white px-4 py-3 text-[15px] font-medium text-secondary outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 leading-relaxed" placeholder="Nhập nội dung chính sách thanh toán..." />
+            </div>
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-[#8a7a67] uppercase tracking-wider flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5" /> Chính sách Bảo mật & Quyền riêng tư</label>
+              <textarea value={form.privacy_policy_text || ""} onChange={e => setForm({ ...form, privacy_policy_text: e.target.value })} rows={5} className="w-full rounded-xl border border-[#eadfcd] bg-white px-4 py-3 text-[15px] font-medium text-secondary outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 leading-relaxed" placeholder="Nhập nội dung chính sách bảo mật..." />
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-secondary mb-1">About Title</label>
-            <input value={form.about_title} onChange={e => setForm({ ...form, about_title: e.target.value })} className="admin-input w-full px-4 py-2.5" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-secondary mb-1">About Story Title</label>
-            <input value={form.about_story_title} onChange={e => setForm({ ...form, about_story_title: e.target.value })} className="admin-input w-full px-4 py-2.5" />
-          </div>
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-secondary mb-1">About Intro</label>
-            <textarea value={form.about_intro} onChange={e => setForm({ ...form, about_intro: e.target.value })} rows={3} className="admin-input w-full px-4 py-2.5" />
-          </div>
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-secondary mb-1">About Image URL</label>
-            <input value={form.about_image} onChange={e => setForm({ ...form, about_image: e.target.value })} className="admin-input w-full px-4 py-2.5" />
-          </div>
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-secondary mb-1">About Story</label>
-            <textarea value={form.about_story} onChange={e => setForm({ ...form, about_story: e.target.value })} rows={4} className="admin-input w-full px-4 py-2.5" />
-          </div>
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-secondary mb-1">About Story Secondary</label>
-            <textarea value={form.about_story_secondary} onChange={e => setForm({ ...form, about_story_secondary: e.target.value })} rows={4} className="admin-input w-full px-4 py-2.5" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-secondary mb-1">Reasons Title</label>
-            <input value={form.about_reasons_title} onChange={e => setForm({ ...form, about_reasons_title: e.target.value })} className="admin-input w-full px-4 py-2.5" />
-          </div>
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-secondary mb-1">Reasons JSON</label>
-            <textarea value={form.about_reasons_json} onChange={e => setForm({ ...form, about_reasons_json: e.target.value })} rows={6} className="admin-input w-full px-4 py-2.5 font-mono text-xs" />
-          </div>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-secondary mb-1">About Us</label>
-          <textarea value={form.about_us} onChange={e => setForm({ ...form, about_us: e.target.value })} rows={5} className="admin-input w-full px-4 py-2.5" />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-secondary mb-1">Delivery Info</label>
-          <textarea value={form.delivery_info} onChange={e => setForm({ ...form, delivery_info: e.target.value })} rows={5} className="admin-input w-full px-4 py-2.5" />
         </div>
 
-        <h2 className="section-title border-b border-[#efe4d4] pb-3 pt-4 text-[20px]">Custom Box</h2>
-        <div>
-          <label className="block text-sm font-medium text-secondary mb-1">Box Types JSON</label>
-          <textarea value={form.custom_box_types_json} onChange={e => setForm({ ...form, custom_box_types_json: e.target.value })} rows={8} className="admin-input w-full px-4 py-2.5 font-mono text-xs" />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-secondary mb-1">Allowed Product Slugs</label>
-          <textarea value={form.custom_box_product_slugs} onChange={e => setForm({ ...form, custom_box_product_slugs: e.target.value })} rows={4} className="admin-input w-full px-4 py-2.5" />
-        </div>
-
-        <h2 className="section-title border-b border-[#efe4d4] pb-3 pt-4 text-[20px]">Policies</h2>
-        <div>
-          <label className="block text-sm font-medium text-secondary mb-1">Shipping Policy</label>
-          <textarea value={form.shipping_policy_text} onChange={e => setForm({ ...form, shipping_policy_text: e.target.value })} rows={5} className="admin-input w-full px-4 py-2.5" />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-secondary mb-1">Payment Policy</label>
-          <textarea value={form.payment_policy_text} onChange={e => setForm({ ...form, payment_policy_text: e.target.value })} rows={4} className="admin-input w-full px-4 py-2.5" />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-secondary mb-1">Privacy Policy</label>
-          <textarea value={form.privacy_policy_text} onChange={e => setForm({ ...form, privacy_policy_text: e.target.value })} rows={4} className="admin-input w-full px-4 py-2.5" />
-        </div>
-
-        <div className="pt-2">
-          <button type="submit" disabled={saving} className="admin-button-primary px-6 py-2.5 text-sm disabled:opacity-50">{saving ? "Saving..." : "Save Settings"}</button>
-        </div>
       </form>
     </div>
   )

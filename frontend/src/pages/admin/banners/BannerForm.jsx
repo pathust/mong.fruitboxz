@@ -51,6 +51,10 @@ export default function BannerForm() {
           <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" required placeholder="e.g. Khuyến mãi Cam vàng" />
         </div>
         <div>
+          <label className="block text-sm font-medium text-secondary mb-1">Subtitle</label>
+          <input value={form.subtitle} onChange={e => setForm({ ...form, subtitle: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" placeholder="e.g. Giảm giá 50% hôm nay" />
+        </div>
+        <div>
           <label className="block text-sm font-medium text-secondary mb-1">Quick Link Product</label>
           <button
             type="button"

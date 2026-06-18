@@ -1,15 +1,14 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 
-export async function GET(req: MedusaRequest, res: MedusaResponse) {
+export async function POST(req: MedusaRequest, res: MedusaResponse) {
   try {
     const siteService = req.scope.resolve("site") as any
-    const [blog_categories] = await siteService.listAndCountBlogCategories({})
-    res.json({
-      blog_categories: (blog_categories || []).sort((a, b) =>
-        String(a?.name || "").localeCompare(String(b?.name || ""))
-      ),
-    })
+    const payload = req.body as any
+    console.log("PAYLOAD:", payload)
+    const blog_category = await siteService.createBlogCategories(payload)
+    res.json({ blog_category })
   } catch (error: any) {
-    res.status(500).json({ message: error.message || "An error occurred while fetching blog categories" })
+    console.error("STORE_CATEGORY_ERROR:", error)
+    res.status(500).json({ message: error.message, stack: error.stack })
   }
 }

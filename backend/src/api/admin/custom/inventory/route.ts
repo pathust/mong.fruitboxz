@@ -5,21 +5,23 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
   try {
     const query = req.scope.resolve(ContainerRegistrationKeys.QUERY)
 
-    // We want products, their variants, and inventory levels
-    const { data: products } = await query.graph({
-      entity: "product",
+    // Fetch all inventory items and their location levels
+    const { data: inventory_items } = await query.graph({
+      entity: "inventory_item",
       fields: [
         "id",
         "title",
-        "thumbnail",
-        "variants.*",
-        "variants.inventory_items.*",
-        "variants.inventory_items.inventory.*",
+        "sku",
+        "metadata",
+        "location_levels.*",
       ],
       pagination: { take: 500 }
     })
 
-    res.json({ products })
+    // Filter to only include items marked as ingredients
+    const ingredients = inventory_items.filter((item: any) => item.metadata?.is_ingredient === true)
+
+    res.json({ ingredients })
   } catch (err: any) {
     res.status(500).json({ message: err.message, error: err })
   }
@@ -30,7 +32,6 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
     const inventoryModule = req.scope.resolve(Modules.INVENTORY)
     const { inventory_item_id, location_id, stocked_quantity } = req.body as any
 
-    // Simple update or creation of inventory levels
     if (inventory_item_id && location_id) {
       await inventoryModule.updateInventoryLevels([
         {

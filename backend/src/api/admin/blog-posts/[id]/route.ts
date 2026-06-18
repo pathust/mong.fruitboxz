@@ -3,7 +3,9 @@ import { normalizeBlogPostPayload } from "../../../../lib/blog"
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const siteService = req.scope.resolve("site") as any
-  const blog_post = await siteService.retrieveBlogPost(req.params.id).catch(() => null)
+  const blog_post = await siteService.retrieveBlogPost(req.params.id, {
+    relations: ["category"]
+  }).catch(() => null)
   if (!blog_post) return res.status(404).json({ message: "Blog post not found" })
   res.json({ blog_post })
 }

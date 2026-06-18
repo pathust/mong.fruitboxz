@@ -13,13 +13,13 @@ export default function RecipeManager({ productId, variantId }) {
   const fetchData = useCallback(async () => {
     try {
       const [resIng, resGlobal, resProduct] = await Promise.all([
-        api("/admin/inventory-items?limit=500"),
+        api("/admin/custom/inventory"),
         api("/admin/custom?mode=settings").catch(() => ({ settings: {} })),
         api(`/admin/products/${productId}?fields=*variants,*variants.inventory_items`)
       ])
 
-      if (resIng?.inventory_items) {
-        setIngredients(resIng.inventory_items)
+      if (resIng?.ingredients) {
+        setIngredients(resIng.ingredients)
       }
 
       if (resProduct?.product?.variants) {
@@ -59,6 +59,10 @@ export default function RecipeManager({ productId, variantId }) {
       let errorMsgs = [];
 
       for (const item of items) {
+        if (!item.inventory_item_id) {
+          errorMsgs.push(`Một dòng chưa chọn nguyên liệu`);
+          continue;
+        }
         try {
           await api(`/admin/products/${productId}/variants/${variantId}/inventory-items`, {
             method: "POST",
@@ -103,7 +107,7 @@ export default function RecipeManager({ productId, variantId }) {
 
   const addItem = () => {
     if (ingredients.length === 0) return alert("Vui lòng thêm nguyên liệu (Inventory Items) trước!")
-    setItems([...items, { inventory_item_id: ingredients[0].id, required_quantity: 1, isNew: true }])
+    setItems([...items, { inventory_item_id: "", required_quantity: 1, isNew: true }])
   }
 
   const updateItem = (index, field, value) => {
@@ -124,11 +128,11 @@ export default function RecipeManager({ productId, variantId }) {
   const totalCost = ingredientCost + globalCosts.packaging_cost + globalCosts.labor_cost_per_order
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-[#eadfcd] p-6 mt-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-bold text-primary flex items-center gap-2">
-          <Calculator className="h-5 w-5" /> Định mức nguyên liệu (Recipe/BOM)
-        </h2>
+    <div className="bg-white rounded-xl border border-gray-200 p-5 mt-4">
+      <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-100">
+        <h3 className="text-[15px] font-bold text-gray-800 flex items-center gap-2">
+          <Calculator className="h-4 w-4 text-primary" /> Định mức nguyên liệu (BOM)
+        </h3>
         <button type="button" onClick={handleSave} disabled={saving} className="admin-button-primary px-4 py-2 text-sm">
           {saving ? "Đang lưu..." : "Lưu định mức"}
         </button>
@@ -145,8 +149,9 @@ export default function RecipeManager({ productId, variantId }) {
               <select
                 value={item.inventory_item_id}
                 onChange={e => updateItem(idx, "inventory_item_id", e.target.value)}
-                className="admin-input flex-1 px-4 py-2 text-sm"
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
               >
+                <option value="" disabled>-- Chọn nguyên liệu --</option>
                 {ingredients.map(ing => (
                   <option key={ing.id} value={ing.id}>{ing.title} ({ing.metadata?.unit || "unit"})</option>
                 ))}
@@ -158,11 +163,11 @@ export default function RecipeManager({ productId, variantId }) {
                 step="0.01"
                 value={item.required_quantity}
                 onChange={e => updateItem(idx, "required_quantity", Number(e.target.value) || 0)}
-                className="admin-input w-24 px-4 py-2 text-sm text-center"
+                className="w-20 px-3 py-2 border border-gray-200 rounded-lg text-sm text-center focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
               />
 
-              <span className="w-12 text-sm text-[#766957] text-left">{selectedIng?.metadata?.unit || "unit"}</span>
-              <span className="w-24 text-sm font-semibold text-right text-[#c7643a]">{cost.toLocaleString('vi-VN')}₫</span>
+              <span className="w-10 text-sm text-gray-500">{selectedIng?.metadata?.unit || "unit"}</span>
+              <span className="w-20 text-sm font-semibold text-right text-gray-700">{cost.toLocaleString('vi-VN')}₫</span>
 
               <button type="button" onClick={() => handleDeleteLink(idx)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg">
                 <Trash2 className="h-4 w-4" />

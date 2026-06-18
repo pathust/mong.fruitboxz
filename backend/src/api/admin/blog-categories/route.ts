@@ -26,6 +26,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
     const blog_category = await siteService.createBlogCategories(payload)
     res.status(201).json({ blog_category })
   } catch (error: any) {
+    console.error("CREATE_CATEGORY_ERROR:", error)
     res.status(500).json({ message: error.message || "An error occurred while creating blog category" })
   }
 }

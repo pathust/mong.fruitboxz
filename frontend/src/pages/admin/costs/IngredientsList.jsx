@@ -42,14 +42,16 @@ export default function IngredientsList() {
       const res = await api("/admin/inventory-items?limit=500")
       if (res?.inventory_items) {
         // Map to our unified format using metadata
-        const mapped = res.inventory_items.map(item => ({
-          id: item.id,
-          title: item.title,
-          sku: item.sku,
-          unit: item.metadata?.unit || "kg",
-          category: item.metadata?.category || "Fruit",
-          cost_per_unit: item.metadata?.cost_per_unit ? Number(item.metadata.cost_per_unit) : 0
-        }))
+        const mapped = res.inventory_items
+          .filter(item => item.metadata?.is_ingredient === true)
+          .map(item => ({
+            id: item.id,
+            title: item.title,
+            sku: item.sku,
+            unit: item.metadata?.unit || "kg",
+            category: item.metadata?.category || "Fruit",
+            cost_per_unit: item.metadata?.cost_per_unit ? Number(item.metadata.cost_per_unit) : 0
+          }))
         setIngredients(mapped)
       }
     } catch (err) {
@@ -78,7 +80,8 @@ export default function IngredientsList() {
         metadata: {
           unit: form.unit,
           category: form.category,
-          cost_per_unit: Number(form.cost_per_unit)
+          cost_per_unit: Number(form.cost_per_unit),
+          is_ingredient: true
         }
       }
 

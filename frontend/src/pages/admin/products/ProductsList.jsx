@@ -5,7 +5,7 @@ import { useAdminAuth } from "../../../context/AdminAuthContext"
 import { AdminListFilters } from "../../../components/admin/AdminListFilters"
 
 function formatVnd(n) {
-  if (!n || n <= 0) return "Het hang"
+  if (!n || n <= 0) return "Hết hàng"
   return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(n)
 }
 
@@ -33,15 +33,17 @@ function minVariantPrice(p) {
 
 export default function ProductsList() {
   const { api } = useAdminAuth()
-  const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [query, setQuery] = useState("")
   const [debouncedQuery, setDebouncedQuery] = useState("")
   const [status, setStatus] = useState("all")
+  const [categories, setCategories] = useState([])
+  const [categoryFilter, setCategoryFilter] = useState("all")
+  const [priceFilter, setPriceFilter] = useState("all")
+  const [allProducts, setAllProducts] = useState([])
 
   // Pagination state
   const [offset, setOffset] = useState(0)
-  const [total, setTotal] = useState(0)
   const limit = 20
 
   // Debounce search query
@@ -53,33 +55,75 @@ export default function ProductsList() {
     return () => clearTimeout(timer)
   }, [query])
 
+  // Fetch categories for filter
   useEffect(() => {
+    api("/admin/product-categories?limit=100")
+      .then(d => {
+        if (d.product_categories) {
+          setCategories(d.product_categories.map(c => ({ value: c.id, label: c.name })))
+        }
+      })
+      .catch(() => {})
+  }, [api])
+
+  // Fetch ALL products ONCE
+  useEffect(() => {
+    let mounted = true
     const timer = window.setTimeout(() => {
       setLoading(true)
-      let url = `/admin/products?fields=id,title,status,thumbnail,images,variants,created_at&limit=${limit}&offset=${offset}`
-      if (debouncedQuery) {
-        url += `&q=${encodeURIComponent(debouncedQuery)}`
-      }
-      if (status !== "all") {
-        url += `&status=${encodeURIComponent(status)}`
-      }
-
+      const url = `/admin/products?fields=id,title,status,thumbnail,*images,*variants,*variants.prices,*categories,created_at&limit=1000`
       api(url)
         .then(d => {
-          setProducts(d.products || [])
-          setTotal(d.count || 0)
+          if (mounted) setAllProducts(d.products || [])
         })
         .catch(() => {})
-        .finally(() => setLoading(false))
+        .finally(() => { if (mounted) setLoading(false) })
     }, 0)
-    return () => window.clearTimeout(timer)
-  }, [api, offset, debouncedQuery, status])
+    return () => {
+      mounted = false
+      window.clearTimeout(timer)
+    }
+  }, [api])
+
+  // Client-side filtering
+  const { filteredProducts, total } = (() => {
+    let result = [...allProducts]
+
+    if (debouncedQuery) {
+      const q = debouncedQuery.toLowerCase()
+      result = result.filter(p => p.title?.toLowerCase().includes(q))
+    }
+
+    if (status !== "all") {
+      result = result.filter(p => p.status === status)
+    }
+
+    if (categoryFilter !== "all") {
+      result = result.filter(p => p.categories?.some(c => c.id === categoryFilter))
+    }
+
+    if (priceFilter !== "all") {
+      result = result.filter(p => {
+        const minPrice = minVariantPrice(p)
+        if (minPrice === null) return false
+        if (priceFilter === 'under-100') return minPrice < 100000
+        if (priceFilter === '100-300') return minPrice >= 100000 && minPrice <= 300000
+        if (priceFilter === '300-500') return minPrice >= 300000 && minPrice <= 500000
+        if (priceFilter === 'over-500') return minPrice > 500000
+        return true
+      })
+    }
+
+    return { filteredProducts: result, total: result.length }
+  })()
+
+  // Pagination slice
+  const products = filteredProducts.slice(offset, offset + limit)
 
   const deleteProduct = async (id) => {
     if (!confirm("Delete this product?")) return
     await api(`/admin/products/${id}`, { method: "DELETE" })
-    setProducts(prev => prev.filter(p => p.id !== id))
-    setTotal(t => Math.max(0, t - 1))
+    setAllProducts(prev => prev.filter(p => p.id !== id))
   }
 
   const handlePrevPage = () => {
@@ -99,15 +143,15 @@ export default function ProductsList() {
     <div className="space-y-6">
       <div className="admin-panel flex flex-col gap-4 p-6 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="product-meta text-[12px] uppercase tracking-[0.14em] text-[#a08d79]">Catalog</p>
-          <h1 className="page-title mt-2 text-[30px]">Products</h1>
+          <p className="product-meta text-[12px] uppercase tracking-[0.14em] text-[#a08d79]">Danh mục</p>
+          <h1 className="page-title mt-2 text-[30px]">Sản phẩm</h1>
           <p className="product-meta mt-2 text-[14px]">
-            {total} san pham
+            {total} sản phẩm
           </p>
         </div>
         <Link to="/admin/products/new" className="admin-button-primary px-5 py-3 text-sm">
           <PackagePlus className="h-4 w-4" />
-          Add Product
+          Thêm sản phẩm
         </Link>
       </div>
 
@@ -120,6 +164,8 @@ export default function ProductsList() {
         onReset={() => {
           setQuery("")
           setStatus("all")
+          setCategoryFilter("all")
+          setPriceFilter("all")
           setOffset(0)
         }}
         filters={[
@@ -138,22 +184,50 @@ export default function ProductsList() {
               { value: "rejected", label: "Rejected" },
             ],
           },
+          {
+            label: "Danh mục",
+            value: categoryFilter,
+            onChange: (value) => {
+              setCategoryFilter(value)
+              setOffset(0)
+            },
+            options: [
+              { value: "all", label: "Tất cả danh mục" },
+              ...categories
+            ],
+          },
+          {
+            label: "Khoảng giá",
+            value: priceFilter,
+            onChange: (value) => {
+              setPriceFilter(value)
+              setOffset(0)
+            },
+            options: [
+              { value: "all", label: "Mọi mức giá" },
+              { value: "under-100", label: "Dưới 100.000đ" },
+              { value: "100-300", label: "100.000đ - 300.000đ" },
+              { value: "300-500", label: "300.000đ - 500.000đ" },
+              { value: "over-500", label: "Trên 500.000đ" },
+            ],
+          },
         ]}
       />
 
       <div className="admin-table">
         <div className="overflow-x-auto">
           {loading ? (
-            <div className="text-center py-12 text-secondary-light">Loading...</div>
+            <div className="text-center py-12 text-secondary-light">Đang tải...</div>
           ) : (
             <table className="w-full text-sm">
               <thead>
                 <tr>
-                  <th className="text-left px-4 py-3 font-medium">Product</th>
-                  <th className="text-left px-4 py-3 font-medium">Gia tu</th>
-                  <th className="text-left px-4 py-3 font-medium">Variants</th>
-                  <th className="text-left px-4 py-3 font-medium">Status</th>
-                  <th className="text-right px-4 py-3 font-medium">Actions</th>
+                  <th className="text-left px-4 py-3 font-medium">Sản phẩm</th>
+                  <th className="text-left px-4 py-3 font-medium">Danh mục</th>
+                  <th className="text-left px-4 py-3 font-medium">Giá từ</th>
+                  <th className="text-left px-4 py-3 font-medium">Phân loại</th>
+                  <th className="text-left px-4 py-3 font-medium">Trạng thái</th>
+                  <th className="text-right px-4 py-3 font-medium">Thao tác</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#f1e7da]">
@@ -172,8 +246,11 @@ export default function ProductsList() {
                         <span className="font-medium text-secondary">{p.title}</span>
                       </div>
                     </td>
+                    <td className="px-4 py-3 text-secondary">
+                      {p.categories?.length > 0 ? p.categories.map(c => c.name).join(', ') : <span className="text-gray-400 italic">Chưa phân loại</span>}
+                    </td>
                     <td className="px-4 py-3 text-secondary">{formatVnd(minVariantPrice(p))}</td>
-                    <td className="px-4 py-3 text-secondary-light">{p.variants?.length || 0}</td>
+                    <td className="px-4 py-3 text-secondary-light">{p.variants?.length || 0} phân loại</td>
                     <td className="px-4 py-3">
                       <span className={`admin-status ${p.status === "published" ? "bg-[#e8f6e9] text-[#2f7a37]" : "bg-[#f1eadf] text-[#766957]"}`}>{p.status}</span>
                     </td>
@@ -190,7 +267,7 @@ export default function ProductsList() {
                   </tr>
                 ))}
                 {products.length === 0 && (
-                  <tr><td colSpan={5} className="px-4 py-8 text-center text-secondary-light">No products found</td></tr>
+                  <tr><td colSpan={5} className="px-4 py-8 text-center text-secondary-light">Không có sản phẩm nào</td></tr>
                 )}
               </tbody>
             </table>

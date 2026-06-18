@@ -49,7 +49,7 @@ export default function BlogPostsList() {
   }
 
   const categoryOptions = useMemo(() => {
-    const categories = [...new Set(posts.map((post) => post.category).filter(Boolean))]
+    const categories = [...new Set(posts.map((post) => typeof post.category === 'object' && post.category !== null ? post.category.name : post.category).filter(Boolean))]
     return [
       { value: "all", label: "Tất cả danh mục" },
       ...categories.map((item) => ({ value: item, label: item })),
@@ -59,9 +59,9 @@ export default function BlogPostsList() {
   const filteredPosts = useMemo(() => {
     return posts.filter((post) => {
       return (
-        filterBySearch(post, query, ["title", "slug", "excerpt", "author", "category"]) &&
+        filterBySearch(post, query, ["title", "slug", "excerpt", "author", (p) => typeof p.category === 'object' && p.category !== null ? p.category.name : p.category]) &&
         (status === "all" || (status === "published" ? post.published : !post.published)) &&
-        (category === "all" || post.category === category)
+        (category === "all" || (typeof post.category === 'object' && post.category !== null ? post.category.name : post.category) === category)
       )
     })
   }, [posts, query, status, category])
@@ -124,7 +124,7 @@ export default function BlogPostsList() {
                   <p className="font-bold text-[#3f352b]">{post.title}</p>
                   <p className="mt-1 text-xs text-[#8d7f6f]">/{post.slug}</p>
                 </td>
-                <td className="px-4 py-3 text-[#5d5246]">{post.category || "-"}</td>
+                <td className="px-4 py-3 text-[#5d5246]">{typeof post.category === 'object' && post.category !== null ? post.category.name : (post.category || "-")}</td>
                 <td className="px-4 py-3 text-[#5d5246]">{formatDate(post.published_at || post.created_at)}</td>
                 <td className="px-4 py-3">
                   <span className={`admin-status ${post.published ? "bg-[#e8f6e9] text-[#2f7a37]" : "bg-[#f1eadf] text-[#766957]"}`}>

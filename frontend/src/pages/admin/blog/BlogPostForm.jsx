@@ -46,15 +46,14 @@ export default function BlogPostForm() {
       api(`/admin/blog-posts/${id}`)
         .then((data) => {
           const post = data.blog_post || {}
-          setForm({ ...emptyPost, ...post })
-          setCatInput(post.category || '')
+          setForm({ ...emptyPost, ...post, category_id: post.category?.id || post.category || '' })
+          setCatInput(post.category?.name || post.category || '')
         })
         .finally(() => setLoading(false))
     }
-    // Load all existing categories from the new category API
-    api('/admin/blog-categories')
+      api('/admin/blog-categories')
       .then(data => {
-        const cats = (data.blog_categories || []).map(c => c.name).sort()
+        const cats = (data.blog_categories || []).sort((a, b) => a.name.localeCompare(b.name))
         setExistingCategories(cats)
       })
       .catch(() => {})
@@ -76,7 +75,12 @@ export default function BlogPostForm() {
     e.preventDefault()
     setSaving(true)
     try {
-      const payload = { ...form, slug: previewPath }
+      let payloadCategoryId = form.category_id
+      if (catInput) {
+        const matched = existingCategories.find(c => c.name === catInput)
+        if (matched) payloadCategoryId = matched.id
+      }
+      const payload = { ...form, slug: previewPath, category_id: payloadCategoryId }
       const url = isNew ? "/admin/blog-posts" : `/admin/blog-posts/${id}`
       await api(url, { method: "POST", body: JSON.stringify(payload) })
       pushToast("Đã lưu bài viết.", "success")
@@ -128,22 +132,22 @@ export default function BlogPostForm() {
               <div className="absolute z-50 mt-1 w-full rounded-xl border border-[#eadfcd] bg-white shadow-xl overflow-hidden">
                 {/* Filtered existing options */}
                 {existingCategories
-                  .filter(c => c.toLowerCase().includes(catInput.toLowerCase()))
+                  .filter(c => c.name.toLowerCase().includes(catInput.toLowerCase()))
                   .map(c => (
                     <button
-                      key={c}
+                      key={c.id}
                       type="button"
-                      onMouseDown={() => { setCatInput(c); setField('category', c); setCatOpen(false) }}
+                      onMouseDown={() => { setCatInput(c.name); setField('category_id', c.id); setCatOpen(false) }}
                       className={`w-full text-left px-4 py-2.5 text-sm hover:bg-[#fff8f0] transition-colors ${
-                        form.category === c ? 'font-bold text-primary bg-[#fff8f0]' : 'text-secondary'
+                        form.category_id === c.id ? 'font-bold text-primary bg-[#fff8f0]' : 'text-secondary'
                       }`}
                     >
-                      {c}
+                      {c.name}
                     </button>
                   ))
                 }
                 {/* Option to create new if not existing */}
-                {catInput.trim() && !existingCategories.some(c => c.toLowerCase() === catInput.trim().toLowerCase()) && (
+                {catInput.trim() && !existingCategories.some(c => c.name.toLowerCase() === catInput.trim().toLowerCase()) && (
                   <button
                     type="button"
                     onMouseDown={async () => {
@@ -153,8 +157,10 @@ export default function BlogPostForm() {
                           method: 'POST',
                           body: JSON.stringify({ name: newCatName, slug: slugify(newCatName) })
                         })
-                        setExistingCategories(prev => [...prev, res.blog_category.name].sort())
-                        setField('category', res.blog_category.name)
+                        const createdCat = Array.isArray(res.blog_category) ? res.blog_category[0] : res.blog_category
+                        setExistingCategories(prev => [...prev, createdCat].sort((a, b) => a.name.localeCompare(b.name)))
+                        setField('category_id', createdCat.id)
+                        setCatInput(createdCat.name)
                         pushToast("Đã tạo danh mục mới", "success")
                       } catch (err) {
                         pushToast("Lỗi tạo danh mục: " + err.message, "error")
@@ -167,7 +173,7 @@ export default function BlogPostForm() {
                     Tạo mới: &ldquo;{catInput.trim()}&rdquo;
                   </button>
                 )}
-                {existingCategories.filter(c => c.toLowerCase().includes(catInput.toLowerCase())).length === 0 && !catInput.trim() && (
+                {existingCategories.filter(c => c.name.toLowerCase().includes(catInput.toLowerCase())).length === 0 && !catInput.trim() && (
                   <div className="px-4 py-3 text-sm text-gray-400">Chưa có danh mục nào. Nhập để tạo mới.</div>
                 )}
               </div>

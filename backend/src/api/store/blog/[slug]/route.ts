@@ -5,6 +5,8 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const [blog_posts] = await siteService.listAndCountBlogPosts({
     slug: req.params.slug,
     published: true,
+  }, {
+    relations: ["category"]
   })
   const blog_post = blog_posts?.[0]
   if (!blog_post) return res.status(404).json({ message: "Blog post not found" })

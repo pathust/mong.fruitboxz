@@ -450,8 +450,8 @@
           "enumItems": [],
           "mappedType": "text"
         },
-        "category": {
-          "name": "category",
+        "category_id": {
+          "name": "category_id",
           "type": "text",
           "unsigned": false,
           "autoincrement": false,
@@ -551,6 +551,15 @@
       "schema": "public",
       "indexes": [
         {
+          "keyName": "IDX_site_blog_post_category_id",
+          "columnNames": [],
+          "composite": false,
+          "constraint": false,
+          "primary": false,
+          "unique": false,
+          "expression": "CREATE INDEX IF NOT EXISTS \"IDX_site_blog_post_category_id\" ON \"site_blog_post\" (\"category_id\") WHERE deleted_at IS NULL"
+        },
+        {
           "keyName": "IDX_site_blog_post_deleted_at",
           "columnNames": [],
           "composite": false,
@@ -571,7 +580,21 @@
         }
       ],
       "checks": [],
-      "foreignKeys": {},
+      "foreignKeys": {
+        "site_blog_post_category_id_foreign": {
+          "constraintName": "site_blog_post_category_id_foreign",
+          "columnNames": [
+            "category_id"
+          ],
+          "localTableName": "public.site_blog_post",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.site_blog_category",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        }
+      },
       "nativeEnums": {}
     },
     {

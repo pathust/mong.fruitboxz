@@ -12,12 +12,19 @@ function mapVariant(v) {
     v?.prices?.[0]?.calculated_amount ??
     0
   )
+  
+  let inStock = true;
+  if (v?.manage_inventory && !v?.allow_backorder) {
+    inStock = (v?.inventory_quantity ?? 0) > 0;
+  }
+
   return {
     id: v?.id || "",
     title: v?.title || "Default",
     label: v?.title || "Default",
     price: amount > 0 ? amount : null,
     prices: amount > 0 ? [{ amount }] : [],
+    inStock,
   }
 }
 
@@ -27,27 +34,37 @@ export function mapProduct(p) {
   const allCategories = p?.categories || []
   const categorySlugs = allCategories.map(c => c.slug || c.handle).filter(Boolean)
   const categoryNames = allCategories.map(c => c.name).filter(Boolean)
+  const categoryIds = allCategories.map(c => c.id).filter(Boolean)
   const slug = p?.slug || p?.handle || p?.id
   const images = (p?.images || []).map((img) => img?.url).filter(Boolean)
   const rawThumb = p?.thumbnail || ""
   const isPlaceholder = !rawThumb || rawThumb.includes("placeholder")
   const thumbnail = isPlaceholder ? (images[0] || rawThumb) : rawThumb
   const fallbackPrice = mappedVariants[0]?.price ?? null
+  // A product is in stock if at least one variant has stock or doesn't manage inventory
+  const inStock = (p?.variants || []).length === 0
+    ? true
+    : (p?.variants || []).some(v => {
+        if (!v.manage_inventory) return true          // no inventory tracking → always in stock
+        if (v.allow_backorder) return true             // backorder allowed → always available
+        return (v.inventory_quantity ?? 0) > 0        // has physical stock
+      })
   return {
     id: slug,
     medusa_id: p?.id || null,
     slug,
     handle: slug,
-    title: p?.title || "Sản phẩm",
-    category: firstCategory?.slug || firstCategory?.handle || "",
-    categoryDisplay: firstCategory?.name || "",
+    title: p?.title || 'Sản phẩm',
+    category: firstCategory?.slug || firstCategory?.handle || '',
+    categoryDisplay: firstCategory?.name || '',
     categorySlugs,
     categoryNames,
+    categoryIds,
     variants: mappedVariants,
     price: fallbackPrice,
     images,
     thumbnail,
-    inStock: true,
+    inStock,
     isHot: false,
   }
 }

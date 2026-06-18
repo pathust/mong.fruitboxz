@@ -300,6 +300,16 @@ export default function ProductForm() {
                       Biên lợi nhuận: {Math.round((1 - v.cost_price / v.price) * 100)}% • Lãi gộp {(v.price - v.cost_price).toLocaleString()}₫/sp
                     </div>
                   )}
+
+                  <div className="w-full mt-2 pt-2 border-t border-gray-200">
+                    {(!isNew && v.id) ? (
+                      <RecipeManager variantId={v.id} productId={id} />
+                    ) : (
+                      <div className="text-[13px] text-amber-600 font-medium py-3 px-4 bg-amber-50 rounded-lg border border-amber-100 mt-2">
+                        Vui lòng lưu lại sản phẩm để có thể cài đặt nguyên liệu cho phân loại này.
+                      </div>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -359,10 +369,6 @@ export default function ProductForm() {
             />
           </div>
         </div>
-      )}
-
-      {!isNew && variantId && (
-        <RecipeManager variantId={variantId} />
       )}
     </div>
   )

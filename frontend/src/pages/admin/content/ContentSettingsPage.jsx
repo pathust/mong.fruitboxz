@@ -52,13 +52,40 @@ const configs = {
     ],
   },
   customBox: {
-    eyebrow: "CMS / Hộp tự chọn",
+    eyebrow: "Bán hàng / Hộp tự chọn",
     title: "Hộp tự chọn",
     description: "Quản lý loại hộp, giá nền, số món tối đa và danh sách sản phẩm được chọn.",
     preview: "/custom-box/hop-qua-trai-cay-tu-chon",
     fields: [
       { key: "custom_box_types_json", label: "Các loại hộp", type: "boxTypes" },
       { key: "custom_box_product_slugs", label: "Product slugs được phép chọn", type: "textarea", rows: 5 },
+    ],
+  },
+  paymentPolicy: {
+    eyebrow: "CMS / Chính sách thanh toán",
+    title: "Chính sách thanh toán",
+    description: "Quản lý nội dung hiển thị ở trang /payment-policy.",
+    preview: "/payment-policy",
+    fields: [
+      { key: "payment_policy_html", label: "Nội dung chính sách", type: "richtext" },
+    ],
+  },
+  privacyPolicy: {
+    eyebrow: "CMS / Chính sách bảo mật",
+    title: "Chính sách bảo mật",
+    description: "Quản lý nội dung hiển thị ở trang /privacy-policy.",
+    preview: "/privacy-policy",
+    fields: [
+      { key: "privacy_policy_html", label: "Nội dung chính sách", type: "richtext" },
+    ],
+  },
+  shippingPolicy: {
+    eyebrow: "CMS / Chính sách vận chuyển",
+    title: "Chính sách vận chuyển",
+    description: "Quản lý nội dung hiển thị ở trang /shipping-policy.",
+    preview: "/shipping-policy",
+    fields: [
+      { key: "shipping_policy_html", label: "Nội dung chính sách", type: "richtext" },
     ],
   },
 }

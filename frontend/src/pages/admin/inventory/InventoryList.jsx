@@ -1,20 +1,20 @@
 import { useCallback, useMemo, useState, useEffect } from "react"
-import { Package, Save, AlertCircle } from "lucide-react"
+import { Package, Save, AlertCircle, Leaf } from "lucide-react"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
 import { AdminListFilters, filterBySearch } from "../../../components/admin/AdminListFilters"
 
-function getVariantStock(variant) {
-  const inventoryItem = variant.inventory_items?.[0]?.inventory
-  const locationLevel = inventoryItem?.location_levels?.[0]
+function getIngredientStock(ingredient) {
+  const locationLevel = ingredient.location_levels?.[0]
   return {
-    linked: Boolean(inventoryItem?.id),
+    linked: Boolean(locationLevel),
+    location_id: locationLevel?.location_id,
     stock: Number(locationLevel?.stocked_quantity || 0),
   }
 }
 
 export default function InventoryList() {
   const { api } = useAdminAuth()
-  const [products, setProducts] = useState([])
+  const [ingredients, setIngredients] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [stockFilter, setStockFilter] = useState("all")
@@ -24,212 +24,198 @@ export default function InventoryList() {
     try {
       setLoading(true)
       const res = await api("/admin/custom/inventory")
-      if (res?.products) {
-        setProducts(res.products)
+      if (res?.ingredients) {
+        setIngredients(res.ingredients)
       }
     } catch (error) {
-      console.error("Failed to fetch inventory:", error)
+      console.error("Lỗi lấy tồn kho:", error)
     } finally {
       setLoading(false)
     }
   }, [api])
 
   useEffect(() => {
-    const timer = window.setTimeout(fetchInventory, 0)
-    return () => window.clearTimeout(timer)
+    fetchInventory()
   }, [fetchInventory])
 
-  const handleStockChange = (inventoryItemId, locationId, value) => {
-    setUpdates({
-      ...updates,
-      [`${inventoryItemId}_${locationId}`]: {
-        inventory_item_id: inventoryItemId,
-        location_id: locationId,
-        stocked_quantity: value
+  const filteredItems = useMemo(() => {
+    return ingredients.filter(ing => {
+      // 1. Search
+      const searchMatch = filterBySearch(ing, searchTerm, ["title", "sku"])
+      if (!searchMatch) return false
+
+      // 2. Stock status filter
+      const { stock } = getIngredientStock(ing)
+      switch (stockFilter) {
+        case "in_stock": return stock > 0
+        case "low_stock": return stock > 0 && stock <= 10
+        case "out_of_stock": return stock === 0
+        default: return true
       }
     })
+  }, [ingredients, searchTerm, stockFilter])
+
+  const handleUpdateStock = (ingredientId, locationId, value) => {
+    const num = parseInt(value, 10)
+    if (isNaN(num) || num < 0) return
+    setUpdates(prev => ({
+      ...prev,
+      [ingredientId]: {
+        location_id: locationId,
+        stocked_quantity: num
+      }
+    }))
   }
 
-  const handleSave = async (updateKey) => {
-    const update = updates[updateKey]
-    if (!update) return
+  const handleSaveAll = async () => {
+    const updateEntries = Object.entries(updates)
+    if (!updateEntries.length) return
 
     try {
-      await api("/admin/custom/inventory", {
-        method: "POST",
-        body: update
-      })
-      // Clear this update
-      const newUpdates = { ...updates }
-      delete newUpdates[updateKey]
-      setUpdates(newUpdates)
-      alert("Cập nhật thành công")
+      for (const [ingredientId, data] of updateEntries) {
+        await api("/admin/custom/inventory", {
+          method: "POST",
+          body: JSON.stringify({
+            inventory_item_id: ingredientId,
+            location_id: data.location_id,
+            stocked_quantity: data.stocked_quantity
+          })
+        })
+      }
+      setUpdates({})
       fetchInventory()
-    } catch (error) {
-      alert("Lỗi cập nhật: " + error.message)
+      alert("Cập nhật tồn kho nguyên liệu thành công!")
+    } catch (err) {
+      alert("Lỗi khi cập nhật tồn kho: " + err.message)
     }
   }
 
-  const filteredProducts = useMemo(() => {
-    return products
-      .map((product) => ({
-        ...product,
-        variants: (product.variants || []).filter((variant) => {
-          const inventory = getVariantStock(variant)
-          const passesSearch = filterBySearch(
-            { ...variant, product_title: product.title },
-            searchTerm,
-            ["title", "sku", "product_title"]
-          )
-          const passesStock =
-            stockFilter === "all" ||
-            (stockFilter === "out" && inventory.linked && inventory.stock <= 0) ||
-            (stockFilter === "low" && inventory.linked && inventory.stock > 0 && inventory.stock <= 5) ||
-            (stockFilter === "available" && inventory.linked && inventory.stock > 5) ||
-            (stockFilter === "unlinked" && !inventory.linked)
-
-          return passesSearch && passesStock
-        }),
-      }))
-      .filter((product) => product.variants.length > 0)
-  }, [products, searchTerm, stockFilter])
+  const stockFilterOptions = [
+    { label: "Tất cả", value: "all" },
+    { label: "Còn hàng (>0)", value: "in_stock" },
+    { label: "Sắp hết (<=10)", value: "low_stock" },
+    { label: "Hết hàng (0)", value: "out_of_stock" }
+  ]
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="space-y-6 pb-20">
+      <div className="admin-panel px-6 py-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            <Package className="w-6 h-6 text-blue-500" />
-            Tồn kho
+          <p className="product-meta text-[12px] uppercase tracking-[0.14em] text-[#a08d79] mb-2">Inventory Management</p>
+          <h1 className="page-title text-[28px] flex items-center gap-3">
+            <Package className="w-8 h-8 text-primary" />
+            Tồn kho Nguyên liệu
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">
-            Quản lý số lượng tồn kho của các sản phẩm
+          <p className="product-meta mt-2 text-[14px] text-[#766957]">
+            Quản lý số lượng tồn kho của các nguyên liệu thô (Trái cây, bao bì, gia vị...)
           </p>
         </div>
+        
+        {Object.keys(updates).length > 0 && (
+          <button
+            onClick={handleSaveAll}
+            className="admin-button-primary px-6 py-2.5 text-sm flex items-center gap-2 shadow-lg shadow-primary/20 animate-in fade-in slide-in-from-bottom-2"
+          >
+            <Save className="w-4 h-4" /> Lưu Thay Đổi ({Object.keys(updates).length})
+          </button>
+        )}
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-        <div className="p-4 border-b border-gray-100 dark:border-gray-700">
-          <AdminListFilters
-            search={searchTerm}
-            onSearchChange={setSearchTerm}
-            searchPlaceholder="Tìm theo sản phẩm, variant, SKU..."
-            showing={filteredProducts.reduce((sum, product) => sum + product.variants.length, 0)}
-            total={products.reduce((sum, product) => sum + (product.variants || []).length, 0)}
-            onReset={() => {
-              setSearchTerm("")
-              setStockFilter("all")
-            }}
-            filters={[
-              {
-                label: "Tồn kho",
-                value: stockFilter,
-                onChange: setStockFilter,
-                options: [
-                  { value: "all", label: "Tất cả tồn kho" },
-                  { value: "available", label: "Còn hàng" },
-                  { value: "low", label: "Sắp hết" },
-                  { value: "out", label: "Hết hàng" },
-                  { value: "unlinked", label: "Chưa liên kết" },
-                ],
-              },
-            ]}
-          />
-        </div>
+      <AdminListFilters
+        search={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder="Tìm theo tên nguyên liệu, SKU..."
+        filters={[
+          {
+            id: "stock-filter",
+            label: "Trạng thái tồn kho",
+            value: stockFilter,
+            options: stockFilterOptions,
+            onChange: setStockFilter
+          }
+        ]}
+        total={ingredients.length}
+        showing={filteredItems.length}
+      />
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
+      <div className="admin-table overflow-x-auto">
+        {loading ? (
+          <div className="text-center py-20 text-[#a08d79]">
+            <div className="h-8 w-8 mx-auto rounded-full border-4 border-primary border-t-transparent animate-spin mb-4" />
+            Đang tải dữ liệu...
+          </div>
+        ) : filteredItems.length === 0 ? (
+          <div className="text-center py-20">
+            <div className="w-16 h-16 bg-[#faf6f0] rounded-full flex items-center justify-center mx-auto mb-4">
+              <AlertCircle className="w-8 h-8 text-[#d4c5b3]" />
+            </div>
+            <h3 className="text-lg font-bold text-secondary mb-2">Không tìm thấy nguyên liệu</h3>
+            <p className="text-[#8a7a67]">Thử thay đổi bộ lọc hoặc tìm kiếm khác.</p>
+          </div>
+        ) : (
+          <table className="w-full text-sm text-left">
+            <thead className="border-b border-[#eadfcd]">
               <tr>
-                <th className="px-6 py-4 text-sm font-medium text-gray-500 dark:text-gray-400">Sản phẩm</th>
-                <th className="px-6 py-4 text-sm font-medium text-gray-500 dark:text-gray-400">Phân loại (Variant)</th>
-                <th className="px-6 py-4 text-sm font-medium text-gray-500 dark:text-gray-400">Tồn kho hiện tại</th>
-                <th className="px-6 py-4 text-sm font-medium text-gray-500 dark:text-gray-400 text-right">Thao tác</th>
+                <th className="px-5 py-4 font-bold text-secondary">Nguyên liệu</th>
+                <th className="px-5 py-4 font-bold text-secondary">Phân loại</th>
+                <th className="px-5 py-4 font-bold text-secondary">Đơn vị</th>
+                <th className="px-5 py-4 font-bold text-secondary">Tồn kho (Số lượng)</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-              {loading ? (
-                <tr>
-                  <td colSpan="4" className="px-6 py-8 text-center text-gray-500">Đang tải...</td>
-                </tr>
-              ) : filteredProducts.length === 0 ? (
-                <tr>
-                  <td colSpan="4" className="px-6 py-8 text-center text-gray-500">Không tìm thấy sản phẩm nào</td>
-                </tr>
-              ) : (
-                filteredProducts.map((product) => (
-                  (product.variants || []).map((variant, index) => {
-                    // Extract inventory item and level
-                    // Medusa v2 links variants to inventory_items
-                    const inventoryItemObj = variant.inventory_items?.[0]
-                    const inventoryItem = inventoryItemObj?.inventory
-                    const locationLevel = inventoryItem?.location_levels?.[0]
-
-                    const inventoryItemId = inventoryItem?.id
-                    const locationId = locationLevel?.location_id || "default_location" // Usually you'd fetch locations
-                    const currentStock = locationLevel?.stocked_quantity || 0
-
-                    const updateKey = `${inventoryItemId}_${locationId}`
-                    const hasUpdate = updates[updateKey] !== undefined
-                    const displayStock = hasUpdate ? updates[updateKey].stocked_quantity : currentStock
-
-                    return (
-                      <tr key={variant.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                        {index === 0 ? (
-                          <td className="px-6 py-4" rowSpan={product.variants.length}>
-                            <div className="flex items-center gap-3">
-                              {product.thumbnail ? (
-                                <img src={product.thumbnail} alt="" className="w-10 h-10 rounded-lg object-cover" />
-                              ) : (
-                                <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                                  <Package className="w-5 h-5 text-gray-400" />
-                                </div>
-                              )}
-                              <span className="font-medium text-gray-900 dark:text-white">{product.title}</span>
-                            </div>
-                          </td>
-                        ) : null}
-                        <td className="px-6 py-4">
-                          <span className="text-gray-600 dark:text-gray-300">{variant.title}</span>
-                          {variant.sku && <div className="text-xs text-gray-400 font-mono mt-1">SKU: {variant.sku}</div>}
-                        </td>
-                        <td className="px-6 py-4">
-                          {inventoryItemId ? (
-                            <div className="flex items-center gap-2">
-                              <input
-                                type="number"
-                                min="0"
-                                value={displayStock}
-                                onChange={(e) => handleStockChange(inventoryItemId, locationId, e.target.value)}
-                                className={`w-24 px-3 py-1.5 border rounded-lg focus:outline-none focus:ring-2 ${hasUpdate ? 'border-blue-400 focus:ring-blue-500/50' : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 focus:ring-blue-500/50'}`}
-                              />
-                              {currentStock <= 5 && !hasUpdate && (
-                                <AlertCircle className="w-4 h-4 text-yellow-500" title="Sắp hết hàng" />
-                              )}
-                            </div>
-                          ) : (
-                            <span className="text-sm text-gray-500 italic">Chưa liên kết tồn kho</span>
+            <tbody className="divide-y divide-[#eadfcd]">
+              {filteredItems.map(ingredient => {
+                const { stock, linked, location_id } = getIngredientStock(ingredient)
+                const pendingUpdate = updates[ingredient.id]
+                const currentVal = pendingUpdate !== undefined ? pendingUpdate.stocked_quantity : stock
+                
+                return (
+                  <tr key={ingredient.id} className={stock === 0 ? "bg-red-50/20" : ""}>
+                    <td className="px-5 py-4">
+                      <div className="font-bold text-secondary text-[15px] flex items-center gap-2">
+                        <Leaf className="w-4 h-4 text-primary" />
+                        {ingredient.title}
+                      </div>
+                      {ingredient.sku && (
+                        <div className="text-xs text-[#8a7a67] font-mono mt-1 ml-6">{ingredient.sku}</div>
+                      )}
+                    </td>
+                    <td className="px-5 py-4">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-[#faf6f0] text-[#8a7a67]">
+                        {ingredient.metadata?.category || "Khác"}
+                      </span>
+                    </td>
+                    <td className="px-5 py-4">
+                      <span className="text-sm font-medium text-secondary">
+                        {ingredient.metadata?.unit || "-"}
+                      </span>
+                    </td>
+                    <td className="px-5 py-4">
+                      {!linked ? (
+                        <span className="text-xs text-red-500 font-bold bg-red-50 px-2 py-1 rounded">Chưa setup kho</span>
+                      ) : (
+                        <div className="flex items-center gap-2 max-w-[200px]">
+                          <input
+                            type="number"
+                            min="0"
+                            value={currentVal}
+                            onChange={e => handleUpdateStock(ingredient.id, location_id, e.target.value)}
+                            className={`admin-input w-24 text-center font-mono ${pendingUpdate !== undefined ? 'border-primary ring-1 ring-primary/20 bg-primary/5' : ''}`}
+                          />
+                          {currentVal === 0 && (
+                            <span className="text-xs font-bold text-red-500 bg-red-50 px-2 py-1 rounded">Hết hàng</span>
                           )}
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          {hasUpdate && (
-                            <button
-                              onClick={() => handleSave(updateKey)}
-                              className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ml-auto"
-                            >
-                              <Save className="w-4 h-4" />
-                              Lưu
-                            </button>
+                          {currentVal > 0 && currentVal <= 10 && (
+                            <span className="text-xs font-bold text-amber-500 bg-amber-50 px-2 py-1 rounded">Sắp hết</span>
                           )}
-                        </td>
-                      </tr>
-                    )
-                  })
-                ))
-              )}
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
-        </div>
+        )}
       </div>
     </div>
   )

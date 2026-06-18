@@ -33,7 +33,7 @@ export default function CategoryDetail() {
 
       try {
         const offset = (page - 1) * limit
-        let url = `/store/products?limit=${limit}&offset=${offset}&fields=id,handle,title,thumbnail,*images,*variants,*variants.prices,*categories`
+        let url = `/store/products?limit=${limit}&offset=${offset}&fields=id,handle,title,thumbnail,*images,*variants,*variants.prices,+variants.inventory_quantity,*categories`
 
         if (category) {
           url += `&category_id[]=${category.id}`
@@ -80,13 +80,7 @@ export default function CategoryDetail() {
 
   return (
     <div className="max-w-[1240px] mx-auto px-4 py-10">
-      <nav className="flex items-center gap-2 text-sm text-gray-500 mb-8">
-        <Link to="/" className="hover:text-primary">Trang chủ</Link>
-        <span>/</span>
-        <Link to="/categories" className="hover:text-primary">Danh mục</Link>
-        <span>/</span>
-        <span className="text-secondary">{category?.displayName || category?.name || 'Danh mục'}</span>
-      </nav>
+      
 
       <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-end mb-8">
         <div>

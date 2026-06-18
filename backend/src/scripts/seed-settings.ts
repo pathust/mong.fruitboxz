@@ -23,6 +23,9 @@ export default async function seedSettings({ container }: ExecArgs) {
     about_story_title: "Câu chuyện của Mọng",
     about_story: "Khởi nguồn từ tình yêu với trái cây tươi, Mọng Fruitboxz ra đời với mong muốn mang đến cho khách hàng những trải nghiệm ẩm thực tuyệt vời nhất.",
     about_story_secondary: "Mỗi hộp trái cây là một món quà tinh thần, thay bạn gửi gắm yêu thương tới người thân, bạn bè.",
+    blog_eyebrow: "Mọng's Blog",
+    blog_title: "Chuyện nhà Mọng",
+    blog_intro: "Nơi chia sẻ những câu chuyện về trái cây tươi ngon, kiến thức dinh dưỡng và bí quyết chọn quà tặng ý nghĩa dành cho người thân yêu.",
     about_reasons_title: "Vì sao chọn Mọng?",
     about_reasons_json: JSON.stringify([
       { title: "Chất lượng hàng đầu", description: "100% trái cây nhập khẩu tươi ngon", icon: "quality" },
@@ -38,7 +41,7 @@ export default async function seedSettings({ container }: ExecArgs) {
     delivery_info: "Giao hàng hoả tốc nội thành Hà Nội",
     shipping_policy_text: "Mọng giao hàng trong Hà Nội theo khu vực. Phí ship được hiển thị trước khi đặt hàng và có thể thay đổi theo khoảng cách thực tế.",
     payment_policy_text: "Mọng hỗ trợ COD và chuyển khoản. Đơn hàng được xác nhận trước khi giao.",
-    privacy_policy_text: "Thông tin khách hàng chỉ dùng để xử lý đơn hàng, giao hàng và chăm sóc sau bán.",
+    privacy_policy_text: "Thông tin khách hàng chỉ dùng để xử lý đơn hàng, giao hàng và chăm sóc sau bán."
   })
   console.log("Seeded settings successfully", merged.site_name)
 }

@@ -1,4 +1,5 @@
 import { model } from "@medusajs/framework/utils"
+import BlogCategory from "./blog-category"
 
 const BlogPost = model.define("site_blog_post", {
   id: model.id().primaryKey(),
@@ -8,7 +9,7 @@ const BlogPost = model.define("site_blog_post", {
   content: model.text().nullable(),
   image: model.text().nullable(),
   author: model.text().nullable(),
-  category: model.text().nullable(),
+  category: model.belongsTo(() => BlogCategory).nullable(),
   published: model.boolean().default(true),
   published_at: model.dateTime().nullable(),
 })
