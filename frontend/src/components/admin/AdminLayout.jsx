@@ -32,8 +32,6 @@ const navGroups = [
     items: [
       { label: "Bài viết Blog", path: "/admin/blog", icon: FileText, permission: "settings.read" },
       { label: "Danh mục Blog", path: "/admin/blog-categories", icon: FolderKanban, permission: "settings.read" },
-      { label: "Trang Blog", path: "/admin/content/blog", icon: LayoutTemplate, permission: "settings.read" },
-      { label: "Về chúng tôi", path: "/admin/content/about", icon: Info, permission: "settings.read" },
       { label: "Liên hệ", path: "/admin/content/contact", icon: Mail, permission: "settings.read" },
       { label: "CS Thanh toán", path: "/admin/content/payment-policy", icon: FileText, permission: "orders.read" },
       { label: "CS Bảo mật", path: "/admin/content/privacy-policy", icon: Shield, permission: "orders.read" },

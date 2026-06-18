@@ -131,13 +131,11 @@ export default function App() {
           <Route path="blog-categories" element={<Suspense fallback={<ScreenLoader />}><BlogCategoriesList /></Suspense>} />
           <Route path="blog-categories/new" element={<Suspense fallback={<ScreenLoader />}><BlogCategoryForm /></Suspense>} />
           <Route path="blog-categories/:id/edit" element={<Suspense fallback={<ScreenLoader />}><BlogCategoryForm /></Suspense>} />
-          <Route path="content/about" element={<Suspense fallback={<ScreenLoader />}><ContentSettingsPage type="about" /></Suspense>} />
           <Route path="content/contact" element={<Suspense fallback={<ScreenLoader />}><ContentSettingsPage type="contact" /></Suspense>} />
           <Route path="content/payment-policy" element={<Suspense fallback={<ScreenLoader />}><ContentSettingsPage type="paymentPolicy" /></Suspense>} />
           <Route path="content/privacy-policy" element={<Suspense fallback={<ScreenLoader />}><ContentSettingsPage type="privacyPolicy" /></Suspense>} />
           <Route path="content/shipping-policy" element={<Suspense fallback={<ScreenLoader />}><ContentSettingsPage type="shippingPolicy" /></Suspense>} />
           <Route path="content/custom-box" element={<Suspense fallback={<ScreenLoader />}><ContentSettingsPage type="customBox" /></Suspense>} />
-          <Route path="content/blog" element={<Suspense fallback={<ScreenLoader />}><ContentSettingsPage type="blog" /></Suspense>} />
           <Route path="settings" element={<Suspense fallback={<ScreenLoader />}><Settings /></Suspense>} />
         </Route>
       </Route>
