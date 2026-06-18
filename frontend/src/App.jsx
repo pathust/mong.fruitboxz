@@ -6,6 +6,7 @@ import AdminLayout from './components/admin/AdminLayout'
 import ProtectedRoute from './components/admin/ProtectedRoute'
 import AdminLoginCheck from './components/admin/AdminLoginCheck'
 import { RequirePermission } from './components/admin/RequirePermission'
+import { AdminEmpty } from './components/admin/AdminStates'
 
 const Home = lazy(() => import('./pages/Home'))
 const Products = lazy(() => import('./pages/Products'))
@@ -136,6 +137,7 @@ export default function App() {
           <Route path="content/shipping-policy" element={<Suspense fallback={<ScreenLoader />}><ContentSettingsPage type="shippingPolicy" /></Suspense>} />
           <Route path="content/custom-box" element={<Suspense fallback={<ScreenLoader />}><ContentSettingsPage type="customBox" /></Suspense>} />
           <Route path="settings" element={<Suspense fallback={<ScreenLoader />}><Settings /></Suspense>} />
+          <Route path="*" element={<div className="p-6"><AdminEmpty title="404 - Không tìm thấy trang" message="Trang bạn truy cập không tồn tại hoặc đã bị xóa khỏi hệ thống." /></div>} />
         </Route>
       </Route>
     </Routes>
