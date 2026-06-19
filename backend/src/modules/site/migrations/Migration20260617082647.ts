@@ -4,15 +4,21 @@ export class Migration20260617082647 extends Migration {
   override async up(): Promise<void> {
     this.addSql(`alter table if exists "site_blog_post" add column if not exists "category_id" text null;`)
     this.addSql(`
-      update "site_blog_post" post
-      set "category_id" = category."id"
-      from "site_blog_category" category
-      where post."category_id" is null
-        and post."category" is not null
-        and (
-          lower(trim(post."category")) = lower(trim(category."name"))
-          or lower(trim(post."category")) = lower(trim(category."slug"))
-        );
+      DO $$
+      BEGIN
+        IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='site_blog_post' AND column_name='category') THEN
+          update "site_blog_post" post
+          set "category_id" = category."id"
+          from "site_blog_category" category
+          where post."category_id" is null
+            and post."category" is not null
+            and (
+              lower(trim(post."category")) = lower(trim(category."name"))
+              or lower(trim(post."category")) = lower(trim(category."slug"))
+            );
+        END IF;
+      END;
+      $$;
     `)
     this.addSql(`alter table if exists "site_blog_post" drop column if exists "category";`)
     this.addSql(`

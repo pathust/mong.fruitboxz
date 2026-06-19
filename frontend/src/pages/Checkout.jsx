@@ -234,8 +234,8 @@ export default function Checkout() {
             address,
             lat,
             lng,
-          }),
-          }
+          },
+        })
         if (!controller.signal.aborted) {
           setShipping(Number(data.shipping) || 30000)
           setQuoteMode(data.mode || 'static-hanoi')
@@ -295,8 +295,8 @@ export default function Checkout() {
             note: form.note,
           },
           promotion_code: discountData?.code || undefined,
-        }),
-        }
+        },
+      })
 
       const finalAmount = subtotal - (discountData?.discount_amount || 0) + shipping
       const displayId = res?.order ? getOrderCode(res.order) : form.phone

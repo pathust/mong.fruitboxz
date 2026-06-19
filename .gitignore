@@ -42,3 +42,7 @@ raw_views.txt
 scraped_images.json
 targets.json
 frontend/public/images/
+
+# User requested ignores
+package-lock.json
+docs/
