@@ -1,23 +1,22 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { Modules } from "@medusajs/framework/utils"
-import { z } from "zod"
 import { getPromotionMetadata } from "../../../../lib/promotion-metadata"
+import type { PromotionValidationBody } from "../../../middlewares/validation"
+import { resolveSiteService } from "../../../../lib/module-services"
 
-const ValidateSchema = z.object({
-  code: z.string().min(1, "Mã giảm giá không hợp lệ"),
-  subtotal: z.number().min(0, "Subtotal phải lớn hơn hoặc bằng 0"),
-})
+type PromotionRecord = {
+  id: string
+  code?: string | null
+  application_method?: { type?: string | null; value?: number | string | null } | null
+  campaign?: {
+    starts_at?: string | Date | null
+    ends_at?: string | Date | null
+    budget?: { limit?: number | string | null } | null
+  } | null
+}
 
-export async function POST(req: MedusaRequest, res: MedusaResponse) {
-  const parsed = ValidateSchema.safeParse(req.body)
-  if (!parsed.success) {
-    return res.status(400).json({
-      message: "Dữ liệu đầu vào không hợp lệ",
-      errors: parsed.error.format()
-    })
-  }
-
-  const { code, subtotal } = parsed.data
+export async function POST(req: MedusaRequest<PromotionValidationBody>, res: MedusaResponse) {
+  const { code, subtotal } = req.validatedBody
   const promotionModuleService = req.scope.resolve(Modules.PROMOTION)
 
   let promotions
@@ -36,13 +35,14 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
     return res.status(404).json({ message: "Mã giảm giá không tồn tại hoặc đã hết hạn" })
   }
 
-  const promotion = promotions[0] as any
-  const siteService = req.scope.resolve("site")
+  const promotion = promotions[0] as PromotionRecord
+  const siteService = resolveSiteService(req.scope)
   const promotionMetadata = await getPromotionMetadata(siteService, promotion.id)
   const startsAt = promotionMetadata.starts_at || promotion.campaign?.starts_at
   const endsAt = promotionMetadata.ends_at || promotion.campaign?.ends_at
   const usageLimit = Number(promotionMetadata.usage_limit || promotion.campaign?.budget?.limit || 0)
   const now = new Date()
+  let remainingUsages: number | undefined
 
   // Validate limits and dates from custom metadata first, then legacy campaign fields.
   if (startsAt && new Date(startsAt) > now) {
@@ -70,7 +70,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
       console.error("Failed to query order usage limit:", e)
     }
 
-    ;(promotion as any).remaining_usages = Math.max(0, usageLimit - usedCount)
+    remainingUsages = Math.max(0, usageLimit - usedCount)
   }
 
   // 3. Validate Minimum Order Value
@@ -106,6 +106,6 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
     code: promotion.code,
     type: appMethod.type,
     discount_amount: discountAmount,
-    remaining_usages: (promotion as any).remaining_usages
+    remaining_usages: remainingUsages
   })
 }

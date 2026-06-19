@@ -1,23 +1,22 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+import type { BannerBody } from "../../middlewares/validation"
+import { resolveSiteService } from "../../../lib/module-services"
+import { sendInternalError } from "../../../lib/api-error"
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   try {
-    const siteService = req.scope.resolve("site") as any
+    const siteService = resolveSiteService(req.scope)
     const [banners] = await siteService.listAndCountBanners({})
     res.json({ banners })
-  } catch (error: any) {
-    res.status(500).json({ message: error.message || "An error occurred while fetching banners" })
+  } catch (error: unknown) {
+    sendInternalError(req, res, error, "Unable to fetch banners", "BANNER_LIST_FAILED")
   }
 }
 
-export async function POST(req: MedusaRequest, res: MedusaResponse) {
+export async function POST(req: MedusaRequest<BannerBody>, res: MedusaResponse) {
   try {
-    const siteService = req.scope.resolve("site") as any
-    const body = req.body as any
-
-    if (!body || typeof body !== "object") {
-      return res.status(400).json({ message: "Invalid payload" })
-    }
+    const siteService = resolveSiteService(req.scope)
+    const body = req.validatedBody
 
     const [existing] = await siteService.listAndCountBanners({})
     const banner = await siteService.createBanners({
@@ -29,7 +28,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
       active: body.active ?? true,
     })
     res.status(201).json({ banner })
-  } catch (error: any) {
-    res.status(500).json({ message: error.message || "An error occurred while creating banner" })
+  } catch (error: unknown) {
+    sendInternalError(req, res, error, "Unable to create banner", "BANNER_CREATE_FAILED")
   }
 }

@@ -1,13 +1,13 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+import { resolveSiteService } from "../../../lib/module-services"
+import { sendInternalError } from "../../../lib/api-error"
+import type { StoreCustomQuery } from "../../middlewares/validation"
 
-export async function GET(req: MedusaRequest, res: MedusaResponse) {
-  const mode = (req.query?.mode || "homepage").toString()
-  if (!["homepage", "site"].includes(mode)) {
-    return res.json({ ok: true })
-  }
+export async function GET(req: MedusaRequest<unknown, StoreCustomQuery>, res: MedusaResponse) {
+  const { mode } = req.validatedQuery
 
   try {
-    const siteService = req.scope.resolve("site") as any
+    const siteService = resolveSiteService(req.scope)
     const [settingsRows] = await siteService.listAndCountSiteSettings({ key: "global" })
     const [allBanners] = await siteService.listAndCountBanners({})
     const settings = settingsRows?.[0]?.value || {}
@@ -16,7 +16,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
       .sort((a, b) => Number(a?.order ?? 0) - Number(b?.order ?? 0))
 
     res.json(mode === "homepage" ? { settings, banners } : { settings })
-  } catch (err: any) {
-    res.status(500).json({ error: err.message, stack: err.stack })
+  } catch (error: unknown) {
+    sendInternalError(req, res, error, "Unable to load storefront settings", "STOREFRONT_SETTINGS_FAILED")
   }
 }

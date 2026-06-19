@@ -1,5 +1,7 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { Modules, ContainerRegistrationKeys } from "@medusajs/framework/utils"
+import type { InventoryLevelBody } from "../../../middlewares/validation"
+import { sendInternalError } from "../../../../lib/api-error"
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   try {
@@ -19,18 +21,20 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
     })
 
     // Filter to only include items marked as ingredients
-    const ingredients = inventory_items.filter((item: any) => item.metadata?.is_ingredient === true)
+    const ingredients = (inventory_items as Array<{ metadata?: Record<string, unknown> | null }>).filter(
+      (item) => item.metadata?.is_ingredient === true
+    )
 
     res.json({ ingredients })
-  } catch (err: any) {
-    res.status(500).json({ message: err.message, error: err })
+  } catch (error: unknown) {
+    sendInternalError(req, res, error, "Unable to fetch inventory", "INVENTORY_LIST_FAILED")
   }
 }
 
-export async function POST(req: MedusaRequest, res: MedusaResponse) {
+export async function POST(req: MedusaRequest<InventoryLevelBody>, res: MedusaResponse) {
   try {
     const inventoryModule = req.scope.resolve(Modules.INVENTORY)
-    const { inventory_item_id, location_id, stocked_quantity } = req.body as any
+    const { inventory_item_id, location_id, stocked_quantity } = req.validatedBody
 
     if (inventory_item_id && location_id) {
       await inventoryModule.updateInventoryLevels([
@@ -43,7 +47,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
     }
 
     res.json({ success: true })
-  } catch (err: any) {
-    res.status(500).json({ message: err.message, error: err })
+  } catch (error: unknown) {
+    sendInternalError(req, res, error, "Unable to update inventory", "INVENTORY_UPDATE_FAILED")
   }
 }

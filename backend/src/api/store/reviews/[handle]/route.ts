@@ -1,35 +1,26 @@
-import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+import { AuthenticatedMedusaRequest, MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { Modules } from "@medusajs/framework/utils"
+import type { ReviewBody } from "../../../middlewares/validation"
+import { resolveSiteService } from "../../../../lib/module-services"
 
-function getCustomerId(req: MedusaRequest): string | undefined {
-  const authHeader = req.headers.authorization || req.headers["authorization"] || ""
-  if (authHeader.startsWith("Bearer ")) {
-    try {
-      const token = authHeader.slice(7)
-      const payload = JSON.parse(Buffer.from(token.split(".")[1], "base64").toString())
-      if (payload.actor_type === "customer") {
-        return payload.actor_id
-      }
-    } catch {}
-  }
-  return undefined
+type PurchasedOrder = {
+  items?: Array<{
+    title?: string | null
+    metadata?: Record<string, unknown> | null
+  }>
 }
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
-  const remoteQuery = req.scope.resolve("remoteQuery") as any
   const handle = (req.params.handle || "").toString()
-  
-  const query = {
-    site_review: {
-      __args: { filters: { handle, approved: true } },
-      fields: [
-        "id", "rating", "comment", "created_at",
-        "customer.first_name", "customer.last_name", "customer.email"
-      ]
-    }
-  }
-
-  const { data: reviews } = await remoteQuery(query)
+  const query = req.scope.resolve("query")
+  const { data: reviews } = await query.graph({
+    entity: "site_review",
+    filters: { handle, approved: true },
+    fields: [
+      "id", "rating", "comment", "created_at",
+      "customer.first_name", "customer.last_name", "customer.email",
+    ],
+  })
 
   const count = reviews.length
   const average = count ? reviews.reduce((sum, r) => sum + Number(r.rating || 0), 0) / count : 0
@@ -37,16 +28,12 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
   res.json({ reviews, summary: { count, average: Number(average.toFixed(1)) } })
 }
 
-export async function POST(req: MedusaRequest, res: MedusaResponse) {
-  const siteService = req.scope.resolve("site") as any
+export async function POST(req: AuthenticatedMedusaRequest<ReviewBody>, res: MedusaResponse) {
+  const siteService = resolveSiteService(req.scope)
   const handle = (req.params.handle || "").toString()
-  const customerId = getCustomerId(req)
-  if (!customerId) return res.status(401).json({ message: "Unauthorized" })
+  const customerId = req.auth_context.actor_id
 
-  const { rating, comment, product_id, product_title } = (req.body || {}) as any
-  if (!rating || rating < 1 || rating > 5) {
-    return res.status(400).json({ message: "Rating must be between 1 and 5" })
-  }
+  const { rating, comment, product_id, product_title } = req.validatedBody
 
   const orderModuleService = req.scope.resolve(Modules.ORDER)
   const orders = await orderModuleService.listOrders(
@@ -54,8 +41,8 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
     { relations: ["items"], take: 100 }
   )
 
-  const hasPurchased = orders.some((order: any) =>
-    (order.items || []).some((item: any) =>
+  const hasPurchased = (orders as PurchasedOrder[]).some((order) =>
+    (order.items || []).some((item) =>
       item?.metadata?.frontend_item_id === product_id ||
       item?.title === product_title
     )

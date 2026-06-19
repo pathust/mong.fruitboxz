@@ -7,6 +7,18 @@ type DistrictRecord = {
   fastLane?: boolean
 }
 
+type LocationSuggestion = {
+  type: "district"
+  city: string
+  district: string
+  label: string
+  lat: number
+  lng: number
+  fast_lane: boolean
+  confidence: number
+  score: number
+}
+
 const HANOI_DISTRICTS: DistrictRecord[] = [
   { district: "Hoan Kiem", city: "Ha Noi", lat: 21.0288, lng: 105.8522, aliases: ["hoan kiem", "hoàn kiếm", "quan hoan kiem", "quận hoàn kiếm"], fastLane: true },
   { district: "Ba Dinh", city: "Ha Noi", lat: 21.0359, lng: 105.8142, aliases: ["ba dinh", "ba đình", "quan ba dinh", "quận ba đình"], fastLane: true },
@@ -22,7 +34,7 @@ const HANOI_DISTRICTS: DistrictRecord[] = [
   { district: "Ha Dong", city: "Ha Noi", lat: 20.9541, lng: 105.7688, aliases: ["ha dong", "hà đông", "quan ha dong", "quận hà đông"] },
 ]
 
-const memoryCache = new Map<string, any>()
+const memoryCache = new Map<string, unknown>()
 
 export function normalizeAddress(raw?: string) {
   return (raw || "")
@@ -52,10 +64,12 @@ function haversineKm(aLat: number, aLng: number, bLat: number, bLng: number) {
   return 2 * earthRadiusKm * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x))
 }
 
-function getShippingConfig(settings: Record<string, any>) {
+function getShippingConfig(settings: Record<string, unknown>) {
   const defaultFreeDistricts = "Hoàn Kiếm, Ba Đình, Đống Đa, Hai Bà Trưng, Cầu Giấy, Tây Hồ"
-  const rawDistricts = settings.free_shipping_districts ?? defaultFreeDistricts
-  const freeDistricts = rawDistricts.split(",").map((d: string) => normalizeAddress(d))
+  const rawDistricts = typeof settings.free_shipping_districts === "string"
+    ? settings.free_shipping_districts
+    : defaultFreeDistricts
+  const freeDistricts = rawDistricts.split(",").map((district) => normalizeAddress(district))
 
   return {
     originLat: Number(settings.shipping_origin_lat || process.env.SHIPPING_ORIGIN_LAT || 21.012805),
@@ -81,7 +95,7 @@ export function suggestLocations(query: string, limit = 6) {
 
   const cacheKey = `suggest:${normalized}:${limit}`
   if (memoryCache.has(cacheKey)) {
-    return memoryCache.get(cacheKey)
+    return memoryCache.get(cacheKey) as LocationSuggestion[]
   }
 
   const suggestions = HANOI_DISTRICTS
@@ -105,8 +119,8 @@ export function suggestLocations(query: string, limit = 6) {
         score,
       }
     })
-    .filter(Boolean)
-    .sort((a: any, b: any) => b.score - a.score || a.label.localeCompare(b.label))
+    .filter((suggestion): suggestion is LocationSuggestion => suggestion !== null)
+    .sort((a, b) => b.score - a.score || a.label.localeCompare(b.label))
     .slice(0, limit)
 
   memoryCache.set(cacheKey, suggestions)
@@ -262,7 +276,7 @@ export async function reverseGeocodeLocation(lat: number, lng: number) {
 
 export function resolveShippingQuote(
   input: { address?: string; city?: string; district?: string; lat?: number; lng?: number },
-  settings: Record<string, any>
+  settings: Record<string, unknown>
 ) {
   const config = getShippingConfig(settings)
   const cityNorm = normalizeAddress(input.city)

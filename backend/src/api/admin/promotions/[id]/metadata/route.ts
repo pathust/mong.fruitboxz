@@ -4,14 +4,12 @@ import {
   PromotionMetadata,
   updatePromotionMetadata,
 } from "../../../../../lib/promotion-metadata"
-
-type UpdatePromotionMetadataBody = {
-  metadata?: Record<string, unknown>
-}
+import type { PromotionMetadataBody } from "../../../../middlewares/validation"
+import { resolveSiteService } from "../../../../../lib/module-services"
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const { id } = req.params
-  const siteService = req.scope.resolve("site")
+  const siteService = resolveSiteService(req.scope)
   const metadata = await getPromotionMetadata(siteService, id)
   let usageCount = 0
 
@@ -40,10 +38,10 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
   res.json({ metadata: { ...metadata, usage_count: usageCount } })
 }
 
-export async function POST(req: MedusaRequest<UpdatePromotionMetadataBody>, res: MedusaResponse) {
+export async function POST(req: MedusaRequest<PromotionMetadataBody>, res: MedusaResponse) {
   const { id } = req.params
-  const metadata = (req.body.metadata || {}) as PromotionMetadata
-  const siteService = req.scope.resolve("site")
+  const metadata = req.validatedBody.metadata as PromotionMetadata
+  const siteService = resolveSiteService(req.scope)
 
   try {
     const updated = await updatePromotionMetadata(siteService, id, metadata)

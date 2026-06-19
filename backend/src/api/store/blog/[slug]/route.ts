@@ -1,7 +1,8 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+import { resolveSiteService } from "../../../../lib/module-services"
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
-  const siteService = req.scope.resolve("site") as any
+  const siteService = resolveSiteService(req.scope)
   const [blog_posts] = await siteService.listAndCountBlogPosts({
     slug: req.params.slug,
     published: true,
@@ -12,4 +13,3 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
   if (!blog_post) return res.status(404).json({ message: "Blog post not found" })
   res.json({ blog_post })
 }
-

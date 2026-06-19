@@ -1,9 +1,11 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+import type { ReviewModerationBody } from "../../../middlewares/validation"
+import { resolveSiteService } from "../../../../lib/module-services"
 
-export async function PUT(req: MedusaRequest, res: MedusaResponse) {
-  const siteService = req.scope.resolve("site") as any
+export async function POST(req: MedusaRequest<ReviewModerationBody>, res: MedusaResponse) {
+  const siteService = resolveSiteService(req.scope)
   const { id } = req.params
-  const body = req.body as Record<string, unknown>
+  const body = req.validatedBody
 
   const existing = await siteService.retrieveReview(id).catch(() => null)
   if (!existing) return res.status(404).json({ error: "Review not found" })
@@ -13,7 +15,7 @@ export async function PUT(req: MedusaRequest, res: MedusaResponse) {
 }
 
 export async function DELETE(req: MedusaRequest, res: MedusaResponse) {
-  const siteService = req.scope.resolve("site") as any
+  const siteService = resolveSiteService(req.scope)
   const { id } = req.params
 
   const existing = await siteService.retrieveReview(id).catch(() => null)

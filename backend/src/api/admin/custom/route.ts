@@ -1,6 +1,9 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { Modules } from "@medusajs/framework/utils"
 import { getGlobalSettings, updateGlobalSettings } from "../../../lib/global-settings"
+import type { AdminCustomQuery, CustomSettingsBody } from "../../middlewares/validation"
+import { resolveSiteService } from "../../../lib/module-services"
+import { sendInternalError } from "../../../lib/api-error"
 
 function startOfDay(d: Date) {
   const x = new Date(d)
@@ -8,10 +11,10 @@ function startOfDay(d: Date) {
   return x
 }
 
-export async function GET(req: MedusaRequest, res: MedusaResponse) {
+export async function GET(req: MedusaRequest<unknown, AdminCustomQuery>, res: MedusaResponse) {
   try {
-    const mode = (req.query?.mode || "dashboard").toString()
-    const siteService = req.scope.resolve("site") as any
+    const { mode } = req.validatedQuery
+    const siteService = resolveSiteService(req.scope)
 
     if (mode === "settings") {
       const settings = await getGlobalSettings(siteService)
@@ -61,13 +64,16 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
     }
 
     for (const o of orders) {
-      const orderDate = o.created_at ? new Date(o.created_at as any) : new Date()
+      const orderDate = o.created_at ? new Date(String(o.created_at)) : new Date()
       const orderDay = startOfDay(orderDate)
       if (isNaN(orderDay.getTime())) continue;
       const status = (o.status || "unknown").toString()
       statusMap[status] = (statusMap[status] || 0) + 1
 
-      const paymentStatus = ((o.metadata as any)?.payment_status || "not_paid").toString()
+      const orderMetadata = o.metadata && typeof o.metadata === "object"
+        ? o.metadata as Record<string, unknown>
+        : {}
+      const paymentStatus = String(orderMetadata.payment_status || "not_paid")
 
       let orderRevenue = 0
       let orderCost = 0
@@ -76,7 +82,10 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
       for (const item of (o.items || [])) {
         const qty = Number(item.quantity) || 0
         const price = Number(item.unit_price) || 0
-        const costPrice = Number((item.metadata as any)?.cost_price) || 0
+        const itemMetadata = item.metadata && typeof item.metadata === "object"
+          ? item.metadata as Record<string, unknown>
+          : {}
+        const costPrice = Number(itemMetadata.cost_price) || 0
 
         orderRevenue += price * qty
         // Use explicit cost_price if set, otherwise fall back to default_cost_percent
@@ -146,26 +155,25 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
       })),
       top_products: topProducts,
     })
-  } catch (error: any) {
-    res.status(500).json({ message: error.message || "An error occurred in custom dashboard" })
+  } catch (error: unknown) {
+    sendInternalError(req, res, error, "Unable to load dashboard data", "DASHBOARD_LOAD_FAILED")
   }
 }
 
-export async function POST(req: MedusaRequest, res: MedusaResponse) {
+export async function POST(req: MedusaRequest<CustomSettingsBody, AdminCustomQuery>, res: MedusaResponse) {
   try {
-    const mode = (req.query?.mode || "").toString()
-    const siteService = req.scope.resolve("site") as any
+    const { mode } = req.validatedQuery
+    const siteService = resolveSiteService(req.scope)
 
     if (mode === "settings") {
-      const { settings } = req.body as any
-      if (!settings) return res.status(400).json({ message: "No settings provided" })
+      const { settings } = req.validatedBody
 
       const updated = await updateGlobalSettings(siteService, settings)
       return res.json({ settings: updated })
     }
 
     res.status(400).json({ message: "Invalid mode for POST" })
-  } catch (error: any) {
-    res.status(500).json({ message: error.message || "An error occurred while saving" })
+  } catch (error: unknown) {
+    sendInternalError(req, res, error, "Unable to save settings", "SETTINGS_UPDATE_FAILED")
   }
 }

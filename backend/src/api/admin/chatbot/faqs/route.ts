@@ -1,9 +1,11 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { getGlobalSettings, updateGlobalSettings } from "../../../../lib/global-settings"
+import type { ChatbotFaqBody } from "../../../middlewares/validation"
+import { resolveSiteService } from "../../../../lib/module-services"
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   try {
-    const siteService = req.scope.resolve("site") as any
+    const siteService = resolveSiteService(req.scope)
     const settings = await getGlobalSettings(siteService)
     res.json({
       faqs: Array.isArray(settings.chatbot_faqs) ? settings.chatbot_faqs : [],
@@ -14,9 +16,9 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
   }
 }
 
-export async function PUT(req: MedusaRequest, res: MedusaResponse) {
-  const siteService = req.scope.resolve("site") as any
-  const body = req.body as any
+export async function POST(req: MedusaRequest<ChatbotFaqBody>, res: MedusaResponse) {
+  const siteService = resolveSiteService(req.scope)
+  const body = req.validatedBody
   const settings = await updateGlobalSettings(siteService, {
     chatbot_enabled: body.enabled !== false,
     chatbot_faqs: Array.isArray(body.faqs) ? body.faqs : [],

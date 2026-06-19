@@ -1,4 +1,5 @@
 import { Modules } from "@medusajs/framework/utils"
+import type { ServiceScope } from "./module-services"
 
 export type ProductRecord = {
   id: string
@@ -129,7 +130,10 @@ export function buildProductDocument(product: ProductRecord) {
   }
 }
 
-async function meiliRequest(path: string, init?: RequestInit) {
+type MeiliTask = { taskUid?: number; status?: string }
+type MeiliStats = { numberOfDocuments?: number }
+
+async function meiliRequest<T = unknown>(path: string, init?: RequestInit): Promise<T | null> {
   const host = getHost()
   if (!host) throw new Error("MeiliSearch is not configured")
   const controller = new AbortController()
@@ -147,7 +151,7 @@ async function meiliRequest(path: string, init?: RequestInit) {
     throw new Error(body || `Meili request failed with ${response.status}`)
   }
   if (response.status === 204) return null
-  return response.json()
+  return response.json() as Promise<T>
 }
 
 async function waitForTask(taskUid?: number) {
@@ -155,7 +159,7 @@ async function waitForTask(taskUid?: number) {
 
   const deadline = Date.now() + 10_000
   while (Date.now() < deadline) {
-    const task = await meiliRequest(`/tasks/${taskUid}`).catch(() => null)
+    const task = await meiliRequest<MeiliTask>(`/tasks/${taskUid}`).catch(() => null)
     if (!task || ["succeeded", "failed", "canceled"].includes(task.status)) return
     await new Promise((resolve) => setTimeout(resolve, 250))
   }
@@ -170,7 +174,7 @@ async function configureProductIndex() {
     body: JSON.stringify({ uid: getIndexUid(), primaryKey: "id" }),
   }).catch(() => null)
 
-  const settingsTask = await meiliRequest(`/indexes/${getIndexUid()}/settings`, {
+  const settingsTask = await meiliRequest<MeiliTask>(`/indexes/${getIndexUid()}/settings`, {
     method: "PUT",
     body: JSON.stringify({
       searchableAttributes: ["name", "description", "variants.title", "categories.name", "ingredients"],
@@ -202,11 +206,11 @@ export async function replaceProductIndex(products: ProductRecord[]) {
     .map(buildProductDocument)
     .filter((doc) => doc.status === "published")
 
-  const deleteTask = await meiliRequest(`/indexes/${getIndexUid()}/documents`, { method: "DELETE" }).catch(() => null)
+  const deleteTask = await meiliRequest<MeiliTask>(`/indexes/${getIndexUid()}/documents`, { method: "DELETE" }).catch(() => null)
   await waitForTask(deleteTask?.taskUid)
 
   if (documents.length) {
-    const addTask = await meiliRequest(`/indexes/${getIndexUid()}/documents`, {
+    const addTask = await meiliRequest<MeiliTask>(`/indexes/${getIndexUid()}/documents`, {
       method: "POST",
       body: JSON.stringify(documents),
     })
@@ -220,10 +224,10 @@ export async function upsertProductDocument(product: ProductRecord) {
   if (!ensured) return { enabled: false }
   const doc = buildProductDocument(product)
   if (doc.status !== "published") {
-    const task = await meiliRequest(`/indexes/${getIndexUid()}/documents/${doc.id}`, { method: "DELETE" }).catch(() => null)
+    const task = await meiliRequest<MeiliTask>(`/indexes/${getIndexUid()}/documents/${doc.id}`, { method: "DELETE" }).catch(() => null)
     return { enabled: true, indexed: false, task_uid: task?.taskUid }
   }
-  const task = await meiliRequest(`/indexes/${getIndexUid()}/documents`, {
+  const task = await meiliRequest<MeiliTask>(`/indexes/${getIndexUid()}/documents`, {
     method: "POST",
     body: JSON.stringify([doc]),
   })
@@ -233,7 +237,7 @@ export async function upsertProductDocument(product: ProductRecord) {
 export async function removeProductDocument(productId: string) {
   const ensured = await ensureProductIndex().catch(() => false)
   if (!ensured) return { enabled: false }
-  const task = await meiliRequest(`/indexes/${getIndexUid()}/documents/${productId}`, { method: "DELETE" }).catch(() => null)
+  const task = await meiliRequest<MeiliTask>(`/indexes/${getIndexUid()}/documents/${productId}`, { method: "DELETE" }).catch(() => null)
   return { enabled: true, task_uid: task?.taskUid }
 }
 
@@ -243,7 +247,7 @@ export async function searchProducts(query: string, options: ProductSearchOption
   const filters = [`status = "published"`]
   if (category) filters.push(`categories.id = "${escapeFilterValue(category)}"`)
   if (priceRange) filters.push(`price_range = "${escapeFilterValue(priceRange)}"`)
-  return meiliRequest(`/indexes/${getIndexUid()}/search`, {
+  return meiliRequest<{ hits: ReturnType<typeof buildProductDocument>[]; estimatedTotalHits?: number }>(`/indexes/${getIndexUid()}/search`, {
     method: "POST",
     body: JSON.stringify({
       q: query || "",
@@ -257,7 +261,7 @@ export async function searchProducts(query: string, options: ProductSearchOption
 
 export async function getSearchStatus() {
   if (!getHost()) return { configured: false, enabled: false, online: false, indexed_documents: 0 }
-  const stats = await meiliRequest(`/indexes/${getIndexUid()}/stats`).catch(() => null)
+  const stats = await meiliRequest<MeiliStats>(`/indexes/${getIndexUid()}/stats`).catch(() => null)
   if (!stats) {
     return {
       configured: true,
@@ -280,9 +284,9 @@ export async function getSearchStatus() {
 
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils"
 
-export async function listProductsForSearch(scope: any) {
+export async function listProductsForSearch(scope: ServiceScope): Promise<ProductRecord[]> {
   const query = scope.resolve(ContainerRegistrationKeys.QUERY)
-  const products: any[] = []
+  const products: ProductRecord[] = []
   const take = 200
   let skip = 0
 
@@ -313,7 +317,7 @@ export async function listProductsForSearch(scope: any) {
       ],
       pagination: { skip, take },
     })
-    products.push(...(page || []))
+    products.push(...((page || []) as ProductRecord[]))
     if (!page || page.length < take) break
     skip += take
   }
@@ -321,7 +325,7 @@ export async function listProductsForSearch(scope: any) {
   return products
 }
 
-export async function findFallbackProducts(scope: any, query: string, options: ProductSearchOptions = {}) {
+export async function findFallbackProducts(scope: ServiceScope, query: string, options: ProductSearchOptions = {}) {
   const normalized = normalize(query)
   const { category, priceRange, sort = "created_at:desc", limit = 12, offset = 0 } = options
   const products = await listProductsForSearch(scope)

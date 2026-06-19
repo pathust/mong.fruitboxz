@@ -1,13 +1,11 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+import type { RolePermissionsBody } from "../../../../middlewares/validation"
+import { resolveRbacService } from "../../../../../lib/module-services"
 
-export async function POST(req: MedusaRequest, res: MedusaResponse) {
-  const rbacService = req.scope.resolve("rbac") as any
+export async function POST(req: MedusaRequest<RolePermissionsBody>, res: MedusaResponse) {
+  const rbacService = resolveRbacService(req.scope)
   const { id } = req.params
-  const { permission_ids } = req.body as { permission_ids: string[] }
-
-  if (!Array.isArray(permission_ids)) {
-    return res.status(400).json({ error: "permission_ids must be an array" })
-  }
+  const { permission_ids } = req.validatedBody
 
   const nextPerms = [...new Set(permission_ids)]
   await rbacService.updateRoles({ id, permissions: nextPerms })

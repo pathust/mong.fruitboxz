@@ -1,5 +1,5 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
-import { CACHE_KEYS, TTL, resolveCache } from "../../../../../lib/cache"
+import { CACHE_KEYS, TTL, resolveCache } from "../../../../lib/cache"
 import type { UpdateSessionCartSchema } from "./middlewares"
 
 const EMPTY_CART = { items: [], count: 0 }

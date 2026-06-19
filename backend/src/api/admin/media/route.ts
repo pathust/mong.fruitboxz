@@ -1,9 +1,10 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { isObjectStorageEnabled, listMediaObjects } from "../../../lib/media"
+import type { MediaListQuery } from "../../middlewares/validation"
 
-export async function GET(req: MedusaRequest, res: MedusaResponse) {
+export async function GET(req: MedusaRequest<unknown, MediaListQuery>, res: MedusaResponse) {
   try {
-    const query = (req.query?.q || "").toString().trim().toLowerCase()
+    const query = (req.validatedQuery.q || "").toLowerCase()
     const images = await listMediaObjects()
     const filtered = query
       ? images.filter((item) => item.filename.toLowerCase().includes(query))

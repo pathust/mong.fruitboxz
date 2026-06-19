@@ -5,6 +5,7 @@ import * as path from "path"
 
 const LOCAL_IMAGES_DIR = path.resolve(process.cwd(), "..", "frontend", "public", "images")
 const ALLOWED = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".avif", ".svg"]
+const UPLOAD_ALLOWED = ALLOWED.filter((extension) => extension !== ".svg")
 
 function getMinioClient() {
   const endpoint = process.env.MINIO_ENDPOINT
@@ -55,6 +56,10 @@ function isAllowedExtension(ext: string) {
   return ALLOWED.includes(ext.toLowerCase())
 }
 
+function isSafeObjectKey(objectKey: string) {
+  return Boolean(objectKey) && path.basename(objectKey) === objectKey && !objectKey.includes("\0")
+}
+
 function getContentType(filename: string) {
   const ext = path.extname(filename).toLowerCase()
   const contentTypeMap: Record<string, string> = {
@@ -76,8 +81,8 @@ function parseBase64Payload(data: string) {
 
 export async function uploadMediaObject({ filename, data }: { filename?: string; data: string }) {
   const ext = filename ? path.extname(filename).toLowerCase() : ".png"
-  if (!isAllowedExtension(ext)) {
-    throw new Error(`File type not allowed. Use: ${ALLOWED.join(", ")}`)
+  if (!UPLOAD_ALLOWED.includes(ext)) {
+    throw new Error(`File type not allowed. Use: ${UPLOAD_ALLOWED.join(", ")}`)
   }
 
   const objectKey = `${randomUUID()}${ext}`
@@ -117,7 +122,7 @@ export async function uploadMediaObject({ filename, data }: { filename?: string;
 }
 
 export async function importLocalMediaObject(filename: string) {
-  if (!filename || !isAllowedExtension(path.extname(filename))) {
+  if (!isSafeObjectKey(filename) || !isAllowedExtension(path.extname(filename))) {
     throw new Error("Invalid local media object")
   }
 
@@ -196,7 +201,7 @@ export async function listMediaObjects() {
 }
 
 export async function getMediaObject(objectKey: string) {
-  if (!objectKey || !isAllowedExtension(path.extname(objectKey))) {
+  if (!isSafeObjectKey(objectKey) || !isAllowedExtension(path.extname(objectKey))) {
     throw new Error("Invalid media object")
   }
 
@@ -226,6 +231,10 @@ export async function getMediaObject(objectKey: string) {
 }
 
 export async function deleteMediaObject(objectKey: string) {
+  if (!isSafeObjectKey(objectKey) || !isAllowedExtension(path.extname(objectKey))) {
+    throw new Error("Invalid media object")
+  }
+
   const client = getMinioClient()
   if (client) {
     await ensureBucket(client)

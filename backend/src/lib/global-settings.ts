@@ -1,11 +1,21 @@
-export async function getGlobalSettings(siteService: any) {
+import type SiteModuleService from "../modules/site/service"
+
+export type GlobalSettings = Record<string, unknown>
+
+export async function getGlobalSettings(siteService: SiteModuleService): Promise<GlobalSettings> {
   const [rows] = await siteService.listAndCountSiteSettings({ key: "global" })
-  return rows?.[0]?.value || {}
+  const value = rows?.[0]?.value
+  return value && typeof value === "object" ? value as GlobalSettings : {}
 }
 
-export async function updateGlobalSettings(siteService: any, updates: Record<string, any>) {
+export async function updateGlobalSettings(
+  siteService: SiteModuleService,
+  updates: GlobalSettings
+): Promise<GlobalSettings> {
   const [rows] = await siteService.listAndCountSiteSettings({ key: "global" })
-  const existing = rows?.[0]?.value || {}
+  const existing = rows?.[0]?.value && typeof rows[0].value === "object"
+    ? rows[0].value as GlobalSettings
+    : {}
   const merged = {
     ...existing,
     ...updates,

@@ -10,7 +10,7 @@ export type PromotionMetadata = {
 const promotionMetadataKey = (promotionId: string) => `promotion:${promotionId}:metadata`
 
 export async function getPromotionMetadata(
-  siteService: any,
+  siteService: SiteModuleService,
   promotionId: string
 ): Promise<PromotionMetadata> {
   const [rows] = await siteService.listAndCountSiteSettings({
@@ -20,7 +20,7 @@ export async function getPromotionMetadata(
 }
 
 export async function updatePromotionMetadata(
-  siteService: any,
+  siteService: SiteModuleService,
   promotionId: string,
   metadata: PromotionMetadata
 ): Promise<PromotionMetadata> {
@@ -35,3 +35,4 @@ export async function updatePromotionMetadata(
 
   return metadata
 }
+import type SiteModuleService from "../modules/site/service"

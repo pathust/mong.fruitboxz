@@ -1,54 +1,37 @@
-import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+import { AuthenticatedMedusaRequest, MedusaResponse, MedusaStoreRequest } from "@medusajs/framework/http"
 import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
-import { z } from "zod"
 import { resolveShippingQuote } from "../../../lib/geocoding"
 import { getGlobalSettings } from "../../../lib/global-settings"
 import { getPromotionMetadata } from "../../../lib/promotion-metadata"
+import type { CheckoutBody } from "../../middlewares/validation"
+import { resolveSiteService } from "../../../lib/module-services"
+import { sendInternalError } from "../../../lib/api-error"
 
-const CheckoutSchema = z.object({
-  items: z.array(z.object({
-    variant_id: z.string().min(1, "Thiếu variant_id"),
-    quantity: z.number().min(1, "Số lượng phải lớn hơn 0").default(1),
-    product_id: z.string().optional(),
-    title: z.string().optional(),
-    variantLabel: z.string().optional(),
-    image: z.string().optional(),
-    frontend_item_id: z.string().optional(),
-    id: z.string().optional(),
-  })).min(1, "Giỏ hàng trống"),
-  shipping: z.object({
-    name: z.string().min(1, "Thiếu tên người nhận"),
-    phone: z.string()
-      .min(9, "Số điện thoại quá ngắn")
-      .max(13, "Số điện thoại quá dài")
-      .regex(
-        /^(\+84|84|0)(3[2-9]|5[25689]|7[06-9]|8[0-9]|9[0-9])[0-9]{7}$|^(\+84|84|0)[0-9]{9,10}$/,
-        "Số điện thoại không hợp lệ (vd: 0912345678)"
-      ),
-    address: z.string().min(5, "Địa chỉ quá ngắn"),
-    city: z.string().optional(),
-    district: z.string().optional(),
-    email: z.string().email("Email không hợp lệ").optional(),
-    note: z.string().optional(),
-    lat: z.number().optional(),
-    lng: z.number().optional(),
-  }),
-  idempotency_key: z.string().optional(),
-  promotion_code: z.string().optional(),
-})
+type ProductVariantRecord = {
+  id: string
+  title?: string | null
+  prices?: Array<{ amount?: number | null; currency_code?: string | null }>
+  product?: { title?: string | null }
+  metadata?: Record<string, unknown> | null
+}
 
-function getCustomerId(req: MedusaRequest): string | undefined {
-  const authHeader = req.headers.authorization || req.headers["authorization"] || ""
-  if (authHeader.startsWith("Bearer ")) {
-    try {
-      const token = authHeader.slice(7)
-      const payload = JSON.parse(Buffer.from(token.split(".")[1], "base64").toString())
-      if (payload.actor_type === "customer") {
-        return payload.actor_id
-      }
-    } catch {}
-  }
-  return undefined
+type NormalizedOrderItem = {
+  title: string
+  quantity: number
+  unit_price: number
+  product_title: string
+  metadata: Record<string, unknown>
+}
+
+type PromotionRecord = {
+  id: string
+  code?: string | null
+  application_method?: { type?: string | null; value?: number | string | null } | null
+  campaign?: {
+    starts_at?: string | Date | null
+    ends_at?: string | Date | null
+    budget?: { limit?: number | string | null } | null
+  } | null
 }
 
 function generateOrderCode(order: { id?: string; created_at?: string | Date }) {
@@ -65,23 +48,14 @@ function generateOrderCode(order: { id?: string; created_at?: string | Date }) {
   return `MONG-${datePart}-${suffix}`
 }
 
-export async function POST(req: MedusaRequest, res: MedusaResponse) {
-  // 1. Zod Validation
-  const parsed = CheckoutSchema.safeParse(req.body)
-  if (!parsed.success) {
-    return res.status(400).json({
-      message: "Dữ liệu đầu vào không hợp lệ",
-      errors: parsed.error.format()
-    })
-  }
-
-  const { items, shipping, idempotency_key, promotion_code } = parsed.data
+export async function POST(req: MedusaStoreRequest<CheckoutBody>, res: MedusaResponse) {
+  const { items, shipping, idempotency_key, promotion_code } = req.validatedBody
 
   const orderModuleService = req.scope.resolve(Modules.ORDER)
   const storeModuleService = req.scope.resolve(Modules.STORE)
   const regionModuleService = req.scope.resolve(Modules.REGION)
   const query = req.scope.resolve(ContainerRegistrationKeys.QUERY)
-  const siteService = req.scope.resolve("site") as any
+  const siteService = resolveSiteService(req.scope)
   const settings = await getGlobalSettings(siteService)
 
   // Idempotency Check (Basic check via Medusa metadata to prevent double-clicks if key provided)
@@ -109,7 +83,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
   const first_name = names[0] || ""
   const last_name = names.slice(1).join(" ") || first_name
 
-  const normalizedItems: any[] = []
+  const normalizedItems: NormalizedOrderItem[] = []
 
   for (const item of items) {
     // 2. Strict Pricing Strategy
@@ -124,15 +98,14 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
         fields: ["id", "title", "prices.*", "product.title", "metadata", "manage_inventory", "inventory_quantity"],
         filters: { id: item.variant_id }
       })
-      const variant = data?.[0] as any
+      const variant = data?.[0] as ProductVariantRecord | undefined
       if (!variant) {
         return res.status(400).json({ message: `Không tìm thấy sản phẩm hoặc biến thể bị xóa (ID: ${item.variant_id})` })
       }
 
       // Check prices array
-      const vndPrice = (variant.prices || []).find((p: any) =>
-        p.currency_code?.toLowerCase() === "vnd" ||
-        p.currency_code?.toLowerCase() === "eur"
+      const vndPrice = (variant.prices || []).find((price) =>
+        price.currency_code?.toLowerCase() === "vnd"
       )
       const amount = vndPrice?.amount;
 
@@ -148,8 +121,8 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
       if (variant.metadata?.cost_price) {
         costPrice = Number(variant.metadata.cost_price)
       }
-    } catch (err: any) {
-      return res.status(500).json({ message: `Lỗi hệ thống khi truy vấn giá sản phẩm: ${err.message}` })
+    } catch (error: unknown) {
+      return sendInternalError(req, res, error, "Không thể xác minh giá sản phẩm", "PRODUCT_PRICE_LOOKUP_FAILED")
     }
 
     normalizedItems.push({
@@ -190,7 +163,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
       }, { relations: ["application_method", "campaign", "campaign.budget"], take: 1 })
 
       if (promotions && promotions.length > 0) {
-        const promo = promotions[0] as any
+        const promo = promotions[0] as PromotionRecord
         const promotionMetadata = await getPromotionMetadata(siteService, promo.id)
         const startsAt = promotionMetadata.starts_at || promo.campaign?.starts_at
         const endsAt = promotionMetadata.ends_at || promo.campaign?.ends_at
@@ -217,8 +190,8 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
             if (usedCount >= usageLimit) {
               isValid = false
             }
-          } catch (e) {
-            console.error(e)
+          } catch (error: unknown) {
+            return sendInternalError(req, res, error, "Không thể xác minh lượt sử dụng mã giảm giá", "PROMOTION_USAGE_CHECK_FAILED")
           }
         }
 
@@ -247,8 +220,8 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
           appliedPromotionCode = promo.code
         }
       }
-    } catch (e) {
-      console.error("Lỗi khi áp dụng mã giảm giá", e)
+    } catch (error: unknown) {
+      return sendInternalError(req, res, error, "Không thể áp dụng mã giảm giá", "PROMOTION_APPLY_FAILED")
     }
   }
 
@@ -279,7 +252,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
     currency_code: "vnd",
     region_id: region?.id || undefined,
     sales_channel_id: store?.default_sales_channel_id || undefined,
-    customer_id: getCustomerId(req),
+    customer_id: req.auth_context?.actor_id,
     shipping_address: {
       first_name,
       last_name,
@@ -305,11 +278,11 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
       original_subtotal: originalSubtotal
     },
   })
-  const orderCode = generateOrderCode(order as any)
+  const orderCode = generateOrderCode(order)
   let responseOrder = order
 
   try {
-    const updated = await (orderModuleService as any).updateOrders([{
+    const updated = await orderModuleService.updateOrders([{
       id: order.id,
       metadata: {
         ...(order.metadata || {}),
@@ -317,11 +290,15 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
       },
     }])
     responseOrder = Array.isArray(updated) ? updated[0] : updated
-  } catch (err) {
-    console.error("Failed to persist order code", err)
-    ;(responseOrder as any).metadata = {
-      ...((responseOrder as any).metadata || {}),
+  } catch (error: unknown) {
+    const logger = req.scope.resolve<{ error(message: string, error?: unknown): void }>("logger")
+    logger.error("Failed to persist order code", error)
+    responseOrder = {
+      ...responseOrder,
+      metadata: {
+      ...(responseOrder.metadata || {}),
       order_code: orderCode,
+      },
     }
   }
 
@@ -331,14 +308,10 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
   res.json({ order: responseOrder, summary: { original_subtotal: originalSubtotal, subtotal, discount: discountAmount, shipping: shippingFee, total } })
 }
 
-export async function GET(req: MedusaRequest, res: MedusaResponse) {
+export async function GET(req: AuthenticatedMedusaRequest, res: MedusaResponse) {
   const orderModuleService = req.scope.resolve(Modules.ORDER)
 
-  const customer_id = getCustomerId(req)
-  const filters: Record<string, any> = {}
-  if (customer_id) {
-    filters.customer_id = customer_id
-  }
+  const filters = { customer_id: req.auth_context.actor_id }
 
   const orders = await orderModuleService.listOrders(filters, {
     relations: ["items", "shipping_address"],

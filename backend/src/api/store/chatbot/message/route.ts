@@ -4,6 +4,7 @@ import { getGlobalSettings } from "../../../../lib/global-settings"
 import { normalizeAddress } from "../../../../lib/geocoding"
 import { consumeRateLimit } from "../../../../lib/redis"
 import type { ChatbotMessageSchema } from "./middlewares"
+import { resolveSiteService } from "../../../../lib/module-services"
 
 export async function POST(req: MedusaRequest<ChatbotMessageSchema>, res: MedusaResponse) {
   const limit = Number(process.env.CHATBOT_RATE_LIMIT || 20)
@@ -22,7 +23,7 @@ export async function POST(req: MedusaRequest<ChatbotMessageSchema>, res: Medusa
     })
   }
 
-  const siteService = req.scope.resolve("site") as any
+  const siteService = resolveSiteService(req.scope)
   const settings = await getGlobalSettings(siteService)
   const { message } = req.validatedBody
 

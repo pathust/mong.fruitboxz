@@ -1,54 +1,62 @@
 import { defineWidgetConfig } from "@medusajs/admin-sdk"
-import { Container, Heading, Text, Input, Button, Label, toast } from "@medusajs/ui"
+import { Button, Container, Heading, Input, Label, Text, toast } from "@medusajs/ui"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { useEffect, useState } from "react"
+import { sdk } from "../lib/sdk"
 
-const PromotionMetadataWidget = ({ data }: any) => {
-  const [minOrderValue, setMinOrderValue] = useState(data?.metadata?.min_order_value || "")
-  const [maxDiscount, setMaxDiscount] = useState(data?.metadata?.max_discount || "")
-  const [isLoading, setIsLoading] = useState(false)
+type PromotionMetadata = {
+  min_order_value?: number | null
+  max_discount?: number | null
+  [key: string]: unknown
+}
+
+type Promotion = {
+  id: string
+  metadata?: Record<string, unknown> | null
+}
+
+type ApiEnvelope<T> = {
+  data: T
+  error: null
+  meta: Record<string, unknown> | null
+}
+
+const PromotionMetadataWidget = ({ data }: { data: Promotion }) => {
+  const [minOrderValue, setMinOrderValue] = useState("")
+  const [maxDiscount, setMaxDiscount] = useState("")
+  const metadataQuery = useQuery({
+    queryKey: ["promotion-metadata", data.id],
+    queryFn: () => sdk.client.fetch<ApiEnvelope<{ metadata: PromotionMetadata }>>(
+      `/admin/promotions/${data.id}/metadata`
+    ),
+  })
 
   useEffect(() => {
-    fetch(`/admin/promotions/${data.id}/metadata`)
-      .then((res) => res.ok ? res.json() : Promise.reject(new Error("Failed to load metadata")))
-      .then((result) => {
-        setMinOrderValue(result.metadata?.min_order_value || "")
-        setMaxDiscount(result.metadata?.max_discount || "")
-      })
-      .catch((error) => console.error(error))
-  }, [data.id])
+    const metadata = metadataQuery.data?.data.metadata
+    if (!metadata) return
+    setMinOrderValue(metadata.min_order_value ? String(metadata.min_order_value) : "")
+    setMaxDiscount(metadata.max_discount ? String(metadata.max_discount) : "")
+  }, [metadataQuery.data])
 
-  const handleSave = async () => {
-    setIsLoading(true)
-    try {
-      const res = await fetch(`/admin/promotions/${data.id}/metadata`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          metadata: {
-            ...data.metadata,
-            min_order_value: minOrderValue ? Number(minOrderValue) : null,
-            max_discount: maxDiscount ? Number(maxDiscount) : null
-          }
-        })
-      })
+  const saveMutation = useMutation({
+    mutationFn: (metadata: PromotionMetadata) => sdk.client.fetch(
+      `/admin/promotions/${data.id}/metadata`,
+      { method: "POST", body: { metadata } }
+    ),
+    onSuccess: () => toast.success("Lưu thành công", {
+      description: "Đã cập nhật cấu hình nâng cao cho mã giảm giá.",
+    }),
+    onError: () => toast.error("Lỗi", {
+      description: "Không thể lưu thay đổi, vui lòng thử lại.",
+    }),
+  })
 
-      if (!res.ok) {
-        throw new Error("Failed to update metadata")
-      }
-
-      toast.success("Lưu thành công", {
-        description: "Đã cập nhật cấu hình nâng cao cho mã giảm giá."
-      })
-    } catch (error) {
-      console.error(error)
-      toast.error("Lỗi", {
-        description: "Không thể lưu thay đổi, vui lòng thử lại."
-      })
-    } finally {
-      setIsLoading(false)
-    }
+  const handleSave = () => {
+    saveMutation.mutate({
+      ...(data.metadata || {}),
+      min_order_value: minOrderValue ? Number(minOrderValue) : null,
+      max_discount: maxDiscount ? Number(maxDiscount) : null,
+    })
   }
 
   return (
@@ -62,9 +70,9 @@ const PromotionMetadataWidget = ({ data }: any) => {
           <Input
             id="min_order_value"
             type="number"
-            placeholder="Ví dụ: 200000"
+            min="0"
             value={minOrderValue}
-            onChange={(e) => setMinOrderValue(e.target.value)}
+            onChange={(event) => setMinOrderValue(event.target.value)}
           />
           <Text className="text-ui-fg-subtle text-xs">Mã chỉ áp dụng khi tổng giá trị đơn hàng đạt mức này.</Text>
         </div>
@@ -74,15 +82,23 @@ const PromotionMetadataWidget = ({ data }: any) => {
           <Input
             id="max_discount"
             type="number"
-            placeholder="Ví dụ: 50000"
+            min="0"
             value={maxDiscount}
-            onChange={(e) => setMaxDiscount(e.target.value)}
+            onChange={(event) => setMaxDiscount(event.target.value)}
           />
-          <Text className="text-ui-fg-subtle text-xs">Chỉ áp dụng nếu đây là mã giảm theo Phần trăm (%). Số tiền giảm sẽ không vượt quá giới hạn này.</Text>
+          <Text className="text-ui-fg-subtle text-xs">Áp dụng cho mã giảm theo phần trăm.</Text>
         </div>
 
+        {metadataQuery.isError && (
+          <Text className="text-ui-fg-error text-sm">Không tải được cấu hình hiện tại.</Text>
+        )}
+
         <div className="flex justify-end mt-4">
-          <Button variant="secondary" onClick={handleSave} isLoading={isLoading}>
+          <Button
+            variant="secondary"
+            onClick={handleSave}
+            isLoading={metadataQuery.isLoading || saveMutation.isPending}
+          >
             Lưu thay đổi
           </Button>
         </div>
@@ -91,8 +107,6 @@ const PromotionMetadataWidget = ({ data }: any) => {
   )
 }
 
-export const config = defineWidgetConfig({
-  zone: "promotion.details.after",
-})
+export const config = defineWidgetConfig({ zone: "promotion.details.after" })
 
 export default PromotionMetadataWidget

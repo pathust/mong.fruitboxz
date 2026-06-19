@@ -1,32 +1,30 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+import type { BlogCategoryBody } from "../../middlewares/validation"
+import { resolveSiteService } from "../../../lib/module-services"
+import { sendInternalError } from "../../../lib/api-error"
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   try {
-    const siteService = req.scope.resolve("site") as any
+    const siteService = resolveSiteService(req.scope)
     const [blog_categories] = await siteService.listAndCountBlogCategories({})
     res.json({
       blog_categories: (blog_categories || []).sort((a, b) =>
         String(a?.name || "").localeCompare(String(b?.name || ""))
       ),
     })
-  } catch (error: any) {
-    res.status(500).json({ message: error.message || "An error occurred while fetching blog categories" })
+  } catch (error: unknown) {
+    sendInternalError(req, res, error, "Unable to fetch blog categories", "BLOG_CATEGORY_LIST_FAILED")
   }
 }
 
-export async function POST(req: MedusaRequest, res: MedusaResponse) {
+export async function POST(req: MedusaRequest<BlogCategoryBody>, res: MedusaResponse) {
   try {
-    const siteService = req.scope.resolve("site") as any
-    const payload = req.body as any
-
-    if (!payload.name || !payload.slug) {
-      return res.status(400).json({ message: "Name and slug are required" })
-    }
+    const siteService = resolveSiteService(req.scope)
+    const payload = req.validatedBody
 
     const blog_category = await siteService.createBlogCategories(payload)
     res.status(201).json({ blog_category })
-  } catch (error: any) {
-    console.error("CREATE_CATEGORY_ERROR:", error)
-    res.status(500).json({ message: error.message || "An error occurred while creating blog category" })
+  } catch (error: unknown) {
+    sendInternalError(req, res, error, "Unable to create blog category", "BLOG_CATEGORY_CREATE_FAILED")
   }
 }

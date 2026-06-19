@@ -1,5 +1,12 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { getMediaObject } from "../../../lib/media"
+import { sendInternalError } from "../../../lib/api-error"
+
+type PipeableBody = { pipe(destination: MedusaResponse): unknown }
+
+function isPipeable(body: unknown): body is PipeableBody {
+  return Boolean(body) && typeof body === "object" && "pipe" in body && typeof body.pipe === "function"
+}
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   try {
@@ -12,13 +19,13 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
     }
     res.setHeader("Cache-Control", "public, max-age=31536000, immutable")
 
-    const body = media.body as any
-    if (body?.pipe) {
+    const body: unknown = media.body
+    if (isPipeable(body)) {
       return body.pipe(res)
     }
 
     return res.send(body)
-  } catch (err: any) {
-    res.status(404).json({ message: err?.message || "Media not found" })
+  } catch (error: unknown) {
+    return sendInternalError(req, res, error, "Media not found", "MEDIA_NOT_FOUND", 404)
   }
 }

@@ -1,4 +1,19 @@
 import { findFallbackProducts, searchProducts } from "./search"
+import type { ServiceScope } from "./module-services"
+
+type Faq = {
+  question: string
+  answer: string
+  keywords?: string[]
+}
+
+type ProductSuggestionSource = {
+  id: string
+  slug: string
+  title: string
+  thumbnail: string
+  price_min: number
+}
 
 const DEFAULT_FAQS = [
   {
@@ -31,12 +46,18 @@ function normalize(raw?: string) {
     .trim()
 }
 
-function getFaqs(settings: Record<string, any>) {
-  const faqs = Array.isArray(settings.chatbot_faqs) ? settings.chatbot_faqs : []
+function isFaq(value: unknown): value is Faq {
+  if (!value || typeof value !== "object") return false
+  const faq = value as Record<string, unknown>
+  return typeof faq.question === "string" && typeof faq.answer === "string"
+}
+
+function getFaqs(settings: Record<string, unknown>) {
+  const faqs = Array.isArray(settings.chatbot_faqs) ? settings.chatbot_faqs.filter(isFaq) : []
   return [...faqs, ...DEFAULT_FAQS].filter((item) => item?.question && item?.answer)
 }
 
-function scoreFaqMatch(message: string, faq: any) {
+function scoreFaqMatch(message: string, faq: Faq) {
   const normalizedMessage = normalize(message)
   const normalizedQuestion = normalize(faq.question)
   if (!normalizedMessage || !normalizedQuestion) return 0
@@ -47,7 +68,7 @@ function scoreFaqMatch(message: string, faq: any) {
   return 0
 }
 
-function mapHitToSuggestion(hit: any) {
+function mapHitToSuggestion(hit: ProductSuggestionSource) {
   return {
     id: hit.id,
     slug: hit.slug,
@@ -63,8 +84,8 @@ export async function buildChatbotReply({
   settings,
 }: {
   message: string
-  scope: any
-  settings: Record<string, any>
+  scope: ServiceScope
+  settings: Record<string, unknown>
 }) {
   const trimmed = (message || "").trim()
   if (!trimmed) {
@@ -108,7 +129,7 @@ export async function buildChatbotReply({
     }
   }
 
-  const phone = settings.phone || "0945.204.432"
+  const phone = typeof settings.phone === "string" ? settings.phone : "0945.204.432"
   return {
     mode: "fallback",
     answer: `Mình chưa chắc câu trả lời này từ dữ liệu hiện có. Bạn có thể gọi hotline ${phone} hoặc để lại câu hỏi cụ thể hơn về sản phẩm, giao hàng, hay hộp quà.`,
