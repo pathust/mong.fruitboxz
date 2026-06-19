@@ -71,7 +71,7 @@ const updateStoreCurrencies = createWorkflow(
   }
 );
 
-const dataDir = path.resolve(process.cwd(), "../frontend/src/data");
+const dataDir = path.resolve(process.cwd(), "../storefront/src/data");
 let categories: any[] = [];
 let products: any[] = [];
 
@@ -145,7 +145,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
     })
     region = result.result[0]
     logger.info("  Created region: Europe")
-  } catch (e: any) {
+  } catch (e: unknown) {
     logger.info(`  Region already exists, skipping`)
     const { data: regions } = await query.graph({ entity: "region", fields: ["id"] })
     region = { id: regions[0].id }
@@ -159,7 +159,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
         provider_id: "tp_system",
       })),
     });
-  } catch (e: any) {
+  } catch (e: unknown) {
     logger.info("  Tax regions already exist, skipping");
   }
 
@@ -175,7 +175,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
       },
     });
     stockLocation = stockLocationResult[0];
-  } catch (e: any) {
+  } catch (e: unknown) {
     logger.info("  Stock location already exists, skipping");
     const { data: locations } = await query.graph({ entity: "stock_location", fields: ["id"] })
     stockLocation = locations[0]
@@ -206,14 +206,21 @@ export default async function seedDemoData({ container }: ExecArgs) {
     shippingProfile = shippingProfileResult[0];
   }
 
-  const fulfillmentSet = await fulfillmentModuleService.createFulfillmentSets({
-    name: "European Warehouse delivery",
-    type: "shipping",
-    service_zones: [{
-      name: "Europe",
-      geo_zones: countries.map(code => ({ country_code: code, type: "country" as const })),
-    }],
-  });
+  let fulfillmentSet;
+  try {
+    fulfillmentSet = await fulfillmentModuleService.createFulfillmentSets({
+      name: "European Warehouse delivery",
+      type: "shipping",
+      service_zones: [{
+        name: "Europe",
+        geo_zones: countries.map(code => ({ country_code: code, type: "country" as const })),
+      }],
+    });
+  } catch (e) {
+    logger.info("  Fulfillment set already exists, skipping");
+    const sets = await fulfillmentModuleService.listFulfillmentSets({ name: "European Warehouse delivery" });
+    fulfillmentSet = sets[0];
+  }
 
   await link.create({
     [Modules.STOCK_LOCATION]: { stock_location_id: stockLocation.id },
@@ -347,8 +354,8 @@ function slugify(str: string) {
         30000,
         "createProductsWorkflow chunk timeout"
       );
-    } catch (e: any) {
-      logger.error(`Failed to create products chunk: ${e.message}`);
+    } catch (e: unknown) {
+      logger.error(`Failed to create products chunk: ${e instanceof Error ? e.message : String(e)}`);
     }
   }
 
@@ -447,8 +454,8 @@ function slugify(str: string) {
       authResult = await authModuleService.register("emailpass", {
         body: { email, password },
       })
-    } catch (err: any) {
-      logger.warn(`  Auth registration for ${email}: ${err.message}`)
+    } catch (err: unknown) {
+      logger.warn(`  Auth registration for ${email}: ${err instanceof Error ? err.message : String(err)}`)
     }
 
     // Assign role via metadata

@@ -71,5 +71,11 @@ module.exports = defineConfig({
     {
       resolve: "./src/modules/site",
     },
+    {
+      resolve: "./src/modules/bulk_orders",
+    },
+    {
+      resolve: "./src/modules/voting",
+    },
   ],
 })

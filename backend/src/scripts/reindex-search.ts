@@ -11,7 +11,8 @@ export default async function reindexSearch({ container }: ExecArgs) {
     search_last_reindex_count: result.indexed,
   })
 
-  console.log(JSON.stringify({
+  const logger = container.resolve("logger") as any
+  logger.info(JSON.stringify({
     indexed: result.indexed,
     enabled: result.enabled,
     last_reindex_at: settings.search_last_reindex_at,

@@ -85,44 +85,52 @@ export async function POST(req: MedusaStoreRequest<CheckoutBody>, res: MedusaRes
 
   const normalizedItems: NormalizedOrderItem[] = []
 
+  // 2. Strict Pricing Strategy (Optimized: Batch Query Variants)
+  const variantIds = items.map((item) => item.variant_id)
+  const variantsMap: Record<string, ProductVariantRecord> = {}
+
+  try {
+    const { data } = await query.graph({
+      entity: "product_variant",
+      fields: ["id", "title", "prices.*", "product.title", "metadata", "manage_inventory", "inventory_quantity"],
+      filters: { id: variantIds }
+    })
+    
+    for (const v of (data as ProductVariantRecord[] || [])) {
+      variantsMap[v.id] = v
+    }
+  } catch (error: unknown) {
+    return sendInternalError(req, res, error, "Không thể xác minh danh sách sản phẩm", "PRODUCT_BATCH_LOOKUP_FAILED")
+  }
+
   for (const item of items) {
-    // 2. Strict Pricing Strategy
     let unitPrice = 0
     let variantTitle = item.variantLabel || null
     let productTitle = item.title || "Sản phẩm"
     let costPrice: number | null = null
 
-    try {
-      const { data } = await query.graph({
-        entity: "product_variant",
-        fields: ["id", "title", "prices.*", "product.title", "metadata", "manage_inventory", "inventory_quantity"],
-        filters: { id: item.variant_id }
-      })
-      const variant = data?.[0] as ProductVariantRecord | undefined
-      if (!variant) {
-        return res.status(400).json({ message: `Không tìm thấy sản phẩm hoặc biến thể bị xóa (ID: ${item.variant_id})` })
-      }
+    const variant = variantsMap[item.variant_id]
+    if (!variant) {
+      return res.status(400).json({ message: `Không tìm thấy sản phẩm hoặc biến thể bị xóa (ID: ${item.variant_id})` })
+    }
 
-      // Check prices array
-      const vndPrice = (variant.prices || []).find((price) =>
-        price.currency_code?.toLowerCase() === "vnd"
-      )
-      const amount = vndPrice?.amount;
+    // Check prices array
+    const vndPrice = (variant.prices || []).find((price) =>
+      price.currency_code?.toLowerCase() === "vnd"
+    )
+    const amount = vndPrice?.amount;
 
-      if (amount == null) {
-        return res.status(400).json({ message: `Sản phẩm ${variant.title || productTitle} chưa được cấu hình giá` })
-      }
+    if (amount == null) {
+      return res.status(400).json({ message: `Sản phẩm ${variant.title || productTitle} chưa được cấu hình giá` })
+    }
 
-      unitPrice = Number(amount)
-      variantTitle = variant.title || variantTitle
-      productTitle = variant.product?.title || productTitle
+    unitPrice = Number(amount)
+    variantTitle = variant.title || variantTitle
+    productTitle = variant.product?.title || productTitle
 
-      // --- Inventory check đã bị loại bỏ vì hiện tại sử dụng cơ chế BOM ---
-      if (variant.metadata?.cost_price) {
-        costPrice = Number(variant.metadata.cost_price)
-      }
-    } catch (error: unknown) {
-      return sendInternalError(req, res, error, "Không thể xác minh giá sản phẩm", "PRODUCT_PRICE_LOOKUP_FAILED")
+    // --- Inventory check đã bị loại bỏ vì hiện tại sử dụng cơ chế BOM ---
+    if (variant.metadata?.cost_price) {
+      costPrice = Number(variant.metadata.cost_price)
     }
 
     normalizedItems.push({

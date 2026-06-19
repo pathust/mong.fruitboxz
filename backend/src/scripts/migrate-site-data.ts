@@ -32,16 +32,16 @@ export default async function migrateSiteData({ container }: ExecArgs) {
 
   const [existingBanners] = await siteService.listAndCountBanners({})
   if (!existingBanners?.length) {
-    const banners = readJson<any[]>(bannersFile, [])
+    const banners = readJson<Record<string, unknown>[]>(bannersFile, [])
     if (banners.length > 0) {
       await siteService.createBanners(
         banners.map((b, idx) => ({
-          title: b.title || "",
-          subtitle: b.subtitle || "",
-          image: b.image || "",
-          link: b.link || "",
+          title: String(b.title || ""),
+          subtitle: String(b.subtitle || ""),
+          image: String(b.image || ""),
+          link: String(b.link || ""),
           order: Number(b.order ?? idx),
-          active: b.active ?? true,
+          active: Boolean(b.active ?? true),
         }))
       )
       logger.info(`Migrated ${banners.length} banners -> site_banner`)
@@ -50,15 +50,15 @@ export default async function migrateSiteData({ container }: ExecArgs) {
 
   const [existingReviews] = await siteService.listAndCountReviews({})
   if (!existingReviews?.length) {
-    const reviews = readJson<any[]>(reviewsFile, [])
+    const reviews = readJson<Record<string, unknown>[]>(reviewsFile, [])
     if (reviews.length > 0) {
       await siteService.createReviews(
         reviews.map((r) => ({
-          handle: r.handle || "",
-          product_id: r.product_id || null,
-          customer_id: r.customer_id || "unknown",
+          handle: String(r.handle || ""),
+          product_id: r.product_id ? String(r.product_id) : null,
+          customer_id: String(r.customer_id || "unknown"),
           rating: Number(r.rating) || 5,
-          comment: r.comment || "",
+          comment: String(r.comment || ""),
           approved: true,
         }))
       )
