@@ -66,10 +66,10 @@ export default function RecipeManager({ productId, variantId }) {
         try {
           await api(`/admin/products/${productId}/variants/${variantId}/inventory-items`, {
             method: "POST",
-            body: JSON.stringify({
+            body: {
               inventory_item_id: item.inventory_item_id,
               required_quantity: Number(item.required_quantity)
-            })
+            }
           })
         } catch (err) {
           errorMsgs.push(`Nguyên liệu ${item.inventory_item_id}: ${err.message || JSON.stringify(err)}`);

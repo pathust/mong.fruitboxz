@@ -17,7 +17,7 @@ export default function Settings() {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    api("/admin/store-settings").
+    api("/admin/settings").
     then((d) => {
       if (d.settings) {
         setForm((prev) => ({ ...prev, ...d.settings }));
@@ -32,9 +32,9 @@ export default function Settings() {
     setSaving(true);
     setSuccess(false);
     try {
-      await api("/admin/store-settings", {
+      await api("/admin/settings", {
         method: "POST",
-        body: JSON.stringify(form)
+        body: form
       });
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);

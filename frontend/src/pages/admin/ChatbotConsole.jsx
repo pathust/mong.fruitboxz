@@ -52,8 +52,8 @@ export default function ChatbotConsole() {
     setSaving(true);
     try {
       await api('/admin/chatbot/faqs', {
-        method: 'PUT',
-        body: JSON.stringify({
+        method: 'POST',
+        body: {
           enabled,
           faqs: faqs.
           map((faq) => ({
@@ -66,7 +66,7 @@ export default function ChatbotConsole() {
             filter(Boolean)
           })).
           filter((faq) => faq.question && faq.answer)
-        })
+        }
       });
       pushToast('Đã lưu cấu hình chatbot thành công.', 'success');
     } catch {

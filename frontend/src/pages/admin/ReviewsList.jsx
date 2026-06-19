@@ -42,8 +42,8 @@ export default function ReviewsList() {
   const toggleApproved = async (review) => {
     const next = !review.approved;
     await api(`/admin/reviews/${review.id}`, {
-      method: "PUT",
-      body: JSON.stringify({ approved: next })
+      method: "POST",
+      body: { approved: next }
     });
     setReviews((prev) => prev.map((r) => r.id === review.id ? { ...r, approved: next } : r));
   };

@@ -103,7 +103,7 @@ export default function OrderDetail() {
 
       await api(`/admin/custom/orders/${id}/status`, {
         method: "POST",
-        body: JSON.stringify(payload)
+        body: payload
       });
       // Re-fetch full order
       const refreshed = await api(`/admin/orders/${id}?fields=*items,*items.metadata,metadata,*shipping_address`);

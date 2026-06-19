@@ -138,7 +138,7 @@ export default function Checkout() {
     try {
       const res = await apiFetch('/store/promotions/validate', {
         method: 'POST',
-        body: JSON.stringify({ code: promoCode, subtotal })
+        body: { code: promoCode, subtotal }
       })
       if (res.valid) {
         setDiscountData(res)
@@ -230,12 +230,12 @@ export default function Checkout() {
         const data = await apiFetch('/store/shipping/quote', {
           method: 'POST',
           signal: controller.signal,
-          body: JSON.stringify({
+          body: {
             address,
             lat,
             lng,
           }),
-        })
+          }
         if (!controller.signal.aborted) {
           setShipping(Number(data.shipping) || 30000)
           setQuoteMode(data.mode || 'static-hanoi')
@@ -273,7 +273,7 @@ export default function Checkout() {
       const res = await apiFetch('/store/checkout', {
         method: 'POST',
         token,
-        body: JSON.stringify({
+        body: {
           items: checkoutItems.map(item => ({
             title: item.title,
             quantity: item.quantity,
@@ -296,7 +296,7 @@ export default function Checkout() {
           },
           promotion_code: discountData?.code || undefined,
         }),
-      })
+        }
 
       const finalAmount = subtotal - (discountData?.discount_amount || 0) + shipping
       const displayId = res?.order ? getOrderCode(res.order) : form.phone

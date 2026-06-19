@@ -31,18 +31,18 @@ export default function Register() {
 
       await apiFetch('/store/customers', {
         method: 'POST',
-        body: JSON.stringify({
+        body: {
           email: form.email,
           password: form.password,
           first_name,
           last_name,
           phone: form.phone || undefined,
-        }),
+        },
       })
 
       const authData = await apiFetch('/auth/customer/emailpass', {
         method: 'POST',
-        body: JSON.stringify({ email: form.email, password: form.password }),
+        body: { email: form.email, password: form.password },
       })
 
       login(authData.token)

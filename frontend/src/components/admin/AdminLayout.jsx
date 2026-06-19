@@ -95,7 +95,7 @@ export default function AdminLayout() {
           {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
         </button>
 
-        <div className={`flex items-center border-b border-[#eadfcd] p-5 ${isCollapsed ? "lg:justify-center justify-between" : "justify-between"}`}>
+        <div className={`flex h-[72px] shrink-0 items-center border-b border-[#eadfcd] px-5 ${isCollapsed ? "lg:justify-center justify-between" : "justify-between"}`}>
           <Link to="/admin" className={`flex min-w-0 items-center gap-3 ${isCollapsed ? "lg:justify-center" : ""}`}>
             <img src="/mong_logo-removebg.png" alt="Mọng" className={`h-12 w-auto object-contain ${isCollapsed ? "lg:mx-auto" : ""}`} />
             <div className={`min-w-0 ${isCollapsed ? "lg:hidden" : ""}`}>
@@ -144,7 +144,7 @@ export default function AdminLayout() {
       {sidebarOpen && <div className="fixed inset-0 z-40 bg-[#2c2018]/25 backdrop-blur-[2px] lg:hidden" onClick={() => setSidebarOpen(false)} />}
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="shrink-0 sticky top-0 z-30 flex items-center gap-4 border-b border-[#eadfcd] bg-[#fffaf4]/86 px-4 py-4 backdrop-blur-xl lg:px-6">
+        <header className="shrink-0 sticky top-0 z-30 flex h-[72px] items-center gap-4 border-b border-[#eadfcd] bg-[#fffaf4]/86 px-4 backdrop-blur-xl lg:px-6">
           <button type="button" className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#eadfcd] bg-white text-[#5d5246] lg:hidden" onClick={() => setSidebarOpen(true)}>
             <Menu className="h-5 w-5" />
           </button>

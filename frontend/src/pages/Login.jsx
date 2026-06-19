@@ -20,7 +20,7 @@ export default function Login() {
       try {
         const adminData = await apiFetch('/auth/user/emailpass', {
           method: 'POST',
-          body: JSON.stringify({ email: form.email, password: form.password }),
+          body: { email: form.email, password: form.password },
         })
 
         const payload = decodeJwt(adminData.token)
@@ -41,7 +41,7 @@ export default function Login() {
 
       const customerData = await apiFetch('/auth/customer/emailpass', {
         method: 'POST',
-        body: JSON.stringify({ email: form.email, password: form.password }),
+        body: { email: form.email, password: form.password },
       })
 
       customerLogin(customerData.token)

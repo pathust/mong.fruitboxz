@@ -94,14 +94,14 @@ export default function RolesList() {
     try {
       if (editRole) {
         const update = await api(`/admin/roles/${editRole.id}`, {
-          method: "PUT",
-          body: JSON.stringify({ name: valName, description: form.description })
+          method: "POST",
+          body: { name: valName, description: form.description }
         });
         setRoles((prev) => prev.map((item) => item.id === editRole.id ? update.role : item));
       } else {
         const result = await api("/admin/roles", {
           method: "POST",
-          body: JSON.stringify({ name: valName, description: form.description })
+          body: { name: valName, description: form.description }
         });
         setRoles((prev) => [result.role, ...prev]);
       }
@@ -135,7 +135,7 @@ export default function RolesList() {
       if (!dbPerm) {
         const res = await api("/admin/permissions", {
           method: "POST",
-          body: JSON.stringify({ name: permName, description: `Tự động tạo quyền ${permName}` })
+          body: { name: permName, description: `Tự động tạo quyền ${permName}` }
         });
         dbPerm = res.permission;
         setPermissionsDb((prev) => [...prev, dbPerm]);
@@ -156,8 +156,8 @@ export default function RolesList() {
 
       // API update
       await api(`/admin/roles/${role.id}`, {
-        method: "PUT",
-        body: JSON.stringify({ permissions: newPerms })
+        method: "POST",
+        body: { permissions: newPerms }
       });
 
     } catch (err) {

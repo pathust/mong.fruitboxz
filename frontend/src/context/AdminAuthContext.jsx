@@ -76,7 +76,7 @@ export function AdminAuthProvider({ children }) {
   const login = useCallback(async (email, password) => {
     const data = await apiFetch("/auth/user/emailpass", {
       method: "POST",
-      body: JSON.stringify({ email, password }),
+      body: { email, password },
     })
 
     localStorage.setItem("admin_token", data.token)

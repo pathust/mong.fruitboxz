@@ -56,9 +56,9 @@ export default function CategoryForm() {
       };
 
       if (isNew) {
-        await api("/admin/product-categories", { method: "POST", body: JSON.stringify(body) });
+        await api("/admin/product-categories", { method: "POST", body });
       } else {
-        await api(`/admin/product-categories/${id}`, { method: "POST", body: JSON.stringify(body) });
+        await api(`/admin/product-categories/${id}`, { method: "POST", body });
       }
       navigate("/admin/categories");
     } catch (err) {

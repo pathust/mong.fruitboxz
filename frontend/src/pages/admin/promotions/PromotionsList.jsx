@@ -130,12 +130,12 @@ export default function PromotionsList() {
 
         await api(`/admin/promotions/${editingId}`, {
           method: "POST",
-          body: JSON.stringify(updatePayload)
+          body: updatePayload
         });
 
         await api(`/admin/promotions/${editingId}/metadata`, {
           method: "POST",
-          body: JSON.stringify({ metadata })
+          body: { metadata }
         });
 
         setIsModalOpen(false);
@@ -176,7 +176,7 @@ export default function PromotionsList() {
         // Tạo Campaign trước
         const campRes = await api("/admin/campaigns", {
           method: "POST",
-          body: JSON.stringify(campaignPayload)
+          body: campaignPayload
         });
         campaignId = campRes.campaign.id;
       }
@@ -194,14 +194,14 @@ export default function PromotionsList() {
 
       const createdRes = await api("/admin/promotions", {
         method: "POST",
-        body: JSON.stringify(payload)
+        body: payload
       })
 
       const createdPromo = createdRes?.promotion || createdRes;
       if (createdPromo && createdPromo.id && Object.keys(metadata).length > 0) {
         await api(`/admin/promotions/${createdPromo.id}/metadata`, {
           method: "POST",
-          body: JSON.stringify({ metadata })
+          body: { metadata }
         });
       }
 

@@ -56,7 +56,7 @@ export default function BlogCategoryForm() {
     setSaving(true);
     try {
       const url = isNew ? "/admin/blog-categories" : `/admin/blog-categories/${id}`;
-      await api(url, { method: "POST", body: JSON.stringify(form) });
+      await api(url, { method: "POST", body: form });
       pushToast("Đã lưu danh mục blog.", "success");
       navigate("/admin/blog-categories");
     } catch (err) {

@@ -225,7 +225,7 @@ export default function ContentSettingsPage({ type }) {
     e.preventDefault();
     setSaving(true);
     try {
-      await api("/admin/settings", { method: "PUT", body: JSON.stringify(form) });
+      await api("/admin/settings", { method: "POST", body: form });
       pushToast("Đã lưu nội dung.", "success");
     } catch (err) {
       pushToast(err?.message || "Không lưu được nội dung.", "error");

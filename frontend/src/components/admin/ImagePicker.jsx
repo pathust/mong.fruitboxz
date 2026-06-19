@@ -36,7 +36,7 @@ export default function ImagePicker({ selected, onSelect, multiple }) {
       const base64 = await readFileAsDataUrl(file)
       await api("/admin/media/upload", {
         method: "POST",
-        body: JSON.stringify({ filename: file.name, data: base64 }),
+        body: { filename: file.name, data: base64 },
       })
       const d = await api("/admin/media")
       setImages(d.images || [])

@@ -33,9 +33,9 @@ export default function BannerForm() {
     e.preventDefault();
     setSaving(true);
     try {
-      const method = isNew ? "POST" : "PUT";
+      const method = "POST";
       const url = isNew ? "/admin/banners" : `/admin/banners/${id}`;
-      await api(url, { method, body: JSON.stringify(form) });
+      await api(url, { method, body: form });
       navigate("/admin/banners");
     } catch (err) {
       alert("Error: " + err.message);

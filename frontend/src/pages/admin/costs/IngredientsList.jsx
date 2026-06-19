@@ -89,12 +89,12 @@ export default function IngredientsList() {
       if (editingItem) {
         await api(`/admin/inventory-items/${editingItem.id}`, {
           method: "POST",
-          body: JSON.stringify(payload)
+          body: payload
         })
       } else {
         const createRes = await api(`/admin/inventory-items`, {
           method: "POST",
-          body: JSON.stringify(payload)
+          body: payload
         })
 
         // Ensure the inventory item has a location level if it was created successfully
@@ -106,10 +106,10 @@ export default function IngredientsList() {
                const locId = locRes.stock_locations[0].id
                await api(`/admin/inventory-items/${createRes.inventory_item.id}/location-levels`, {
                  method: "POST",
-                 body: JSON.stringify({
+                 body: {
                    location_id: locId,
                    stocked_quantity: 0
-                 })
+                 }
                })
              }
           } catch(e) {

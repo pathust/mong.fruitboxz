@@ -121,7 +121,7 @@ export default function ProductForm() {
       if (isNew) {
         await api("/admin/products", {
           method: "POST",
-          body: JSON.stringify({
+          body: {
             title: form.title,
             handle: baseSlug,
             description: form.description,
@@ -137,7 +137,7 @@ export default function ProductForm() {
               prices: [{ amount: Number(v.price) || 0, currency_code: "vnd" }],
               metadata: { cost_price: v.cost_price || 0 }
             }))
-          })
+          }
         });
       } else {
         const existing = await api(`/admin/products/${id}`);
@@ -145,14 +145,14 @@ export default function ProductForm() {
         // 1. Update basic info
         await api(`/admin/products/${id}`, {
           method: "PATCH",
-          body: JSON.stringify({
+          body: {
             title: form.title,
             handle: baseSlug,
             description: form.description,
             status: form.status,
             images: form.images.map((url) => ({ url })),
             thumbnail: form.thumbnail
-          })
+          }
         });
 
         // 2. Manage variants
@@ -172,24 +172,24 @@ export default function ProductForm() {
 
             await api(`/admin/products/${id}/variants/${v.id}`, {
               method: "POST",
-              body: JSON.stringify({
+              body: {
                 title: vTitle,
                 sku: buildVariantSku(baseSlug, v, i),
                 prices: pricesData,
                 metadata: { cost_price: v.cost_price || 0 }
-              })
+              }
             }).catch(console.error);
           } else {
             // Add new variant
             await api(`/admin/products/${id}/variants`, {
               method: "POST",
-              body: JSON.stringify({
+              body: {
                 title: vTitle,
                 sku: buildVariantSku(baseSlug, v, i),
                 prices: [{ amount: Number(v.price) || 0, currency_code: "vnd" }],
                 metadata: { cost_price: v.cost_price || 0 },
                 options: { Default: vTitle }
-              })
+              }
             }).catch(console.error);
           }
         }

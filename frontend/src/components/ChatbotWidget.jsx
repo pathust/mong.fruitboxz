@@ -73,7 +73,7 @@ export default function ChatbotWidget() {
     try {
       const response = await apiFetch('/store/chatbot/message', {
         method: 'POST',
-        body: JSON.stringify({ message }),
+        body: { message },
       })
 
       setMessages((prev) => [

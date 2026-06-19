@@ -44,9 +44,11 @@ export default function AboutUs() {
             <div className="relative group">
               <div className="absolute inset-0 bg-primary/10 rounded-[2.5rem] transform rotate-3 scale-105 transition-transform duration-500 group-hover:rotate-6"></div>
               <div className="overflow-hidden rounded-[2rem] bg-accent aspect-[4/5] relative z-10 shadow-xl shadow-primary/5">
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#f0e5d5] to-[#eadfcd]">
-                  <span className="text-[#a08d79] font-medium tracking-widest uppercase">Mọng Image</span>
-                </div>
+                <img 
+                  src="/images/about-us.png" 
+                  alt="Câu chuyện của Mọng" 
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
               </div>
             </div>
             

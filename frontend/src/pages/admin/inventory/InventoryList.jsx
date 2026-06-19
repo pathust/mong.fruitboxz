@@ -76,11 +76,11 @@ export default function InventoryList() {
       for (const [ingredientId, data] of updateEntries) {
         await api("/admin/custom/inventory", {
           method: "POST",
-          body: JSON.stringify({
+          body: {
             inventory_item_id: ingredientId,
             location_id: data.location_id,
             stocked_quantity: data.stocked_quantity
-          })
+          }
         })
       }
       setUpdates({})

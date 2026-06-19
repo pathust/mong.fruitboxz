@@ -60,7 +60,7 @@ export default function MediaLibrary() {
       const data = await readFileAsDataUrl(file)
       await api('/admin/media/upload', {
         method: 'POST',
-        body: JSON.stringify({ filename: file.name, data }),
+        body: { filename: file.name, data },
       })
       await loadMedia(query)
       pushToast('Ảnh đã được tải lên.', 'success')

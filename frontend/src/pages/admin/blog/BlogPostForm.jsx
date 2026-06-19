@@ -84,7 +84,7 @@ export default function BlogPostForm() {
       }
       const payload = { ...form, slug: previewPath, category_id: payloadCategoryId };
       const url = isNew ? "/admin/blog-posts" : `/admin/blog-posts/${id}`;
-      await api(url, { method: "POST", body: JSON.stringify(payload) });
+      await api(url, { method: "POST", body: payload });
       pushToast("Đã lưu bài viết.", "success");
       navigate("/admin/blog");
     } catch (err) {
@@ -163,7 +163,7 @@ export default function BlogPostForm() {
                     try {
                       const res = await api('/admin/blog-categories', {
                         method: 'POST',
-                        body: JSON.stringify({ name: newCatName, slug: slugify(newCatName) })
+                        body: { name: newCatName, slug: slugify(newCatName) }
                       });
                       const createdCat = Array.isArray(res.blog_category) ? res.blog_category[0] : res.blog_category;
                       setExistingCategories((prev) => [...prev, createdCat].sort((a, b) => a.name.localeCompare(b.name)));

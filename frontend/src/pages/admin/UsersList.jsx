@@ -31,7 +31,7 @@ export default function UsersList() {
   const setUserRoles = async (userId, roleIds) => {
     await api(`/admin/users/${userId}/roles`, {
       method: "POST",
-      body: JSON.stringify({ roles: roleIds })
+      body: { roles: roleIds }
     });
     const update = await api(`/admin/users/${userId}`);
     setUsers((prev) => prev.map((u) => u.id === userId ? update.user : u));
@@ -58,7 +58,7 @@ export default function UsersList() {
     try {
       const result = await api("/admin/users", {
         method: "POST",
-        body: JSON.stringify({ email: newEmail })
+        body: { email: newEmail }
       });
       setUsers((prev) => [result.user, ...prev]);
       setIsCreating(false);
