@@ -1,4 +1,5 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+import { INGREDIENTS_MODULE } from "../../../../modules/ingredients"
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const handle = (req.params.handle || "").toString()
@@ -8,8 +9,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const { data: products } = await query.graph({
     entity: "product",
     fields: [
-      "variants.inventory_items.inventory.title",
-      "variants.inventory_items.inventory.sku"
+      "variants.id"
     ],
     filters: {
       handle: handle
@@ -20,10 +20,19 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
 
   if (products && products.length > 0) {
     const product = products[0]
-    for (const variant of product.variants || []) {
-      for (const inv of variant.inventory_items || []) {
-        if (inv.inventory?.sku?.startsWith("ing-") && inv.inventory?.title) {
-          ingredientsSet.add(inv.inventory.title)
+    const variantIds = product.variants?.map(v => v.id) || []
+    
+    if (variantIds.length > 0) {
+      const ingredientsService = req.scope.resolve(INGREDIENTS_MODULE)
+      const recipeItems = await ingredientsService.listRecipeItems({
+        variant_id: variantIds
+      }, {
+        relations: ["ingredient"]
+      })
+
+      for (const rcp of recipeItems) {
+        if (rcp.ingredient?.name) {
+          ingredientsSet.add(rcp.ingredient.name)
         }
       }
     }

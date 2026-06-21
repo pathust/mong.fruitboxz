@@ -77,5 +77,8 @@ module.exports = defineConfig({
     {
       resolve: "./src/modules/voting",
     },
+    {
+      resolve: "./src/modules/ingredients",
+    },
   ],
 })

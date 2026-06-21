@@ -7,23 +7,47 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
   try {
     const query = req.scope.resolve(ContainerRegistrationKeys.QUERY)
 
-    // Fetch all inventory items and their location levels
-    const { data: inventory_items } = await query.graph({
-      entity: "inventory_item",
+    // Fetch ingredients and their inventory items
+    const { data: ingredientsData } = await query.graph({
+      entity: "ingredient",
       fields: [
-        "id",
-        "title",
-        "sku",
-        "metadata",
-        "location_levels.*",
+        "name",
+        "unit",
+        "inventory_item.id",
+        "inventory_item.sku",
+        "inventory_item.location_levels.*",
       ],
       pagination: { take: 500 }
     })
 
-    // Filter to only include items marked as ingredients
-    const ingredients = (inventory_items as Array<{ metadata?: Record<string, unknown> | null }>).filter(
-      (item) => item.metadata?.is_ingredient === true
-    )
+    // Fetch default stock location just in case
+    const stockLocationModule = req.scope.resolve(Modules.STOCK_LOCATION)
+    const stockLocations = await stockLocationModule.listStockLocations({}, { take: 1 })
+    const defaultLocationId = stockLocations[0]?.id
+
+    const ingredients = ingredientsData.map((ing: any) => {
+      const invItem = ing.inventory_item
+      const locationLevels = invItem?.location_levels || []
+      
+      // If it has no location levels, mock one using the default location
+      if (locationLevels.length === 0 && defaultLocationId) {
+        locationLevels.push({
+          location_id: defaultLocationId,
+          stocked_quantity: 0
+        })
+      }
+
+      return {
+        id: invItem?.id, // Use inventory_item id for updates
+        title: ing.name,
+        sku: invItem?.sku,
+        metadata: {
+          unit: ing.unit,
+          category: "Nguyên liệu"
+        },
+        location_levels: locationLevels
+      }
+    }).filter((ing: any) => ing.id) // Only those with linked inv items
 
     res.json({ ingredients })
   } catch (error: unknown) {
@@ -37,13 +61,30 @@ export async function POST(req: MedusaRequest<InventoryLevelBody>, res: MedusaRe
     const { inventory_item_id, location_id, stocked_quantity } = req.validatedBody
 
     if (inventory_item_id && location_id) {
-      await inventoryModule.updateInventoryLevels([
-        {
-          inventory_item_id,
-          location_id,
-          stocked_quantity: Number(stocked_quantity)
+      const quantity = Number(stocked_quantity)
+      
+      try {
+        await inventoryModule.updateInventoryLevels([
+          {
+            inventory_item_id,
+            location_id,
+            stocked_quantity: quantity
+          }
+        ])
+      } catch (err: any) {
+        // If it fails (e.g. level doesn't exist), create it
+        if (err.message?.includes("not found") || err.type === "not_found") {
+          await inventoryModule.createInventoryLevels([
+            {
+              inventory_item_id,
+              location_id,
+              stocked_quantity: quantity
+            }
+          ])
+        } else {
+          throw err
         }
-      ])
+      }
     }
 
     res.json({ success: true })
