@@ -3,6 +3,7 @@ import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
 import { resolveShippingQuote } from "../../../lib/geocoding"
 import { getGlobalSettings } from "../../../lib/global-settings"
 import { getPromotionMetadata } from "../../../lib/promotion-metadata"
+import { processCheckoutPromotions } from "../../../lib/checkout"
 import type { CheckoutBody } from "../../middlewares/validation"
 import { resolveSiteService } from "../../../lib/module-services"
 import { sendInternalError } from "../../../lib/api-error"
@@ -103,6 +104,51 @@ export async function POST(req: MedusaStoreRequest<CheckoutBody>, res: MedusaRes
     return sendInternalError(req, res, error, "Không thể xác minh danh sách sản phẩm", "PRODUCT_BATCH_LOOKUP_FAILED")
   }
 
+  // 3. Inventory Validation using BOM
+  try {
+    const { data: recipeItems } = await query.graph({
+      entity: "recipe_item",
+      fields: [
+        "*",
+        "ingredient.*",
+        "ingredient.inventory_item.*",
+        "ingredient.inventory_item.location_levels.*"
+      ],
+      filters: { variant_id: variantIds }
+    })
+
+    const requiredIngredients: Record<string, { name: string, required: number, stock: number }> = {}
+
+    for (const item of items) {
+      const variantRecipeItems = (recipeItems as any[] || []).filter((r) => r.variant_id === item.variant_id)
+      for (const reqItem of variantRecipeItems) {
+        const ingId = reqItem.ingredient?.id
+        if (!ingId) continue
+        
+        if (!requiredIngredients[ingId]) {
+          const invItem = reqItem.ingredient?.inventory_item
+          const stock = invItem?.location_levels?.reduce((sum: number, l: any) => sum + (l.stocked_quantity || 0), 0) || 0
+          requiredIngredients[ingId] = {
+            name: reqItem.ingredient?.name || "Nguyên liệu",
+            required: 0,
+            stock: stock
+          }
+        }
+        
+        requiredIngredients[ingId].required += reqItem.quantity * item.quantity
+      }
+    }
+
+    for (const ingId in requiredIngredients) {
+      const ing = requiredIngredients[ingId]
+      if (ing.required > ing.stock) {
+        return res.status(400).json({ message: `Đơn hàng vượt quá số lượng nguyên liệu trong kho. Vui lòng giảm số lượng. (Nguyên liệu: ${ing.name} - Cần: ${ing.required}, Còn: ${ing.stock})` })
+      }
+    }
+  } catch (error: unknown) {
+    return sendInternalError(req, res, error, "Không thể kiểm tra tồn kho nguyên liệu", "INVENTORY_CHECK_FAILED")
+  }
+
   for (const item of items) {
     let unitPrice = 0
     let variantTitle = item.variantLabel || null
@@ -149,7 +195,7 @@ export async function POST(req: MedusaStoreRequest<CheckoutBody>, res: MedusaRes
     })
   }
 
-  const shippingQuote = resolveShippingQuote({
+  const shippingQuote = await resolveShippingQuote({
     address: shipping.address,
     city: shipping.city,
     district: shipping.district,
@@ -158,109 +204,60 @@ export async function POST(req: MedusaStoreRequest<CheckoutBody>, res: MedusaRes
   }, settings)
   const shippingFee = shippingQuote.shipping
 
-  // Promotion logic
   let discountAmount = 0
   let appliedPromotionCode = null
   let originalSubtotal = normalizedItems.reduce((sum, item) => sum + item.unit_price * item.quantity, 0)
 
-  if (promotion_code) {
-    try {
-      const promotionModuleService = req.scope.resolve(Modules.PROMOTION)
-      const promotions = await promotionModuleService.listPromotions({
-        code: promotion_code.toUpperCase()
-      }, { relations: ["application_method", "campaign", "campaign.budget"], take: 1 })
-
-      if (promotions && promotions.length > 0) {
-        const promo = promotions[0] as PromotionRecord
-        const promotionMetadata = await getPromotionMetadata(siteService, promo.id)
-        const startsAt = promotionMetadata.starts_at || promo.campaign?.starts_at
-        const endsAt = promotionMetadata.ends_at || promo.campaign?.ends_at
-        const usageLimit = Number(promotionMetadata.usage_limit || promo.campaign?.budget?.limit || 0)
-
-        let isValid = true
-        const now = new Date()
-        if (startsAt && new Date(startsAt) > now) {
-          isValid = false
-        }
-        if (endsAt && new Date(endsAt) < now) {
-          isValid = false
-        }
-        if (usageLimit > 0) {
-          try {
-            const query = req.scope.resolve("query")
-            const { data } = await query.graph({
-              entity: "order",
-              fields: ["id", "metadata"],
-            })
-            const usedCount = (data as Array<{ metadata?: Record<string, unknown> | null }>)
-              .filter((order) => order.metadata?.promotion_code === promo.code)
-              .length
-            if (usedCount >= usageLimit) {
-              isValid = false
-            }
-          } catch (error: unknown) {
-            return sendInternalError(req, res, error, "Không thể xác minh lượt sử dụng mã giảm giá", "PROMOTION_USAGE_CHECK_FAILED")
-          }
-        }
-
-        const minOrderValue = Number(promotionMetadata.min_order_value || 0)
-        if (minOrderValue > 0 && originalSubtotal < minOrderValue) {
-          return res.status(400).json({
-            message: `Mã giảm giá yêu cầu đơn hàng tối thiểu ${new Intl.NumberFormat('vi-VN').format(minOrderValue)}đ`
-          })
-        }
-
-        if (!isValid) {
-          return res.status(400).json({ message: "Mã giảm giá đã hết hạn hoặc hết lượt sử dụng" })
-        }
-
-        const appMethod = promo.application_method
-        if (appMethod) {
-          const maxDiscount = Number(promotionMetadata.max_discount || 0)
-          if (appMethod.type === "fixed") {
-            discountAmount = Math.min(Number(appMethod.value), originalSubtotal)
-          } else if (appMethod.type === "percentage") {
-            discountAmount = Math.round(originalSubtotal * (Number(appMethod.value) / 100))
-            if (maxDiscount > 0 && discountAmount > maxDiscount) {
-              discountAmount = maxDiscount
-            }
-          }
-          appliedPromotionCode = promo.code
-        }
-      }
-    } catch (error: unknown) {
-      return sendInternalError(req, res, error, "Không thể áp dụng mã giảm giá", "PROMOTION_APPLY_FAILED")
-    }
+  try {
+    const promotionResult = await processCheckoutPromotions({
+      scope: req.scope,
+      siteService,
+      promotion_code,
+      normalizedItems,
+      originalSubtotal
+    })
+    discountAmount = promotionResult.discountAmount
+    appliedPromotionCode = promotionResult.appliedPromotionCode
+  } catch (error: any) {
+    return res.status(400).json({ message: error.message || "Không thể áp dụng mã giảm giá" })
   }
 
-  // Proportional discount allocation
-  if (discountAmount > 0 && originalSubtotal > 0) {
-    const discountRatio = discountAmount / originalSubtotal
-    let totalDiscountAllocated = 0
+  const customerModuleService = req.scope.resolve(Modules.CUSTOMER)
 
-    for (let i = 0; i < normalizedItems.length; i++) {
-      const item = normalizedItems[i]
-      if (i === normalizedItems.length - 1) {
-        // Last item takes the remainder to ensure exact discount amount
-        const remainingDiscount = discountAmount - totalDiscountAllocated
-        // Distribute remaining discount evenly across quantity
-        const discountPerUnit = Math.round(remainingDiscount / item.quantity)
-        item.unit_price = Math.max(0, item.unit_price - discountPerUnit)
-      } else {
-        const itemTotalDiscount = Math.round((item.unit_price * item.quantity) * discountRatio)
-        const discountPerUnit = Math.round(itemTotalDiscount / item.quantity)
-        item.unit_price = Math.max(0, item.unit_price - discountPerUnit)
-        totalDiscountAllocated += (discountPerUnit * item.quantity)
+  let customerId = req.auth_context?.actor_id
+  const customerEmail = shipping.email?.toLowerCase().trim() || first_name.toLowerCase() + "@example.com"
+
+  if (!customerId) {
+    const existingCustomers = await customerModuleService.listCustomers(
+      { email: customerEmail },
+      { take: 1 }
+    )
+    
+    if (existingCustomers && existingCustomers.length > 0) {
+      customerId = existingCustomers[0].id
+    } else {
+      try {
+        const newCustomer = await customerModuleService.createCustomers({
+          email: customerEmail,
+          first_name,
+          last_name,
+          phone: shipping.phone || undefined,
+        })
+        customerId = newCustomer.id
+      } catch (err) {
+        // Fallback gracefully if customer creation fails
+        const logger = req.scope.resolve<{ error(message: string, error?: unknown): void }>("logger")
+        logger.error("Failed to create customer record during checkout", err)
       }
     }
   }
 
   const order = await orderModuleService.createOrders({
-    email: shipping.email || first_name.toLowerCase() + "@example.com",
+    email: customerEmail,
     currency_code: "vnd",
     region_id: region?.id || undefined,
     sales_channel_id: store?.default_sales_channel_id || undefined,
-    customer_id: req.auth_context?.actor_id,
+    customer_id: customerId,
     shipping_address: {
       first_name,
       last_name,
@@ -312,6 +309,18 @@ export async function POST(req: MedusaStoreRequest<CheckoutBody>, res: MedusaRes
 
   const subtotal = normalizedItems.reduce((sum, item) => sum + item.unit_price * item.quantity, 0)
   const total = subtotal + shippingFee
+
+  // Emit order.placed event manually because we bypassed the standard workflow
+  try {
+    const eventBus = req.scope.resolve(Modules.EVENT_BUS)
+    await eventBus.emit({
+      name: "order.placed",
+      data: { id: responseOrder.id }
+    })
+  } catch (err) {
+    const logger = req.scope.resolve<{ error(message: string, error?: unknown): void }>("logger")
+    logger.error("Failed to emit order.placed event", err)
+  }
 
   res.json({ order: responseOrder, summary: { original_subtotal: originalSubtotal, subtotal, discount: discountAmount, shipping: shippingFee, total } })
 }

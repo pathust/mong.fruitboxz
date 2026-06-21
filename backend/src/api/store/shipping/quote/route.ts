@@ -8,6 +8,6 @@ export async function POST(req: MedusaRequest<ShippingQuoteBody>, res: MedusaRes
   const siteService = resolveSiteService(req.scope)
   const settings = await getGlobalSettings(siteService)
   const { address, city, district, lat, lng } = req.validatedBody
-  const quote = resolveShippingQuote({ address, city, district, lat, lng }, settings)
+  const quote = await resolveShippingQuote({ address, city, district, lat, lng }, settings)
   res.json(quote)
 }
