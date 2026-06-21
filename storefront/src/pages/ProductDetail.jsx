@@ -6,7 +6,7 @@ import { useCatalog, mapProduct } from '../context/CatalogContext'
 import { apiFetch } from '../lib/api'
 export default function ProductDetail() {
   const { slug } = useParams()
-  const { addItem } = useCart()
+  const { addItem, cart } = useCart()
 
   const [selectedVariant, setSelectedVariant] = useState(0)
   const [selectedImage, setSelectedImage] = useState(0)
@@ -51,7 +51,10 @@ export default function ProductDetail() {
     if (!product) return
     const productSlug = product.slug || product.id
     apiFetch(`/store/ingredients/${productSlug}`)
-      .then((data) => setIngredients(data.ingredients || []))
+      .then((res) => {
+        const data = res?.data || res || {};
+        setIngredients(data.ingredients || []);
+      })
       .catch(() => setIngredients([]))
 
 
@@ -117,6 +120,14 @@ export default function ProductDetail() {
     .slice(0, 4)
   const handleAddToCart = () => {
     if (!hasPrice) return
+    const maxAllowed = currentVariant?.purchasable_quantity ?? Infinity
+    const currentInCart = cart?.items?.find(i => i.variantId === currentVariant?.id)?.quantity || 0
+    
+    if (quantity + currentInCart > maxAllowed) {
+      alert("Đơn hàng của bạn lớn hơn lượng nguyên liệu đang có, liên hệ shop để được hỗ trợ.")
+      return
+    }
+
     addItem({
       id: product.id,
       title: product.title,
@@ -126,6 +137,7 @@ export default function ProductDetail() {
       slug: product.slug || product.id,
       variantId: currentVariant?.id || null,
       productId: product.medusa_id || null,
+      maxAllowed: maxAllowed,
     })
     setAddedToCart(true)
     setTimeout(() => setAddedToCart(false), 2000)
@@ -221,11 +233,31 @@ export default function ProductDetail() {
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" /></svg>
               </button>
-              <span className="product-meta px-2 text-secondary min-w-[2.5rem] text-center font-medium">
-                {quantity}
-              </span>
+              <input
+                type="number"
+                min="1"
+                value={quantity}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value) || 1
+                  const maxAllowed = currentVariant?.purchasable_quantity ?? Infinity
+                  const currentInCart = cart?.items?.find(i => i.variantId === currentVariant?.id)?.quantity || 0
+                  setQuantity(Math.min(Math.max(0, maxAllowed - currentInCart), Math.max(1, val)))
+                }}
+                onBlur={() => {
+                  if (quantity < 1) setQuantity(1)
+                }}
+                className="w-12 text-center text-secondary font-medium bg-transparent outline-none p-0 border-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              />
               <button
-                onClick={() => setQuantity(q => q + 1)}
+                onClick={() => {
+                  const maxAllowed = currentVariant?.purchasable_quantity ?? Infinity
+                  const currentInCart = cart?.items?.find(i => i.variantId === currentVariant?.id)?.quantity || 0
+                  if (quantity + currentInCart >= maxAllowed) {
+                    alert("Đơn hàng của bạn vượt quá số lượng nguyên liệu đang có, liên hệ shop để được hỗ trợ.")
+                    return
+                  }
+                  setQuantity(q => q + 1)
+                }}
                 className="px-4 h-full text-secondary hover:text-primary transition-colors flex items-center justify-center"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>

@@ -4,7 +4,7 @@ import { useCart } from '../context/CartContext'
 import { ShoppingCart } from 'lucide-react'
 
 export default function ProductCard({ product, viewMode = 'grid' }) {
-  const { addItem } = useCart()
+  const { cart, addItem } = useCart()
   const [selectedVariant, setSelectedVariant] = useState(0)
   const [added, setAdded] = useState(false)
 
@@ -23,6 +23,14 @@ export default function ProductCard({ product, viewMode = 'grid' }) {
   const handleAddToCart = (e) => {
     e.preventDefault()
     if (isOutOfStock) return
+
+    const maxAllowed = variant?.purchasable_quantity ?? Infinity
+    const currentInCart = cart?.items?.find(i => i.variantId === variant?.id)?.quantity || 0
+    if (1 + currentInCart > maxAllowed) {
+      alert("Đơn hàng của bạn lớn hơn lượng nguyên liệu đang có, liên hệ shop để được hỗ trợ.")
+      return
+    }
+
     addItem({
       id: product.id,
       title: product.title,
@@ -33,6 +41,7 @@ export default function ProductCard({ product, viewMode = 'grid' }) {
       variantLabel: variant?.label || '',
       variantId: variant?.id || null,
       productId: product.medusa_id || null,
+      maxAllowed: maxAllowed,
     })
     setAdded(true)
     setTimeout(() => setAdded(false), 1400)

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import ProductCard from '../components/ProductCard'
 import { useCatalog, mapProduct } from '../context/CatalogContext'
 import { apiFetch } from '../lib/api'
-import { LayoutGrid, List, Filter } from 'lucide-react'
+import { LayoutGrid, List, Filter, Search } from 'lucide-react'
 
 export default function Products() {
   const [showMobileFilters, setShowMobileFilters] = useState(false)
@@ -14,6 +14,8 @@ export default function Products() {
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [viewMode, setViewMode] = useState('grid') // 'grid' | 'list'
+  const [searchInput, setSearchInput] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
 
   const { categories } = useCatalog()
   const limit = viewMode === 'grid' ? 16 : 12
@@ -31,6 +33,12 @@ export default function Products() {
     { value: 'over-500', label: 'Trên 500.000đ' },
   ]
 
+  const handleSearch = (e) => {
+    e.preventDefault()
+    setSearchQuery(searchInput)
+    setPage(1)
+  }
+
   useEffect(() => {
     const controller = new AbortController()
     async function fetchProducts() {
@@ -43,6 +51,8 @@ export default function Products() {
         })
         if (selectedCategory) params.set('category', selectedCategory)
         if (priceRange) params.set('price_range', priceRange)
+        if (searchQuery) params.set('q', searchQuery)
+        
         const res = await apiFetch(`/store/search?${params}`, { signal: controller.signal })
         setProducts((res.hits || []).map(mapProduct))
         setTotal(Number(res.total || 0))
@@ -58,15 +68,32 @@ export default function Products() {
 
     fetchProducts()
     return () => controller.abort()
-  }, [limit, page, priceRange, selectedCategory, sortBy])
+  }, [limit, page, priceRange, selectedCategory, sortBy, searchQuery])
 
   const totalPages = Math.ceil(total / limit)
 
   return (
     <div className="max-w-[1240px] mx-auto px-4 py-8 md:py-10">
-      <div className="mb-6">
-        <h1 className="page-title text-3xl md:text-5xl">Sản phẩm</h1>
-        <p className="text-gray-500 mt-1 text-sm">Khám phá bộ sưu tập trái cây tươi ngon ({total} sản phẩm)</p>
+      <div className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h1 className="page-title text-3xl md:text-5xl">Sản phẩm</h1>
+          <p className="text-gray-500 mt-1 text-sm">Khám phá bộ sưu tập trái cây tươi ngon ({total} sản phẩm)</p>
+        </div>
+        <form onSubmit={handleSearch} className="relative w-full md:w-80 shrink-0">
+          <input
+            type="text"
+            placeholder="Tìm kiếm sản phẩm..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-[#e8e0d3] rounded-xl text-sm focus:outline-none focus:border-primary shadow-sm transition-all"
+          />
+          <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          {searchInput && (
+            <button type="button" onClick={() => { setSearchInput(''); setSearchQuery(''); setPage(1) }} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          )}
+        </form>
       </div>
       <div className="flex flex-col md:flex-row gap-8">
         

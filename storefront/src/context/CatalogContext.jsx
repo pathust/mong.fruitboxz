@@ -28,6 +28,7 @@ function mapVariant(v) {
     price: amount > 0 ? amount : null,
     prices: amount > 0 ? [{ amount }] : [],
     inStock,
+    purchasable_quantity: typeof v?.purchasable_quantity === 'number' ? v.purchasable_quantity : (v?.inventory_quantity ?? 0)
   }
 }
 
@@ -48,6 +49,7 @@ export function mapProduct(p) {
   const inStock = (p?.variants || []).length === 0
     ? true
     : (p?.variants || []).some(v => {
+        if (typeof v.in_stock === "boolean") return v.in_stock
         if (!v.manage_inventory) return true          // no inventory tracking → always in stock
         if (v.allow_backorder) return true             // backorder allowed → always available
         return (v.inventory_quantity ?? 0) > 0        // has physical stock

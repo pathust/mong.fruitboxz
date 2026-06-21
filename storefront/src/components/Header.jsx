@@ -240,12 +240,12 @@ export default function Header() {
               <Link
                 to="/cart"
                 className="relative h-10 w-10 rounded-full bg-gradient-to-br from-[#ea5a2a] to-[#d44a1e] text-white flex items-center justify-center transition-all hover-card shadow-lg shadow-primary/30"
-                aria-label={`${t('cartTitle')} - ${cart.count}`}
+                aria-label={`${t('cartTitle')} - ${cart.items.length}`}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17" /></svg>
-                {cart.count > 0 && (
+                {cart.items.length > 0 && (
                   <span className="absolute -top-1 -right-1 h-5 min-w-[20px] px-1.5 bg-black text-white text-[11px] font-bold rounded-full flex items-center justify-center shadow-md animate-pulse-slow border-2 border-white" aria-live="polite">
-                    {cart.count > 9 ? '9+' : cart.count}
+                    {cart.items.length > 9 ? '9+' : cart.items.length}
                   </span>
                 )}
               </Link>
@@ -256,7 +256,7 @@ export default function Header() {
                   <div className="flex items-center justify-between border-b border-[#f1e7da] bg-[#fffaf4] px-5 py-4">
                     <div>
                       <p className="text-sm font-extrabold text-[#43382b]">{t('cartTitle')}</p>
-                      <p className="product-meta mt-0.5 text-[12px]">{cart.count} {t('sản phẩm đã thêm')}</p>
+                      <p className="product-meta mt-0.5 text-[12px]">{cart.items.length} {t('sản phẩm đã thêm')}</p>
                     </div>
                     <Link to="/cart" onClick={() => setCartPreviewOpen(false)} className="text-xs font-bold text-primary hover:text-primary-dark">
                       {t('viewAllProducts')}

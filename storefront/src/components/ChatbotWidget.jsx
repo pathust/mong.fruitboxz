@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Bot, LoaderCircle, MessageCircle, SendHorizonal, Sparkles, X } from 'lucide-react'
 import { apiFetch } from '../lib/api'
+import { useCart } from '../context/CartContext'
+import ReactMarkdown from 'react-markdown'
 
 const QUICK_PROMPTS = [
   'Gợi ý hộp quà trái cây',
@@ -47,7 +49,9 @@ export default function ChatbotWidget() {
       suggestions: [],
     },
   ])
+  const { addItem } = useCart()
   const bodyRef = useRef(null)
+  const textareaRef = useRef(null)
 
   useEffect(() => {
     apiFetch('/store/custom?mode=homepage')
@@ -142,21 +146,54 @@ export default function ChatbotWidget() {
                     ? 'max-w-[85%] rounded-[22px] rounded-br-md bg-primary px-4 py-3 text-sm font-medium text-white shadow-[0_18px_42px_-26px_rgba(234,90,42,0.8)]'
                     : 'max-w-[90%] rounded-[22px] rounded-bl-md border border-[#f0e4d3] bg-white px-4 py-3 text-sm text-[#4f463d] shadow-[0_18px_42px_-32px_rgba(70,48,27,0.28)]'
                   }>
-                    <p className="leading-6">{message.content}</p>
+                    <div className="text-[14px] leading-6 break-words">
+                      <ReactMarkdown 
+                        components={{
+                          p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />,
+                          ul: ({node, ...props}) => <ul className="list-disc pl-5 mb-2 space-y-1" {...props} />,
+                          ol: ({node, ...props}) => <ol className="list-decimal pl-5 mb-2 space-y-1" {...props} />,
+                          li: ({node, ...props}) => <li className="" {...props} />,
+                          strong: ({node, ...props}) => <strong className="font-bold text-inherit" {...props} />,
+                          a: ({node, ...props}) => <a className="text-primary hover:underline font-medium" {...props} />,
+                        }}
+                      >
+                        {message.content}
+                      </ReactMarkdown>
+                    </div>
                     {message.suggestions?.length > 0 && (
                       <div className="mt-3 grid gap-2">
                         {message.suggestions.map((item) => (
-                          <a key={item.id} href={`/products/${item.slug || item.handle || item.id}`} className="flex items-center gap-3 rounded-2xl border border-[#f2e8db] bg-[#fffaf5] p-2 transition hover:border-primary">
-                            <div className="h-14 w-14 overflow-hidden rounded-2xl bg-[#f7f0e6]">
+                          <div key={item.id} className="flex items-center gap-3 rounded-2xl border border-[#f2e8db] bg-[#fffaf5] p-2 transition hover:border-primary">
+                            <a href={`/products/${item.slug || item.handle || item.id}`} className="h-14 w-14 shrink-0 overflow-hidden rounded-2xl bg-[#f7f0e6]">
                               <img src={item.thumbnail || '/media/placeholder.svg'} alt={item.title} className="h-full w-full object-cover" />
+                            </a>
+                            <div className="min-w-0 flex-1 flex flex-col justify-between h-14 py-0.5">
+                              <a href={`/products/${item.slug || item.handle || item.id}`} className="truncate text-[13px] font-semibold text-[#3c352d] hover:text-primary">
+                                {item.title}
+                              </a>
+                              <div className="flex items-center justify-between mt-auto">
+                                <p className="text-[12px] font-bold text-primary">
+                                  {item.price ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price) : 'Xem chi tiết'}
+                                </p>
+                                <button 
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    addItem({
+                                      id: item.id,
+                                      title: item.title,
+                                      image: item.thumbnail,
+                                      price: item.price,
+                                      originalPrice: item.price,
+                                      quantity: 1
+                                    });
+                                  }}
+                                  className="rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold text-primary hover:bg-primary hover:text-white transition-colors">
+                                  Mua ngay
+                                </button>
+                              </div>
                             </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="truncate text-sm font-semibold text-[#3c352d]">{item.title}</p>
-                              <p className="text-xs text-primary">
-                                {item.price ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price) : 'Xem chi tiết'}
-                              </p>
-                            </div>
-                          </a>
+                          </div>
                         ))}
                       </div>
                     )}
@@ -183,11 +220,23 @@ export default function ChatbotWidget() {
             >
               <div className="flex items-end gap-3 rounded-[24px] border border-[#eddcc7] bg-[#fffaf4] px-4 py-3 shadow-inner">
                 <textarea
+                  ref={textareaRef}
                   value={draft}
-                  onChange={(event) => setDraft(event.target.value)}
+                  onChange={(event) => {
+                    setDraft(event.target.value);
+                    event.target.style.height = '24px';
+                    event.target.style.height = `${Math.min(event.target.scrollHeight, 120)}px`;
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' && !event.shiftKey) {
+                      event.preventDefault();
+                      sendMessage();
+                      if (textareaRef.current) textareaRef.current.style.height = '24px';
+                    }
+                  }}
                   rows={1}
                   placeholder="Bạn đang cần tìm gì cho hôm nay?"
-                  className="min-h-[24px] flex-1 resize-none bg-transparent text-sm text-[#40362d] placeholder:text-[#a29484] focus:outline-none"
+                  className="min-h-[24px] max-h-[120px] py-0.5 flex-1 resize-none bg-transparent text-[14px] text-[#40362d] placeholder:text-[#a29484] focus:outline-none scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent"
                 />
                 <button type="submit" disabled={loading || !draft.trim()} className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white transition disabled:cursor-not-allowed disabled:opacity-50">
                   <SendHorizonal className="h-4 w-4" />

@@ -1,13 +1,78 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
+import { apiFetch } from '../lib/api'
 
 export default function Cart() {
-  const { cart, removeItem, updateQuantity } = useCart()
+  const { cart, removeItem, updateQuantity, updateItem } = useCart()
   const navigate = useNavigate()
 
   // selected: Set of item ids
   const [selected, setSelected] = useState(() => new Set(cart.items.map(i => i.id)))
+  const [syncing, setSyncing] = useState(false)
+  const [syncMessage, setSyncMessage] = useState(null)
+  const [isValid, setIsValid] = useState(true)
+
+  const validateCart = async () => {
+    if (!cart?.items?.length) return true
+    setSyncing(true)
+    try {
+      const res = await apiFetch('/store/cart/validate', {
+        method: 'POST',
+        body: {
+          items: cart.items.map(item => ({
+            variant_id: item.variantId,
+            quantity: item.quantity
+          }))
+        }
+      })
+      
+      if (res && res.standalone_max_allowed) {
+        let adjusted = false
+        for (const item of cart.items) {
+          const currentMax = res.standalone_max_allowed[item.variantId]
+          if (currentMax !== undefined) {
+            const cap = currentMax === null ? Infinity : currentMax
+            if (item.maxAllowed !== cap) {
+              updateItem(item.id, { maxAllowed: cap })
+              if (item.quantity > cap) {
+                updateQuantity(item.id, Math.max(0, cap))
+                adjusted = true
+              }
+            }
+          }
+        }
+        if (!res.valid) {
+          setSyncMessage(res.message)
+          setIsValid(false)
+          return false
+        } else if (adjusted) {
+          setSyncMessage("Số lượng một số sản phẩm đã được điều chỉnh do nguyên liệu không đủ.")
+          setIsValid(true)
+          return false // Don't proceed, let them see the changes
+        } else {
+          setSyncMessage(null)
+          setIsValid(true)
+          return true
+        }
+      }
+    } catch (err) {
+      console.error("Cart sync error", err)
+      return false
+    } finally {
+      setSyncing(false)
+    }
+    return true
+  }
+
+  useEffect(() => {
+    let mounted = true
+    if (mounted) {
+      validateCart()
+    }
+    return () => { mounted = false }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // run once on mount
 
   const allChecked = cart.items.length > 0 && selected.size === cart.items.length
   const someChecked = selected.size > 0 && selected.size < cart.items.length
@@ -36,10 +101,13 @@ export default function Cart() {
     [selectedItems]
   )
 
-  const selectedCount = selectedItems.reduce((sum, i) => sum + i.quantity, 0)
+  const selectedCount = selectedItems.length
 
-  const handleCheckout = () => {
-    navigate('/checkout', { state: { selectedItems } })
+  const handleCheckout = async () => {
+    const valid = await validateCart()
+    if (valid) {
+      navigate('/checkout', { state: { selectedItems } })
+    }
   }
 
   if (cart.items.length === 0) {
@@ -72,6 +140,15 @@ export default function Cart() {
       <div className="lg:grid lg:grid-cols-12 lg:gap-10">
         {/* Item list */}
         <div className="lg:col-span-8 space-y-3 mb-8 lg:mb-0">
+          
+          {syncMessage && (
+            <div className="mb-4 bg-orange-50 border-l-4 border-orange-500 p-4 rounded-xl text-orange-800 text-sm animate-fadeIn">
+              <div className="flex gap-2 items-start">
+                <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                <p>{syncMessage}</p>
+              </div>
+            </div>
+          )}
 
           {/* Select-all bar */}
           <div className="flex items-center gap-3 px-5 py-3 bg-[#fffaf4] rounded-2xl border border-[#efe7dc]">
@@ -163,7 +240,14 @@ export default function Cart() {
                       </button>
                       <span className="product-meta px-2 text-secondary min-w-[2rem] text-center text-sm font-medium">{item.quantity}</span>
                       <button
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        onClick={() => {
+                          const max = item.maxAllowed ?? Infinity;
+                          if (item.quantity + 1 > max) {
+                            alert("Đơn hàng của bạn lớn hơn lượng nguyên liệu đang có, liên hệ shop để được hỗ trợ.")
+                          } else {
+                            updateQuantity(item.id, item.quantity + 1)
+                          }
+                        }}
                         className="px-2.5 h-full text-secondary hover:text-primary transition-colors flex items-center"
                       >
                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -226,13 +310,29 @@ export default function Cart() {
 
             <button
               onClick={handleCheckout}
-              disabled={selected.size === 0}
-              className="w-full flex items-center justify-center gap-2 py-4 rounded-xl font-semibold transition-all
-                disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-y-0
-                bg-primary text-white hover:bg-primary-dark hover:shadow-lg hover:-translate-y-0.5"
+              disabled={selected.size === 0 || syncing || !isValid}
+              className={`w-full flex items-center justify-center gap-2 py-4 rounded-xl font-semibold transition-all
+                ${selected.size === 0 || syncing || !isValid
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'bg-primary text-white hover:bg-primary-dark shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5'
+                }`}
             >
-              Tiến hành thanh toán
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+              {syncing ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Đang đồng bộ...
+                </>
+              ) : !isValid ? (
+                'Vượt quá tồn kho'
+              ) : (
+                <>
+                  Tiến hành thanh toán
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                </>
+              )}
             </button>
 
             <Link to="/products" className="mt-4 flex items-center justify-center gap-1.5 text-sm text-[#8b7b68] hover:text-primary transition-colors">

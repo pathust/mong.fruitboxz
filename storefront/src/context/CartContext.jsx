@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useReducer, useEffect, useState, useCallback, useRef } from 'react'
+import { createContext, useContext, useReducer, useEffect, useState, useCallback, useRef, useMemo } from 'react'
 import { apiFetch } from '../lib/api'
 
 const CartContext = createContext()
@@ -46,12 +46,12 @@ function cartReducer(state, action) {
               ? { ...i, quantity: i.quantity + (action.payload.quantity || 1) }
               : i
           ),
-          count: state.count + (action.payload.quantity || 1),
+          count: state.items.length,
         }
       } else {
         newState = {
           items: [...state.items, { ...action.payload, quantity: action.payload.quantity || 1 }],
-          count: state.count + (action.payload.quantity || 1),
+          count: state.items.length + 1,
         }
       }
       break
@@ -59,16 +59,24 @@ function cartReducer(state, action) {
     case 'REMOVE_ITEM':
       newState = {
         items: state.items.filter(i => i.id !== action.payload),
-        count: state.count - (state.items.find(i => i.id === action.payload)?.quantity || 0),
+        count: state.items.filter(i => i.id !== action.payload).length,
       }
       break
     case 'UPDATE_QUANTITY': {
-      const diff = action.payload.quantity - (state.items.find(i => i.id === action.payload.id)?.quantity || 0)
       newState = {
         items: state.items.map(i =>
           i.id === action.payload.id ? { ...i, quantity: action.payload.quantity } : i
         ),
-        count: Math.max(0, state.count + diff),
+        count: state.items.length,
+      }
+      break
+    }
+    case 'UPDATE_ITEM': {
+      newState = {
+        items: state.items.map(i =>
+          i.id === action.payload.id ? { ...i, ...action.payload.updates } : i
+        ),
+        count: state.items.length,
       }
       break
     }
@@ -173,11 +181,27 @@ export function CartProvider({ children }) {
     setTimeout(() => setToast(null), 3000)
   }, [])
   const removeItem = useCallback((id) => dispatch({ type: 'REMOVE_ITEM', payload: id }), [])
-  const updateQuantity = useCallback((id, quantity) => dispatch({ type: 'UPDATE_QUANTITY', payload: { id, quantity } }), [])
+  const updateQuantity = useCallback((id, quantity) => {
+    dispatch({ type: 'UPDATE_QUANTITY', payload: { id, quantity } })
+  }, [])
+  const updateItem = useCallback((id, updates) => {
+    dispatch({ type: 'UPDATE_ITEM', payload: { id, updates } })
+  }, [])
   const clearCart = useCallback(() => dispatch({ type: 'CLEAR_CART' }), [])
+  const value = useMemo(
+    () => ({
+      cart,
+      addItem,
+      removeItem,
+      updateQuantity,
+      updateItem,
+      clearCart,
+    }),
+    [cart, addItem, removeItem, updateQuantity, updateItem, clearCart]
+  )
 
   return (
-    <CartContext.Provider value={{ cart, addItem, removeItem, updateQuantity, clearCart }}>
+    <CartContext.Provider value={value}>
       {children}
       {toast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-bounce">
