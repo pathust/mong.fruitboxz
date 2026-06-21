@@ -20,7 +20,7 @@ function getRequiredPermissions(path: string, method: string) {
 
   const permissionModule = moduleName === "product-categories"
     ? "categories"
-    : moduleName === "blog-posts" ? "settings" : moduleName
+    : (moduleName === "blog-posts" || moduleName === "chatbot") ? "settings" : moduleName
   const hasEntityTarget = path.split("/").filter(Boolean).length > 2
   const action = method === "DELETE"
     ? "delete"
