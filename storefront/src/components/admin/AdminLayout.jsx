@@ -15,7 +15,7 @@ const navGroups = [
     label: "Bán hàng",
     items: [
       { label: "Đơn hàng", path: "/admin/orders", icon: ShoppingCart, permission: "orders.read" },
-      { label: "Khách hàng", path: "/admin/customers", icon: Users, permission: "users.read" },
+      { label: "Khách hàng", path: "/admin/customers", icon: Users, permission: "customers.read" },
       { label: "Sản phẩm", path: "/admin/products", icon: Package, permission: "products.read" },
       { label: "Danh mục", path: "/admin/categories", icon: FolderKanban, permission: "categories.read" },
       { label: "Khuyến mãi", path: "/admin/promotions", icon: Tag, permission: "products.read" },
@@ -45,7 +45,7 @@ const navGroups = [
   {
     label: "AI & Khám phá",
     items: [
-      { label: "Chatbot AI", path: "/admin/chatbot", icon: Bot, permission: "chatbot.read" },
+      { label: "Chatbot AI", path: "/admin/chatbot", icon: Bot, permission: "settings.read" },
       { label: "Tìm kiếm", path: "/admin/search", icon: Search, permission: "users.read" },
     ],
   },
@@ -145,7 +145,7 @@ export default function AdminLayout() {
       {sidebarOpen && <div className="fixed inset-0 z-40 bg-[#2c2018]/25 backdrop-blur-[2px] lg:hidden" onClick={() => setSidebarOpen(false)} />}
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="shrink-0 sticky top-0 z-30 flex h-[72px] items-center gap-4 border-b border-[#eadfcd] bg-[#fffaf4]/86 px-4 backdrop-blur-xl lg:px-6">
+        <header className="shrink-0 sticky top-0 z-40 flex h-[72px] items-center gap-4 border-b border-[#eadfcd] bg-[#fffaf4]/86 px-4 backdrop-blur-xl lg:px-6">
           <button type="button" className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#eadfcd] bg-white text-[#5d5246] lg:hidden" onClick={() => setSidebarOpen(true)}>
             <Menu className="h-5 w-5" />
           </button>

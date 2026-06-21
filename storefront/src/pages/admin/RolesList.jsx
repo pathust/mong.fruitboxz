@@ -246,9 +246,9 @@ export default function RolesList() {
         </div>
       }
 
-      <div className="bg-white rounded-2xl border border-[#eadfcd] shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-[#eadfcd] bg-[#fffaf4]/30">
-          <AdminListFilters
+      <div className="bg-white rounded-2xl border border-[#eadfcd] shadow-sm flex flex-col">
+        <div className="p-4 border-b border-[#eadfcd] bg-[#fffaf4]/95 sticky top-0 z-30 backdrop-blur-md">
+          <AdminListFilters disableSticky={true}
             actions={
             <>
                 <RequirePermission perm="roles.create">
@@ -366,12 +366,12 @@ export default function RolesList() {
               })}
             </tbody>
           </table>
-          {filteredRoles.length === 0 &&
+          {filteredRoles.length === 0 ? (
           <div className="p-16 text-center text-[#8a7a67] font-medium text-lg">
               <ShieldCheck className="w-12 h-12 mx-auto mb-4 text-[#eadfcd]" />
-              Không có vai trò nào được tìm thấy.
-            </div>
-          }
+              Không tìm thấy nhóm quyền
+          </div>
+          ) : null}
         </div>
       </div>
     </div>);

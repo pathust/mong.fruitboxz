@@ -301,7 +301,7 @@ export default function PromotionsList() {
 
       <div className="bg-white rounded-2xl shadow-sm border border-[#eadfcd] overflow-hidden">
         <div className="p-4 border-b border-[#eadfcd]">
-          <AdminListFilters
+          <AdminListFilters disableSticky={true}
         actions={
           <>
             <button

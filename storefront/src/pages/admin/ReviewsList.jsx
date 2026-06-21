@@ -71,8 +71,8 @@ export default function ReviewsList() {
       </AdminHeaderPortal>
 
       <div className="bg-white rounded-2xl shadow-sm border border-[#eadfcd] overflow-hidden">
-        <div className="p-4 border-b border-[#eadfcd] bg-[#fffaf4]/30">
-          <AdminListFilters
+        <div className="p-4 border-b border-[#eadfcd] bg-[#fffaf4] sticky top-0 rounded-t-2xl z-30 backdrop-blur-md">
+          <AdminListFilters disableSticky={true}
             search={query}
             onSearchChange={setQuery}
             searchPlaceholder="Tìm đánh giá..."
@@ -142,11 +142,11 @@ export default function ReviewsList() {
                   </td>
                 </tr>
                 )}
-              {filtered.length === 0 &&
+              {filtered.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-5 py-8 text-center text-secondary-light">Không tìm thấy đánh giá</td>
                 </tr>
-                }
+              ) : null}
             </tbody>
           </table>
         </div>

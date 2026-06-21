@@ -29,7 +29,7 @@ export default function OrdersList() {
   const [fulfillmentStatus, setFulfillmentStatus] = useState("all");
 
   useEffect(() => {
-    api("/admin/orders?limit=50&fields=id,email,status,total,created_at,metadata,*shipping_address").
+    api("/admin/orders?limit=50&fields=id,email,status,total,created_at,metadata,customer_id,*shipping_address").
     then((d) => setOrders(d.orders || [])).
     catch(() => setOrders([])).
     finally(() => setLoading(false));
@@ -70,9 +70,9 @@ export default function OrdersList() {
         </div>
       </AdminHeaderPortal>
 
-      <div className="bg-white rounded-2xl border border-[#eadfcd] shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-[#eadfcd] bg-[#fffaf4]/30">
-          <AdminListFilters
+      <div className="bg-white rounded-2xl border border-[#eadfcd] shadow-sm flex flex-col">
+        <div className="p-4 border-b border-[#eadfcd] bg-[#fffaf4]/95 sticky top-0 z-30 backdrop-blur-md">
+          <AdminListFilters disableSticky={true}
             search={query}
             onSearchChange={setQuery}
             searchPlaceholder="Tìm mã đơn, khách hàng..."
@@ -137,7 +137,6 @@ export default function OrdersList() {
               <th className="px-5 py-4">Thanh toán</th>
               <th className="px-5 py-4">Giao hàng</th>
               <th className="px-5 py-4 text-right">Tổng tiền</th>
-              <th className="px-5 py-4 text-right">Thao tác</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[#eadfcd]/50">
@@ -154,7 +153,13 @@ export default function OrdersList() {
                   <p className="mt-1 text-xs text-[#8d7f6f]">{new Date(o.created_at).toLocaleDateString("vi-VN")}</p>
                 </td>
                 <td className="px-5 py-4">
-                  <p className="font-bold text-secondary text-[15px]">{customerName || "Khách lẻ"}</p>
+                  {o.customer_id ? (
+                    <Link to={`/admin/customers/${o.customer_id}`} className="font-bold text-secondary hover:text-primary text-[15px] hover:underline">
+                      {customerName || "Khách lẻ"}
+                    </Link>
+                  ) : (
+                    <p className="font-bold text-secondary text-[15px]">{customerName || "Khách lẻ"}</p>
+                  )}
                   <div className="mt-1 space-y-0.5 text-xs text-[#8d7f6f]">
                     {o.shipping_address?.phone && <p>{o.shipping_address.phone}</p>}
                     {customerAddress && <p className="line-clamp-2 max-w-[280px]">{customerAddress}</p>}
@@ -180,19 +185,12 @@ export default function OrdersList() {
                     })()}
                 </td>
                 <td className="px-5 py-4 text-right font-bold text-secondary">{o.total ? `${o.total.toLocaleString()} ₫` : "—"}</td>
-                <td className="px-5 py-4 text-right">
-                  <div className="flex justify-end gap-2">
-                    <Link to={`/admin/orders/${o.id}`} className="rounded-xl border border-transparent p-2 text-primary transition-colors hover:border-[#eadfcd] hover:bg-[#fffaf4]" title="Xem">
-                      <Eye className="w-4 h-4" />
-                    </Link>
-                  </div>
-                </td>
               </tr>);
 
             })}
-            {filteredOrders.length === 0 &&
-            <tr><td colSpan={8} className="px-5 py-8 text-center text-[#8d7f6f]">Chưa có đơn hàng nào</td></tr>
-            }
+            {filteredOrders.length === 0 ? (
+            <tr><td colSpan={7} className="px-5 py-8 text-center text-[#8d7f6f]">Chưa có đơn hàng nào</td></tr>
+            ) : null}
           </tbody>
         </table>
       </div>

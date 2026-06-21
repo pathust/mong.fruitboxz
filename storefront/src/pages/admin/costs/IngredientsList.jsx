@@ -1,184 +1,117 @@
-import { useCallback, useMemo, useState, useEffect } from "react"
-import { Plus, Edit2, Trash2, Leaf } from "lucide-react"
-import { AdminHeaderPortal } from "../../../components/admin/AdminHeaderPortal"
+import { useEffect, useState } from "react"
 import { useAdminAuth } from "../../../context/AdminAuthContext"
+import { Plus, Edit2, Trash2, Search, Package, Leaf } from 'lucide-react'
+import { AdminHeaderPortal } from '../../../components/admin/AdminHeaderPortal'
 import { AdminListFilters, filterBySearch } from "../../../components/admin/AdminListFilters"
-
-// Simple inline modal to avoid missing imports
-function Modal({ isOpen, onClose, title, children }) {
-  if (!isOpen) return null;
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl">
-        <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
-          <h3 className="text-lg font-bold text-gray-900">{title}</h3>
-          <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-600">×</button>
-        </div>
-        <div className="p-6">{children}</div>
-      </div>
-    </div>
-  )
-}
-
-import AdminSelect from "../../../components/admin/AdminSelect";
 
 export default function IngredientsList() {
   const { api } = useAdminAuth()
   const [ingredients, setIngredients] = useState([])
   const [loading, setLoading] = useState(true)
+  
+  const [query, setQuery] = useState("")
+  const [typeFilter, setTypeFilter] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingItem, setEditingItem] = useState(null)
-  const [query, setQuery] = useState("")
-  const [categoryFilter, setCategoryFilter] = useState("all")
-  const [unitFilter, setUnitFilter] = useState("all")
+  const [form, setForm] = useState({ name: "", unit: "Cái", cost_price: 0, type: "other" })
+  const [selectedIds, setSelectedIds] = useState([])
+  const [deleteCandidates, setDeleteCandidates] = useState([])
+  const [deleteUsageProducts, setDeleteUsageProducts] = useState([])
+  const [isDeleting, setIsDeleting] = useState(false)
 
-  const [form, setForm] = useState({
-    title: "",
-    sku: "",
-    unit: "kg",
-    cost_per_unit: 0,
-    category: "Fruit",
-  })
-
-  const fetchIngredients = useCallback(async () => {
+  const fetchData = async () => {
     try {
-      const res = await api("/admin/inventory-items?limit=500")
-      if (res?.inventory_items) {
-        // Map to our unified format using metadata
-        const mapped = res.inventory_items
-          .filter(item => item.metadata?.is_ingredient === true)
-          .map(item => ({
-            id: item.id,
-            title: item.title,
-            sku: item.sku,
-            unit: item.metadata?.unit || "kg",
-            category: item.metadata?.category || "Fruit",
-            cost_per_unit: item.metadata?.cost_per_unit ? Number(item.metadata.cost_per_unit) : 0
-          }))
-        setIngredients(mapped)
-      }
+      const res = await api("/admin/ingredients")
+      const data = res?.data || res || {}
+      if (data.ingredients) setIngredients(data.ingredients)
     } catch (err) {
-      console.error("Failed to fetch ingredients:", err)
+      console.error(err)
+      alert("Lỗi tải dữ liệu nguyên liệu")
     } finally {
       setLoading(false)
     }
-  }, [api])
+  }
 
   useEffect(() => {
-    const timer = window.setTimeout(fetchIngredients, 0)
-    return () => window.clearTimeout(timer)
-  }, [fetchIngredients])
+    fetchData()
+  }, [])
 
-  const handleSave = async (e) => {
+  const handleSaveIngredient = async (e) => {
     e.preventDefault()
-
-    // Fallback SKU if empty
-    const skuToUse = form.sku ? form.sku : `ING-${Date.now()}`
-
     try {
-      const payload = {
-        title: form.title,
-        sku: skuToUse,
-        requires_shipping: false,
-        metadata: {
-          unit: form.unit,
-          category: form.category,
-          cost_per_unit: Number(form.cost_per_unit),
-          is_ingredient: true
-        }
-      }
-
       if (editingItem) {
-        await api(`/admin/inventory-items/${editingItem.id}`, {
-          method: "POST",
-          body: payload
+        await api(`/admin/ingredients/${editingItem.id}`, {
+          method: "PUT",
+          body: form
         })
       } else {
-        const createRes = await api(`/admin/inventory-items`, {
+        await api(`/admin/ingredients`, {
           method: "POST",
-          body: payload
+          body: form
         })
-
-        // Ensure the inventory item has a location level if it was created successfully
-        // We will try to fetch the first stock location and link it
-        if (createRes?.inventory_item) {
-          try {
-             const locRes = await api("/admin/stock-locations?limit=1")
-             if (locRes?.stock_locations && locRes.stock_locations.length > 0) {
-               const locId = locRes.stock_locations[0].id
-               await api(`/admin/inventory-items/${createRes.inventory_item.id}/location-levels`, {
-                 method: "POST",
-                 body: {
-                   location_id: locId,
-                   stocked_quantity: 0
-                 }
-               })
-             }
-          } catch(e) {
-             console.warn("Could not automatically link to stock location:", e)
-          }
-        }
       }
-
       setIsModalOpen(false)
-      fetchIngredients()
+      fetchData()
     } catch (err) {
-      console.error(err)
-      alert("Lỗi: " + (err.message || JSON.stringify(err)))
+      alert("Lỗi khi lưu nguyên liệu: " + (err.message || JSON.stringify(err)))
     }
   }
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Bạn có chắc muốn xóa nguyên liệu này?")) return
+  const confirmDelete = async (items) => {
+    setDeleteCandidates(items)
     try {
-      await api(`/admin/inventory-items/${id}`, { method: "DELETE" })
-      fetchIngredients()
+      const usagePromises = items.map(item => api(`/admin/ingredients/${item.id}/usage`))
+      const results = await Promise.all(usagePromises)
+      
+      const allProducts = new Set()
+      results.forEach(res => {
+        const data = res?.data || res || {}
+        if (data.products) {
+          data.products.forEach(p => allProducts.add(p))
+        }
+      })
+      setDeleteUsageProducts(Array.from(allProducts))
     } catch (err) {
       console.error(err)
-      alert("Lỗi khi xóa: " + err.message)
+      setDeleteUsageProducts([])
     }
   }
 
-  const openNew = () => {
-    setEditingItem(null)
-    setForm({ title: "", sku: "", unit: "kg", cost_per_unit: 0, category: "Fruit" })
-    setIsModalOpen(true)
+  const handleDeleteIngredient = async () => {
+    if (deleteCandidates.length === 0) return
+    setIsDeleting(true)
+    try {
+      await Promise.all(deleteCandidates.map(candidate => 
+        api(`/admin/ingredients/${candidate.id}`, { method: "DELETE" })
+      ))
+      setDeleteCandidates([])
+      setSelectedIds([])
+      fetchData()
+    } catch (err) {
+      alert("Lỗi khi xoá: " + err.message)
+    } finally {
+      setIsDeleting(false)
+    }
   }
 
-  const openEdit = (item) => {
-    setEditingItem(item)
-    setForm({ ...item })
-    setIsModalOpen(true)
+  if (loading) return <div className="p-8 text-center text-gray-500">Đang tải...</div>
+
+  const INGREDIENT_TYPES = {
+    fruit: "Hoa quả",
+    dip_sauce: "Sốt chấm",
+    mix_sauce: "Sốt trộn",
+    yogurt: "Sữa chua",
+    other: "Khác"
   }
 
-  const categoryOptions = useMemo(() => {
-    const categories = [...new Set(ingredients.map((item) => item.category).filter(Boolean))]
-    return [
-      { value: "all", label: "Tất cả phân loại" },
-      ...categories.map((category) => ({ value: category, label: category })),
-    ]
-  }, [ingredients])
-
-  const unitOptions = useMemo(() => {
-    const units = [...new Set(ingredients.map((item) => item.unit).filter(Boolean))]
-    return [
-      { value: "all", label: "Tất cả đơn vị" },
-      ...units.map((unit) => ({ value: unit, label: unit })),
-    ]
-  }, [ingredients])
-
-  const filteredIngredients = useMemo(() => {
-    return ingredients.filter((item) => {
-      return (
-        filterBySearch(item, query, ["title", "sku", "category", "unit"]) &&
-        (categoryFilter === "all" || item.category === categoryFilter) &&
-        (unitFilter === "all" || item.unit === unitFilter)
-      )
-    })
-  }, [ingredients, query, categoryFilter, unitFilter])
+  const filteredIngredients = ingredients.filter(i => {
+    const matchSearch = filterBySearch(i, query, ["name"])
+    const matchType = typeFilter.length === 0 || typeFilter.includes(i.type || 'other')
+    return matchSearch && matchType
+  })
 
   return (
-    <div>
+    <div className="max-w-7xl mx-auto space-y-6">
       <AdminHeaderPortal>
         <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
           <div>
@@ -188,129 +121,208 @@ export default function IngredientsList() {
             </h1>
             <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Quản lý danh sách nguyên liệu và công thức cấu thành.</p>
           </div>
-          
         </div>
       </AdminHeaderPortal>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-[#eadfcd] overflow-hidden">
-        <div className="p-4 border-b border-[#eadfcd] bg-[#fffaf4]/30">
+      <div className="bg-white rounded-2xl shadow-sm border border-[#eadfcd]">
+        <div className="p-4 border-b border-[#eadfcd] bg-[#fffaf4]/95 flex flex-col sm:flex-row items-center justify-between gap-4 sticky top-0 z-30 backdrop-blur-md">
           <AdminListFilters
-        actions={
-          <>
-            <button onClick={openNew} className="admin-button-primary px-4 py-2 text-sm flex items-center gap-2">
-            <Plus className="w-4 h-4" /> Thêm nguyên liệu
-          </button>
-          </>
-        }
+            disableSticky={true}
+            actions={
+              <div className="flex items-center gap-2">
+                {selectedIds.length > 0 && (
+                  <button onClick={() => {
+                    const selectedItems = ingredients.filter(i => selectedIds.includes(i.id))
+                    confirmDelete(selectedItems)
+                  }} className="bg-red-50 text-red-600 hover:bg-red-100 px-4 py-2 rounded-xl transition-colors text-sm font-medium flex items-center gap-2 whitespace-nowrap">
+                    <Trash2 className="w-4 h-4" /> Xoá {selectedIds.length} mục
+                  </button>
+                )}
+                <button onClick={() => {
+                  setEditingItem(null)
+                  setForm({ name: "", unit: "Cái", cost_price: 0, type: "other" })
+                  setIsModalOpen(true)
+                }} className="admin-button-primary px-4 py-2 flex items-center gap-2 whitespace-nowrap">
+                  <Plus className="w-4 h-4" /> Thêm nguyên liệu
+                </button>
+              </div>
+            }
             search={query}
             onSearchChange={setQuery}
-            searchPlaceholder="Tìm nguyên liệu..."
-            showing={filteredIngredients.length}
-            total={ingredients.length}
-            onReset={() => {
-              setQuery("")
-              setCategoryFilter("all")
-              setUnitFilter("all")
-            }}
             filters={[
-              { label: "Phân loại", value: categoryFilter, onChange: setCategoryFilter, options: categoryOptions },
-              { label: "Đơn vị", value: unitFilter, onChange: setUnitFilter, options: unitOptions },
+              {
+                type: "checkbox",
+                label: "Phân loại",
+                value: typeFilter,
+                onChange: setTypeFilter,
+                options: [
+                  { value: "fruit", label: "Hoa quả" },
+                  { value: "dip_sauce", label: "Sốt chấm" },
+                  { value: "mix_sauce", label: "Sốt trộn" },
+                  { value: "yogurt", label: "Sữa chua" },
+                  { value: "other", label: "Khác" }
+                ]
+              }
             ]}
           />
         </div>
-        <table className="w-full text-left text-sm">
-          <thead className="bg-[#fffaf4] text-[#8d7f6f] text-xs uppercase tracking-wider font-bold border-b border-[#eadfcd]">
-            <tr>
-              <th className="px-5 py-4">Tên nguyên liệu</th>
-              <th className="px-5 py-4">SKU</th>
-              <th className="px-5 py-4">Phân loại</th>
-              <th className="px-5 py-4">Giá vốn (₫)</th>
-              <th className="px-5 py-4">Đơn vị</th>
-              <th className="px-5 py-4 text-right">Thao tác</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[#eadfcd]/50">
-            {loading ? (
-              <tr><td colSpan="6" className="text-center py-6 text-gray-500">Đang tải...</td></tr>
-            ) : filteredIngredients.length === 0 ? (
-              <tr><td colSpan="6" className="text-center py-6 text-gray-500">Chưa có nguyên liệu nào.</td></tr>
-            ) : (
-              filteredIngredients.map(item => (
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm text-[#5d5246]">
+            <thead className="bg-[#fffaf4] text-[#8d7f6f] text-xs uppercase tracking-wider font-bold border-b border-[#eadfcd]">
+              <tr>
+                <th className="px-6 py-4 w-12">
+                  <input type="checkbox" className="rounded border-[#eadfcd] text-primary focus:ring-primary bg-[#fffaf4]"
+                    checked={filteredIngredients.length > 0 && selectedIds.length === filteredIngredients.length}
+                    onChange={(e) => {
+                      if (e.target.checked) setSelectedIds(filteredIngredients.map(i => i.id))
+                      else setSelectedIds([])
+                    }}
+                  />
+                </th>
+                <th className="px-6 py-4">Tên nguyên liệu</th>
+                <th className="px-6 py-4">Phân loại</th>
+                <th className="px-6 py-4">Đơn vị</th>
+                <th className="px-6 py-4">Giá vốn (VND)</th>
+                <th className="px-6 py-4 text-right">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#eadfcd]/50">
+              {filteredIngredients.map((item) => (
                 <tr key={item.id} className="hover:bg-[#fffaf4]/50 transition-colors">
-                  <td className="px-5 py-4 font-semibold text-primary">{item.title}</td>
-                  <td className="px-5 py-4 text-gray-500 font-mono text-xs">{item.sku}</td>
-                  <td className="px-5 py-4">{item.category}</td>
-                  <td className="px-5 py-4 text-[#c7643a] font-semibold">{item.cost_per_unit.toLocaleString('vi-VN')}</td>
-                  <td className="px-5 py-4">{item.unit}</td>
-                  <td className="px-5 py-4 flex justify-end gap-2">
-                    <button onClick={() => openEdit(item)} className="p-2 text-[#766957] hover:bg-[#eadfcd] rounded-lg">
-                      <Edit2 className="h-4 w-4" />
+                  <td className="px-6 py-4">
+                    <input type="checkbox" className="rounded border-[#eadfcd] text-primary focus:ring-primary bg-[#fffaf4]"
+                      checked={selectedIds.includes(item.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) setSelectedIds([...selectedIds, item.id])
+                        else setSelectedIds(selectedIds.filter(id => id !== item.id))
+                      }}
+                    />
+                  </td>
+                  <td className="px-6 py-4 font-semibold text-primary">{item.name}</td>
+                  <td className="px-6 py-4">
+                    <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-[#eadfcd]/30 text-[#6a5a4a]">
+                      {INGREDIENT_TYPES[item.type || 'other'] || 'Khác'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">{item.unit}</td>
+                  <td className="px-6 py-4 text-[#c7643a] font-semibold">{item.cost_price?.toLocaleString('vi-VN') || "0"}₫</td>
+                  <td className="px-6 py-4 flex justify-end gap-2">
+                    <button onClick={() => {
+                      setEditingItem(item)
+                      setForm(item)
+                      setIsModalOpen(true)
+                    }} className="p-2 text-[#766957] hover:bg-[#eadfcd] rounded-lg transition-colors">
+                      <Edit2 className="w-4 h-4" />
                     </button>
-                    <button onClick={() => handleDelete(item.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg">
-                      <Trash2 className="h-4 w-4" />
+                    <button onClick={() => confirmDelete([item])} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors ml-1">
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ))}
+              {filteredIngredients.length === 0 ? (
+                <tr>
+                  <td colSpan="5" className="px-6 py-8 text-center text-gray-500">
+                    Không tìm thấy nguyên liệu nào.
+                  </td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingItem ? "Sửa Nguyên Liệu" : "Thêm Nguyên Liệu"}>
-        <form onSubmit={handleSave} className="space-y-4">
+        <form onSubmit={handleSaveIngredient} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Tên nguyên liệu</label>
-            <input required value={form.title} onChange={e => setForm({...form, title: e.target.value})} className="admin-input w-full px-4 py-2" placeholder="Ví dụ: Dưa hấu đỏ" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">SKU (Mã nội bộ)</label>
-            <input value={form.sku} onChange={e => setForm({...form, sku: e.target.value})} className="admin-input w-full px-4 py-2" placeholder="VD: ING-WATERMELON (Bỏ trống tự tạo)" />
+            <label className="block text-sm font-medium text-gray-700 mb-1">Tên nguyên liệu *</label>
+            <input required type="text" className="admin-input w-full" value={form.name} onChange={e => setForm({...form, name: e.target.value})} placeholder="VD: Quả Táo Fuji" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Phân loại</label>
-              <AdminSelect
-                value={form.category}
-                onChange={(val) => setForm({...form, category: val})}
-                options={[
-                  { value: "Fruit", label: "Hoa quả tươi (Fruit)" },
-                  { value: "Yogurt", label: "Sữa chua (Yogurt)" },
-                  { value: "Topping", label: "Đồ ăn kèm (Topping/Snack)" },
-                  { value: "Sauce", label: "Gia vị / Sốt (Sauce)" },
-                  { value: "Packaging", label: "Bao bì (Packaging)" },
-                  { value: "Other", label: "Khác (Other)" }
-                ]}
-                className="w-full bg-[#fffaf4] border-[#eadfcd]"
-              />
+              <label className="block text-sm font-medium text-gray-700 mb-1">Phân loại</label>
+              <select className="admin-input w-full" value={form.type || "other"} onChange={e => setForm({...form, type: e.target.value})}>
+                <option value="fruit">Hoa quả</option>
+                <option value="dip_sauce">Sốt chấm</option>
+                <option value="mix_sauce">Sốt trộn</option>
+                <option value="yogurt">Sữa chua</option>
+                <option value="other">Khác</option>
+              </select>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Đơn vị tính</label>
-              <AdminSelect
-                value={form.unit}
-                onChange={(val) => setForm({...form, unit: val})}
-                options={[
-                  { value: "kg", label: "Kilogram (kg)" },
-                  { value: "gram", label: "Gram (g)" },
-                  { value: "ml", label: "Mililit (ml)" },
-                  { value: "lít", label: "Lít (L)" },
-                  { value: "hộp", label: "Hộp (box)" },
-                  { value: "cái", label: "Cái (piece)" }
-                ]}
-                className="w-full bg-[#fffaf4] border-[#eadfcd]"
-              />
+              <label className="block text-sm font-medium text-gray-700 mb-1">Đơn vị</label>
+              <select className="admin-input w-full" value={form.unit || "Cái"} onChange={e => setForm({...form, unit: e.target.value})}>
+                <option value="Kilogram">Kilogram (kg)</option>
+                <option value="Gram">Gram (g)</option>
+                <option value="Lít">Lít (l)</option>
+                <option value="Mililít">Mililít (ml)</option>
+                <option value="Hộp">Hộp</option>
+                <option value="Quả">Quả</option>
+                <option value="Gói">Gói</option>
+                <option value="Cái">Cái</option>
+                <option value="Viên">Viên</option>
+                <option value="Hũ">Hũ</option>
+              </select>
             </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Giá vốn (₫) / Đơn vị tính</label>
-            <input type="number" required min={0} value={form.cost_per_unit} onChange={e => setForm({...form, cost_per_unit: Number(e.target.value) || 0})} className="admin-input w-full px-4 py-2" />
+            
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Giá vốn (VND)</label>
+              <input type="number" className="admin-input w-full" value={form.cost_price || 0} onChange={e => setForm({...form, cost_price: Number(e.target.value)})} />
+            </div>
           </div>
-          <div className="pt-4 flex justify-end gap-3 border-t border-[#eadfcd]">
-            <button type="button" onClick={() => setIsModalOpen(false)} className="admin-button-secondary px-4 py-2 text-sm">Hủy</button>
-            <button type="submit" className="admin-button-primary px-4 py-2 text-sm">Lưu</button>
+          <div className="pt-4 flex justify-end gap-3">
+            <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-xl transition-colors font-medium">Hủy</button>
+            <button type="submit" className="admin-button-primary px-6 py-2">Lưu lại</button>
           </div>
         </form>
       </Modal>
+
+      <Modal isOpen={deleteCandidates.length > 0} onClose={() => setDeleteCandidates([])} title="Xác nhận xoá nguyên liệu">
+        <div className="space-y-4">
+          <p className="text-gray-700">
+            Bạn có chắc chắn muốn xoá <strong>{deleteCandidates.length}</strong> nguyên liệu đã chọn không?
+          </p>
+          
+          {deleteUsageProducts.length > 0 && (
+            <div className="bg-yellow-50 text-yellow-800 p-4 rounded-xl border border-yellow-200">
+              <p className="font-semibold mb-2">Cảnh báo: Nguyên liệu này đang được sử dụng trong các sản phẩm sau:</p>
+              <ul className="list-disc pl-5 space-y-1 text-sm">
+                {deleteUsageProducts.map((p, i) => <li key={i}>{p}</li>)}
+              </ul>
+              <p className="mt-2 text-sm font-medium">Việc xoá nguyên liệu sẽ ảnh hưởng đến công thức của các sản phẩm này.</p>
+            </div>
+          )}
+
+          <div className="pt-4 flex justify-end gap-3">
+            <button type="button" onClick={() => setDeleteCandidates([])} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-xl transition-colors font-medium">Hủy</button>
+            <button type="button" onClick={handleDeleteIngredient} disabled={isDeleting} className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-xl transition-colors font-medium disabled:opacity-50">
+              {isDeleting ? "Đang xoá..." : "Xoá"}
+            </button>
+          </div>
+        </div>
+      </Modal>
+    </div>
+  )
+}
+
+function Modal({ isOpen, onClose, title, children }) {
+  if (!isOpen) return null
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
+        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+          <h2 className="text-lg font-bold text-gray-900">{title}</h2>
+          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-colors">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div className="p-6">{children}</div>
+      </div>
     </div>
   )
 }

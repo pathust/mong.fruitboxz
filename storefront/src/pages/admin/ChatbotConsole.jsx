@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Bot, Save, AlertCircle, CheckCircle2, History, Trash2, Power, PowerOff, Sparkles, SlidersHorizontal, Info, KeySquare, MessageSquareWarning, CirclePlus, LoaderCircle } from "lucide-react";
+import { Bot, Save, AlertCircle, CheckCircle2, History, Trash2, Power, PowerOff, Sparkles, SlidersHorizontal, Info, KeySquare, MessageSquareWarning, CirclePlus, LoaderCircle, CopyPlus } from "lucide-react";
 import { AdminHeaderPortal } from "../../components/admin/AdminHeaderPortal";
 import { useAdminAuth } from '../../context/AdminAuthContext';
 import { useToast } from '../../components/ui/ToastProvider';
@@ -22,6 +22,8 @@ export default function ChatbotConsole() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -76,9 +78,48 @@ export default function ChatbotConsole() {
     }
   };
 
+  const handleDeleteUnanswered = async (id) => {
+    if (!window.confirm("Bạn có chắc muốn xoá câu hỏi này khỏi danh sách huấn luyện không?")) return;
+    try {
+      await api(`/admin/chatbot/unanswered/${id}`, { method: 'DELETE' });
+      setUnanswered(prev => prev.filter(item => item.id !== id));
+      setSelectedIds(prev => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+      pushToast("Đã xoá câu hỏi", "success");
+    } catch {
+      pushToast("Lỗi khi xoá câu hỏi", "error");
+    }
+  };
 
-
-
+  const handleBulkDelete = async (deleteAll = false) => {
+    if (!deleteAll && selectedIds.size === 0) return;
+    if (!window.confirm(deleteAll ? "Bạn có chắc muốn xoá TẤT CẢ câu hỏi chưa trả lời không?" : `Bạn có chắc muốn xoá ${selectedIds.size} câu hỏi đã chọn không?`)) return;
+    
+    setDeleting(true);
+    try {
+      await api('/admin/chatbot/unanswered', {
+        method: 'DELETE',
+        body: {
+          deleteAll,
+          ids: deleteAll ? [] : Array.from(selectedIds)
+        }
+      });
+      if (deleteAll) {
+        setUnanswered([]);
+      } else {
+        setUnanswered(prev => prev.filter(item => !selectedIds.has(item.id)));
+      }
+      setSelectedIds(new Set());
+      pushToast("Đã xoá thành công", "success");
+    } catch {
+      pushToast("Lỗi khi xoá câu hỏi", "error");
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   if (error) {
     return <AdminError message={error} onRetry={() => window.location.reload()} />;
@@ -135,18 +176,18 @@ export default function ChatbotConsole() {
         <div className="grid md:grid-cols-3 gap-8 relative z-10">
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-[#c85b34] font-bold text-[15px]">
-              <Bot className="w-4 h-4" /> 1. Cơ chế hoạt động
+              <Bot className="w-4 h-4" /> 1. AI & RAG (Tự động hiểu ý)
             </div>
             <p className="text-[14px] text-[#766957] leading-relaxed">
-              Khi khách hỏi, Chatbot sẽ ưu tiên tìm trong <strong className="text-[#4f453b]">FAQ Rules</strong> trước. Nếu không có, nó tự động tìm các <strong className="text-[#4f453b]">Sản phẩm</strong> liên quan. Nếu vẫn không trả lời được, câu hỏi sẽ bị đẩy vào mục <strong className="text-[#4f453b]">Chưa xử lý tốt</strong>.
+              Hệ thống đã được tích hợp <strong>Groq LLM (Llama 3)</strong>. Chatbot sẽ tự phân tích ý định khách hàng, tìm kiếm trong <strong className="text-[#4f453b]">FAQ Rules</strong> và <strong className="text-[#4f453b]">Sản phẩm</strong> liên quan, sau đó sinh ra câu trả lời tiếng Việt vô cùng tự nhiên.
             </p>
           </div>
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-[#c85b34] font-bold text-[15px]">
-              <KeySquare className="w-4 h-4" /> 2. Tối ưu Từ khóa
+              <KeySquare className="w-4 h-4" /> 2. Tối ưu Nguồn Dữ Liệu
             </div>
             <p className="text-[14px] text-[#766957] leading-relaxed">
-              Tại mỗi câu hỏi FAQ, hãy nhập các từ khóa trọng tâm (cách nhau bởi dấu phẩy). Ví dụ: <code className="bg-[#fff4ea] text-primary px-1.5 py-0.5 rounded text-xs font-semibold">phí ship, vận chuyển</code>. AI sẽ dựa vào đây để bắt ý định siêu chuẩn xác!
+              Hãy nhập các từ khóa trọng tâm ở mỗi FAQ. Ví dụ: <code className="bg-[#fff4ea] text-primary px-1.5 py-0.5 rounded text-xs font-semibold">phí ship, vận chuyển</code>. AI sẽ đọc các từ khóa này để lấy câu trả lời tương ứng đưa vào Prompt ngữ cảnh, giúp tư vấn chuẩn xác 100%.
             </p>
           </div>
           <div className="space-y-3">
@@ -251,21 +292,72 @@ export default function ChatbotConsole() {
         {/* Unanswered Section (Right - Takes up 1/3 width) */}
         <div className="space-y-6">
           <div className="bg-white rounded-[24px] border border-[#efe4d4] shadow-sm p-6 md:p-8 h-full">
-            <div className="flex items-center gap-3 mb-6">
+            <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center shrink-0">
                 <MessageSquareWarning className="w-5 h-5" />
               </div>
-              <div>
+              <div className="flex-1">
                 <h2 className="text-[18px] font-bold text-[#3f352b]">Cần huấn luyện thêm</h2>
                 <p className="text-[13px] text-[#8a7a67] font-medium mt-0.5">Tin nhắn bot chưa hiểu được</p>
               </div>
             </div>
 
-            <div className="mt-6 space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+            {unanswered.length > 0 && (
+              <div className="flex items-center justify-between mb-4 pb-4 border-b border-[#efe4d4]">
+                <label className="flex items-center gap-2 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.size === unanswered.length && unanswered.length > 0}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedIds(new Set(unanswered.map(i => i.id)));
+                      } else {
+                        setSelectedIds(new Set());
+                      }
+                    }}
+                    className="w-4 h-4 rounded text-primary focus:ring-primary/20 cursor-pointer border-[#eadfcd]"
+                  />
+                  <span className="text-sm font-semibold text-[#8a7a67] group-hover:text-[#4d4339] transition-colors">
+                    Chọn tất cả
+                  </span>
+                </label>
+                
+                <div className="flex items-center gap-2">
+                  {selectedIds.size > 0 && (
+                    <button
+                      onClick={() => handleBulkDelete(false)}
+                      disabled={deleting}
+                      className="text-xs font-bold bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      Xoá ({selectedIds.size})
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-4 max-h-[560px] overflow-y-auto pr-2 custom-scrollbar">
               {unanswered.map((item) =>
-                <div key={item.id} className="relative group rounded-2xl border border-[#efe4d4] bg-[#fffaf4] p-4 hover:border-primary/30 hover:bg-white transition-colors">
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-[#f2d7cf] rounded-r-full group-hover:bg-primary transition-colors" />
-                  <p className="text-[14px] font-semibold text-[#43382f] leading-snug pl-2">"{item.message}"</p>
+                <div key={item.id} className="relative group rounded-2xl border border-[#efe4d4] bg-[#fffaf4] p-4 hover:border-primary/30 hover:bg-white transition-colors flex items-start gap-3">
+                  <div className="mt-1 shrink-0">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(item.id)}
+                      onChange={(e) => {
+                        setSelectedIds(prev => {
+                          const next = new Set(prev);
+                          if (e.target.checked) next.add(item.id);
+                          else next.delete(item.id);
+                          return next;
+                        });
+                      }}
+                      className="w-4 h-4 rounded text-primary focus:ring-primary/20 cursor-pointer border-[#eadfcd]"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-[#f2d7cf] rounded-r-full group-hover:bg-primary transition-colors" />
+                    <p className="text-[14px] font-semibold text-[#43382f] leading-snug pl-2 break-words">"{item.message}"</p>
                   <p className="text-[12px] font-medium text-[#a08d79] mt-2 pl-2">
                     {item.created_at ? new Date(item.created_at).toLocaleString('vi-VN', {
                       hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric'
@@ -273,7 +365,14 @@ export default function ChatbotConsole() {
                   </p>
                   
                   {/* Quick Action Overlay on Hover */}
-                  <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                    <button
+                      onClick={() => handleDeleteUnanswered(item.id)}
+                      className="p-2 bg-white rounded-lg shadow-sm border border-[#efe4d4] text-red-500 hover:bg-red-50 transition-colors"
+                      title="Xoá câu này">
+                      
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                     <button
                       onClick={() => {
                         setFaqs((prev) => [{ ...createFaq(), question: item.message }, ...prev]);
@@ -282,13 +381,13 @@ export default function ChatbotConsole() {
                       className="p-2 bg-white rounded-lg shadow-sm border border-[#efe4d4] text-primary hover:bg-[#fff4ea] transition-colors"
                       title="Thêm vào FAQ">
                       
-                      <CirclePlus className="w-4 h-4" />
+                      <CopyPlus className="w-4 h-4" />
                     </button>
+                  </div>
                   </div>
                 </div>
                 )}
-              
-              {!unanswered.length &&
+              {unanswered.length === 0 && (
                 <div className="py-12 flex flex-col items-center justify-center text-center">
                   <div className="w-16 h-16 rounded-full bg-green-50 text-green-500 flex items-center justify-center mb-4">
                     <Bot className="w-8 h-8" />
@@ -296,7 +395,7 @@ export default function ChatbotConsole() {
                   <h3 className="text-[16px] font-bold text-[#3f352b] mb-2">Bot đang làm rất tốt!</h3>
                   <p className="text-[14px] text-[#8a7a67] max-w-[200px]">Chưa có câu hỏi nào làm khó được AI của bạn trong thời gian qua.</p>
                 </div>
-                }
+              )}
             </div>
           </div>
         </div>

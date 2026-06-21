@@ -131,9 +131,9 @@ export default function UsersList() {
         </div>
       }
 
-      <div className="bg-white rounded-2xl border border-[#eadfcd] shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-[#eadfcd] bg-[#fffaf4]/30">
-          <AdminListFilters
+      <div className="bg-white rounded-2xl border border-[#eadfcd] shadow-sm flex flex-col">
+        <div className="p-4 border-b border-[#eadfcd] bg-[#fffaf4]/95 sticky top-0 z-30 backdrop-blur-md">
+          <AdminListFilters disableSticky={true}
         actions={
         <>
             <button
@@ -216,12 +216,12 @@ export default function UsersList() {
             })}
           </tbody>
           </table>
-          {filteredUsers.length === 0 &&
+          {filteredUsers.length === 0 ? (
           <div className="p-12 text-center">
               <ShieldAlert className="w-12 h-12 text-[#eadfcd] mx-auto mb-4" />
-              <p className="text-[#a08d79] font-medium text-lg">Không tìm thấy tài khoản nào.</p>
-            </div>
-          }
+              <p className="text-[#8a7a67] font-medium text-lg">Không tìm thấy nhân viên</p>
+          </div>
+          ) : null}
         </div>
       </div>
 

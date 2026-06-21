@@ -87,9 +87,9 @@ export default function CustomersList() {
         </div>
       </AdminHeaderPortal>
 
-      <div className="bg-white rounded-2xl border border-[#eadfcd] shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-[#eadfcd] bg-[#fffaf4]/30">
-          <AdminListFilters
+      <div className="bg-white rounded-2xl border border-[#eadfcd] shadow-sm flex flex-col">
+        <div className="p-4 border-b border-[#eadfcd] bg-[#fffaf4]/95 sticky top-0 z-30 backdrop-blur-md">
+          <AdminListFilters disableSticky={true}
             search={searchTerm}
             onSearchChange={setSearchTerm}
             searchPlaceholder="Tìm khách hàng..."

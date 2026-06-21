@@ -19,6 +19,7 @@ export default function InventoryList() {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [stockFilter, setStockFilter] = useState("all")
+  const [unitFilter, setUnitFilter] = useState([])
   const [updates, setUpdates] = useState({})
 
   const fetchInventory = useCallback(async () => {
@@ -47,14 +48,23 @@ export default function InventoryList() {
 
       // 2. Stock status filter
       const { stock } = getIngredientStock(ing)
+      let stockMatch = true
       switch (stockFilter) {
-        case "in_stock": return stock > 0
-        case "low_stock": return stock > 0 && stock <= 10
-        case "out_of_stock": return stock === 0
-        default: return true
+        case "in_stock": stockMatch = stock > 0; break;
+        case "low_stock": stockMatch = stock > 0 && stock <= 10; break;
+        case "out_of_stock": stockMatch = stock === 0; break;
       }
+      if (!stockMatch) return false
+
+      // 3. Unit filter
+      if (unitFilter.length > 0) {
+        const ingUnit = ing.metadata?.unit || "-"
+        if (!unitFilter.includes(ingUnit)) return false
+      }
+
+      return true
     })
-  }, [ingredients, searchTerm, stockFilter])
+  }, [ingredients, searchTerm, stockFilter, unitFilter])
 
   const handleUpdateStock = (ingredientId, locationId, value) => {
     const num = parseInt(value, 10)
@@ -98,6 +108,15 @@ export default function InventoryList() {
     { label: "Hết hàng (0)", value: "out_of_stock" }
   ]
 
+  const unitFilterOptions = useMemo(() => {
+    const units = new Set()
+    ingredients.forEach(ing => {
+      const u = ing.metadata?.unit || "-"
+      units.add(u)
+    })
+    return Array.from(units).map(u => ({ label: u, value: u }))
+  }, [ingredients])
+
   return (
     <div className="space-y-6 pb-20">
       <AdminHeaderPortal>
@@ -114,9 +133,9 @@ export default function InventoryList() {
       </div>
       </AdminHeaderPortal>
 
-      <div className="bg-white rounded-2xl border border-[#eadfcd] shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-[#eadfcd] bg-[#fffaf4]/30">
-          <AdminListFilters
+      <div className="bg-white rounded-2xl border border-[#eadfcd] shadow-sm flex flex-col">
+        <div className="p-4 border-b border-[#eadfcd] bg-[#fffaf4]/95 sticky top-0 z-30 backdrop-blur-md">
+          <AdminListFilters disableSticky={true}
             actions={
               <>
                 {Object.keys(updates).length > 0 && (
@@ -139,6 +158,14 @@ export default function InventoryList() {
                 value: stockFilter,
                 options: stockFilterOptions,
                 onChange: setStockFilter
+              },
+              {
+                id: "unit-filter",
+                type: "checkbox",
+                label: "Đơn vị",
+                value: unitFilter,
+                options: unitFilterOptions,
+                onChange: setUnitFilter
               }
             ]}
             total={ingredients.length}
@@ -165,7 +192,6 @@ export default function InventoryList() {
             <thead className="bg-[#fffaf4] text-[#8d7f6f] text-xs uppercase tracking-wider font-bold border-b border-[#eadfcd]">
               <tr>
                 <th className="px-5 py-4">Nguyên liệu</th>
-                <th className="px-5 py-4">Phân loại</th>
                 <th className="px-5 py-4">Đơn vị</th>
                 <th className="px-5 py-4">Tồn kho (Số lượng)</th>
               </tr>
@@ -186,11 +212,6 @@ export default function InventoryList() {
                       {ingredient.sku && (
                         <div className="text-xs text-[#8a7a67] font-mono mt-1 ml-6">{ingredient.sku}</div>
                       )}
-                    </td>
-                    <td className="px-5 py-4">
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-[#faf6f0] text-[#8a7a67]">
-                        {ingredient.metadata?.category || "Khác"}
-                      </span>
                     </td>
                     <td className="px-5 py-4">
                       <span className="text-sm font-medium text-secondary">

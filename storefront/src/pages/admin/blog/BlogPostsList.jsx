@@ -86,9 +86,9 @@ export default function BlogPostsList() {
       </div>
       </AdminHeaderPortal>
 
-      <div className="bg-white rounded-2xl border border-[#eadfcd] shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-[#eadfcd] bg-[#fffaf4]/30">
-          <AdminListFilters
+      <div className="bg-white rounded-2xl border border-[#eadfcd] shadow-sm flex flex-col">
+        <div className="p-4 border-b border-[#eadfcd] bg-[#fffaf4]/95 sticky top-0 z-30 backdrop-blur-md">
+          <AdminListFilters disableSticky={true}
             actions={
             <>
                 <Link to="/admin/blog/new" className="admin-button-primary px-4 py-2 text-sm">Thêm bài viết</Link>
@@ -157,11 +157,11 @@ export default function BlogPostsList() {
                 </td>
               </tr>
               )}
-            {filteredPosts.length === 0 && (
+            {filteredPosts.length === 0 ? (
               <tr>
                 <td colSpan="5" className="p-10 text-center text-[#8d7f6f]">Chưa có bài viết nào phù hợp.</td>
               </tr>
-            )}
+            ) : null}
           </tbody>
         </table>
       </div>

@@ -7,15 +7,18 @@ export default function AdminSelect({
   options = [], 
   className = "", 
   disabled = false, 
-  placeholder = "Chọn một tùy chọn" 
+  placeholder = "Chọn một tùy chọn",
+  searchable = false
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const dropdownRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
+        setSearchTerm('');
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -43,8 +46,21 @@ export default function AdminSelect({
 
       {isOpen && (
         <div className="absolute z-50 w-full mt-1.5 bg-white border border-[#eadfcd] rounded-xl shadow-[0_12px_40px_-12px_rgba(76,47,22,0.15)] overflow-hidden animate-in fade-in zoom-in-95 duration-150 origin-top">
+          {searchable && (
+            <div className="p-2 border-b border-gray-100">
+              <input
+                type="text"
+                autoFocus
+                placeholder="Tìm kiếm..."
+                className="w-full px-3 py-1.5 text-sm bg-gray-50 border border-transparent rounded-lg focus:bg-white focus:border-primary/30 focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
+          )}
           <ul className="max-h-64 overflow-y-auto py-1.5 scrollbar-hide">
-            {options.map((option) => {
+            {options.filter(opt => !searchable || opt.label.toLowerCase().includes(searchTerm.toLowerCase())).map((option) => {
               const isSelected = String(option.value) === String(value);
               return (
                 <li
@@ -52,6 +68,7 @@ export default function AdminSelect({
                   onClick={() => {
                     onChange(option.value);
                     setIsOpen(false);
+                    setSearchTerm('');
                   }}
                   className={`
                     relative cursor-pointer select-none py-2.5 pl-10 pr-4 text-[14px] transition-colors

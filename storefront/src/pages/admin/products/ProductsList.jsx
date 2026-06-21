@@ -39,8 +39,8 @@ export default function ProductsList() {
   const [debouncedQuery, setDebouncedQuery] = useState("")
   const [status, setStatus] = useState("all")
   const [categories, setCategories] = useState([])
-  const [categoryFilter, setCategoryFilter] = useState("all")
-  const [priceFilter, setPriceFilter] = useState("all")
+  const [categoryFilter, setCategoryFilter] = useState([])
+  const [priceFilter, setPriceFilter] = useState(["", ""])
   const [allProducts, setAllProducts] = useState([])
 
   // Pagination state
@@ -99,18 +99,17 @@ export default function ProductsList() {
       result = result.filter(p => p.status === status)
     }
 
-    if (categoryFilter !== "all") {
-      result = result.filter(p => p.categories?.some(c => c.id === categoryFilter))
+    if (categoryFilter.length > 0) {
+      result = result.filter(p => p.categories?.some(c => categoryFilter.includes(c.id)))
     }
 
-    if (priceFilter !== "all") {
+    const [minPriceF, maxPriceF] = priceFilter
+    if (minPriceF !== "" || maxPriceF !== "") {
       result = result.filter(p => {
         const minPrice = minVariantPrice(p)
         if (minPrice === null) return false
-        if (priceFilter === 'under-100') return minPrice < 100000
-        if (priceFilter === '100-300') return minPrice >= 100000 && minPrice <= 300000
-        if (priceFilter === '300-500') return minPrice >= 300000 && minPrice <= 500000
-        if (priceFilter === 'over-500') return minPrice > 500000
+        if (minPriceF !== "" && minPrice < minPriceF) return false
+        if (maxPriceF !== "" && minPrice > maxPriceF) return false
         return true
       })
     }
@@ -121,10 +120,51 @@ export default function ProductsList() {
   // Pagination slice
   const products = filteredProducts.slice(offset, offset + limit)
 
+  const [selectedIds, setSelectedIds] = useState(new Set())
+
+  const handleSelectAll = (e) => {
+    if (e.target.checked) {
+      const newSelected = new Set(selectedIds)
+      products.forEach(p => newSelected.add(p.id))
+      setSelectedIds(newSelected)
+    } else {
+      const newSelected = new Set(selectedIds)
+      products.forEach(p => newSelected.delete(p.id))
+      setSelectedIds(newSelected)
+    }
+  }
+
+  const handleSelect = (id, checked) => {
+    const newSelected = new Set(selectedIds)
+    if (checked) newSelected.add(id)
+    else newSelected.delete(id)
+    setSelectedIds(newSelected)
+  }
+
+  const handleBulkDelete = async () => {
+    if (!confirm(`Xóa ${selectedIds.size} sản phẩm đã chọn?`)) return
+    setLoading(true)
+    try {
+      const promises = Array.from(selectedIds).map(id => api(`/admin/products/${id}`, { method: "DELETE" }))
+      await Promise.all(promises)
+      setAllProducts(prev => prev.filter(p => !selectedIds.has(p.id)))
+      setSelectedIds(new Set())
+    } catch (e) {
+      alert("Có lỗi khi xóa sản phẩm")
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const deleteProduct = async (id) => {
     if (!confirm("Delete this product?")) return
     await api(`/admin/products/${id}`, { method: "DELETE" })
     setAllProducts(prev => prev.filter(p => p.id !== id))
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      next.delete(id)
+      return next
+    })
   }
 
   const handlePrevPage = () => {
@@ -155,12 +195,18 @@ export default function ProductsList() {
       </div>
       </AdminHeaderPortal>
 
-      <div className="bg-white rounded-2xl border border-[#eadfcd] shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-[#eadfcd] bg-[#fffaf4]/30">
-          <AdminListFilters
+      <div className="bg-white rounded-2xl border border-[#eadfcd] shadow-sm flex flex-col">
+        <div className="p-4 border-b border-[#eadfcd] bg-[#fffaf4]/95 sticky top-0 z-30 backdrop-blur-md">
+          <AdminListFilters disableSticky={true}
             actions={
               <>
-                <Link to="/admin/products/new" className="admin-button-primary px-5 py-3 text-sm">
+                {selectedIds.size > 0 && (
+                  <button onClick={handleBulkDelete} className="bg-red-50 text-red-600 hover:bg-red-100 rounded-xl px-5 py-3 text-sm font-bold border border-red-200 transition-colors flex items-center gap-2">
+                    <Trash2 className="h-4 w-4" />
+                    Xóa {selectedIds.size}
+                  </button>
+                )}
+                <Link to="/admin/products/new" className="admin-button-primary px-5 py-3 text-sm flex items-center gap-2">
                   <PackagePlus className="h-4 w-4" />
                   Thêm sản phẩm
                 </Link>
@@ -174,12 +220,13 @@ export default function ProductsList() {
         onReset={() => {
           setQuery("")
           setStatus("all")
-          setCategoryFilter("all")
-          setPriceFilter("all")
+          setCategoryFilter([])
+          setPriceFilter(["", ""])
           setOffset(0)
         }}
         filters={[
           {
+            type: "radio",
             label: "Trạng thái",
             value: status,
             onChange: (value) => {
@@ -188,13 +235,12 @@ export default function ProductsList() {
             },
             options: [
               { value: "all", label: "Tất cả trạng thái" },
-              { value: "published", label: "Published" },
-              { value: "draft", label: "Draft" },
-              { value: "proposed", label: "Proposed" },
-              { value: "rejected", label: "Rejected" },
+              { value: "published", label: "Đang hiển thị (Published)" },
+              { value: "draft", label: "Đang ẩn / Nháp (Draft)" }
             ],
           },
           {
+            type: "checkbox",
             label: "Danh mục",
             value: categoryFilter,
             onChange: (value) => {
@@ -202,25 +248,18 @@ export default function ProductsList() {
               setOffset(0)
             },
             options: [
-              { value: "all", label: "Tất cả danh mục" },
               ...categories
             ],
           },
           {
-            label: "Khoảng giá",
+            type: "range",
+            label: "Khoảng giá (VNĐ)",
             value: priceFilter,
             onChange: (value) => {
               setPriceFilter(value)
               setOffset(0)
-            },
-            options: [
-              { value: "all", label: "Mọi mức giá" },
-              { value: "under-100", label: "Dưới 100.000đ" },
-              { value: "100-300", label: "100.000đ - 300.000đ" },
-              { value: "300-500", label: "300.000đ - 500.000đ" },
-              { value: "over-500", label: "Trên 500.000đ" },
-            ],
-          },
+            }
+          }
         ]}
           />
         </div>
@@ -232,17 +271,32 @@ export default function ProductsList() {
             <table className="w-full text-sm">
               <thead className="bg-[#fffaf4] text-[#8d7f6f] text-xs uppercase tracking-wider font-bold border-b border-[#eadfcd]">
                 <tr>
+                  <th className="px-5 py-4 w-10">
+                    <input
+                      type="checkbox"
+                      className="rounded border-[#eadfcd] text-primary focus:ring-primary/20"
+                      checked={products.length > 0 && products.every(p => selectedIds.has(p.id))}
+                      onChange={handleSelectAll}
+                    />
+                  </th>
                   <th className="text-left px-5 py-4 font-bold">Sản phẩm</th>
                   <th className="text-left px-5 py-4 font-bold">Danh mục</th>
                   <th className="text-left px-5 py-4 font-bold">Giá từ</th>
                   <th className="text-left px-5 py-4 font-bold">Phân loại</th>
                   <th className="text-left px-5 py-4 font-bold">Trạng thái</th>
-                  <th className="text-right px-5 py-4 font-bold">Thao tác</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#eadfcd]/50">
                 {products.map(p => (
-                  <tr key={p.id} className="hover:bg-[#fffaf4]/50 transition-colors">
+                  <tr key={p.id} className={`transition-colors ${selectedIds.has(p.id) ? "bg-[#fffaf4]" : "hover:bg-[#fffaf4]/50"}`}>
+                    <td className="px-5 py-4">
+                      <input
+                        type="checkbox"
+                        className="rounded border-[#eadfcd] text-primary focus:ring-primary/20"
+                        checked={selectedIds.has(p.id)}
+                        onChange={(e) => handleSelect(p.id, e.target.checked)}
+                      />
+                    </td>
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden">
@@ -253,7 +307,9 @@ export default function ProductsList() {
                             onError={e => { e.currentTarget.src = "/mong_logo-removebg.png" }}
                           />
                         </div>
-                        <span className="font-medium text-secondary">{p.title}</span>
+                        <Link to={`/admin/products/${p.id}`} className="font-bold text-secondary hover:text-primary transition-colors hover:underline">
+                          {p.title}
+                        </Link>
                       </div>
                     </td>
                     <td className="px-5 py-4 text-secondary">
@@ -264,21 +320,11 @@ export default function ProductsList() {
                     <td className="px-5 py-4 whitespace-nowrap">
                       <span className={`admin-status ${p.status === "published" ? "bg-[#e8f6e9] text-[#2f7a37]" : "bg-[#f1eadf] text-[#766957]"}`}>{p.status}</span>
                     </td>
-                    <td className="px-5 py-4 text-right">
-                      <div className="flex justify-end gap-2">
-                        <Link to={`/admin/products/${p.id}`} className="p-1.5 text-primary hover:bg-primary/10 rounded-lg transition-colors" title="Sửa">
-                          <Pencil className="w-4 h-4" />
-                        </Link>
-                        <button onClick={() => deleteProduct(p.id)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Xóa">
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
                   </tr>
                 ))}
-                {products.length === 0 && (
+                {products.length === 0 ? (
                   <tr><td colSpan={6} className="px-5 py-8 text-center text-secondary-light">Không có sản phẩm nào</td></tr>
-                )}
+                ) : null}
               </tbody>
             </table>
           )}

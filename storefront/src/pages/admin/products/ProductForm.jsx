@@ -153,7 +153,7 @@ export default function ProductForm() {
 
         // 1. Update basic info
         await api(`/admin/products/${id}`, {
-          method: "PATCH",
+          method: "POST",
           body: {
             title: form.title,
             handle: baseSlug,
@@ -251,12 +251,11 @@ export default function ProductForm() {
           <div>
             <label className="block text-sm font-medium text-secondary mb-1">Trạng thái</label>
             <AdminSelect
-              value={form.status}
+              value={form.status === "unpublished" ? "draft" : form.status}
               onChange={(val) => setForm({ ...form, status: val })}
               options={[
-                { value: "draft", label: "Bản nháp (Draft)" },
-                { value: "published", label: "Xuất bản (Published)" },
-                { value: "unpublished", label: "Đã ẩn (Unpublished)" }
+                { value: "published", label: "Đang hiển thị (Published)" },
+                { value: "draft", label: "Đang ẩn / Nháp (Draft)" }
               ]}
             />
           </div>

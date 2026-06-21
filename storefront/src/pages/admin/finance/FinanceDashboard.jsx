@@ -64,9 +64,9 @@ function DonutChart({ items, total, centerLabel }) {
     : "#eadfcd 0deg 360deg"
 
   return (
-    <div className="flex w-full min-w-0 flex-col items-center gap-5 md:flex-row">
+    <div className="flex w-full min-w-0 flex-col items-center gap-6 sm:flex-row sm:justify-around">
       <div
-        className="relative flex h-40 w-40 shrink-0 items-center justify-center rounded-full"
+        className="relative flex h-40 w-40 shrink-0 items-center justify-center rounded-full shadow-sm"
         style={{ background: `conic-gradient(${gradient})` }}
       >
         <div className="flex h-24 w-24 flex-col items-center justify-center rounded-full bg-white text-center shadow-inner">
@@ -74,11 +74,11 @@ function DonutChart({ items, total, centerLabel }) {
           <span className="text-lg font-extrabold text-[#3e3528]">{formatShortVnd(total)}</span>
         </div>
       </div>
-      <div className="flex-1 w-full min-w-0 space-y-3">
+      <div className="flex w-full min-w-0 max-w-xs flex-col space-y-4">
         {items.map((item) => (
-          <div key={item.label} className="flex w-full min-w-0 items-center justify-between gap-3 text-sm">
-            <span className="flex flex-1 min-w-0 items-center gap-2 font-semibold text-[#43382b]">
-              <span className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: item.color }} />
+          <div key={item.label} className="flex items-center justify-between gap-4 text-sm">
+            <span className="flex min-w-0 items-center gap-2 font-semibold text-[#43382b]">
+              <span className="h-3 w-3 shrink-0 rounded-full shadow-sm" style={{ backgroundColor: item.color }} />
               <span className="truncate">{item.label}</span>
             </span>
             <span className="shrink-0 font-bold text-[#766957]">{formatVnd(item.value)}</span>
@@ -261,8 +261,8 @@ export default function FinanceDashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <ChartCard title="Doanh thu & lợi nhuận 7 ngày" icon={BarChart3} className="xl:col-span-2">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3 mb-6">
+        <ChartCard title="Doanh thu & lợi nhuận 7 ngày" icon={BarChart3} className="xl:col-span-3">
           <div className="h-[290px] rounded-3xl border border-[#eadfcd] bg-[#fffaf4] px-4 pb-4 pt-8">
             {stats.revenue7d.length === 0 && !loading && (
               <div className="flex h-full items-center justify-center text-sm text-[#8a7a67]">Chưa có dữ liệu giao dịch</div>
@@ -302,17 +302,19 @@ export default function FinanceDashboard() {
             <span className="flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-emerald-400" />Lợi nhuận</span>
           </div>
         </ChartCard>
-
-        <ChartCard title="Cơ cấu doanh thu" icon={PieChart}>
-          <DonutChart items={financeMix} total={Math.max(stats.revenue, 0)} centerLabel="Doanh thu" />
-          <div className="mt-5 rounded-2xl bg-[#fffaf4] p-4 text-sm text-[#766957]">
-            <p><span className="font-bold text-[#43382b]">Công nợ:</span> {formatVnd(stats.unpaid)}</p>
-            <p className="mt-1"><span className="font-bold text-[#43382b]">Biên LN:</span> {margin}%</p>
-          </div>
-        </ChartCard>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2 mb-6">
+        <ChartCard title="Cơ cấu doanh thu" icon={PieChart}>
+          <div className="flex h-full flex-col justify-center">
+            <DonutChart items={financeMix} total={Math.max(stats.revenue, 0)} centerLabel="Doanh thu" />
+            <div className="mt-6 rounded-2xl bg-[#fffaf4] p-4 text-sm text-[#766957] flex justify-between items-center">
+              <p><span className="font-bold text-[#43382b]">Tổng công nợ:</span> {formatVnd(stats.unpaid)}</p>
+              <p><span className="font-bold text-[#43382b]">Biên lợi nhuận:</span> {margin}%</p>
+            </div>
+          </div>
+        </ChartCard>
+
         <ChartCard title="Top sản phẩm theo doanh thu" icon={BadgeDollarSign}>
           <HorizontalBars
             items={topProductItems}
@@ -320,7 +322,9 @@ export default function FinanceDashboard() {
             valueFormatter={(value, item) => `${item.qty} sp • ${formatShortVnd(value)}`}
           />
         </ChartCard>
+      </div>
 
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <ChartCard title="Trạng thái thanh toán" icon={PieChart}>
           <HorizontalBars
             items={paymentItems}
