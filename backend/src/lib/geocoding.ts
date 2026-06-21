@@ -64,6 +64,28 @@ function haversineKm(aLat: number, aLng: number, bLat: number, bLng: number) {
   return 2 * earthRadiusKm * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x))
 }
 
+async function osrmDistanceKm(originLat: number, originLng: number, destLat: number, destLng: number): Promise<number> {
+  // Use memoryCache for origin-dest pairs to prevent rate-limiting
+  const cacheKey = `osrm:${originLat.toFixed(3)},${originLng.toFixed(3)}-${destLat.toFixed(3)},${destLng.toFixed(3)}`;
+  if (memoryCache.has(cacheKey)) {
+    return memoryCache.get(cacheKey) as number;
+  }
+
+  const url = `http://router.project-osrm.org/route/v1/driving/${originLng},${originLat};${destLng},${destLat}?overview=false`;
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(1500) });
+    const data = await res.json();
+    if (data.code === "Ok" && data.routes && data.routes.length > 0) {
+      const dist = data.routes[0].distance / 1000;
+      memoryCache.set(cacheKey, dist);
+      return dist;
+    }
+  } catch (error) {
+    console.error("OSRM error, falling back to haversine:", error);
+  }
+  return haversineKm(originLat, originLng, destLat, destLng);
+}
+
 function getShippingConfig(settings: Record<string, unknown>) {
   const defaultFreeDistricts = "Hoàn Kiếm, Ba Đình, Đống Đa, Hai Bà Trưng, Cầu Giấy, Tây Hồ"
   const rawDistricts = typeof settings.free_shipping_districts === "string"
@@ -274,7 +296,7 @@ export async function reverseGeocodeLocation(lat: number, lng: number) {
   return result
 }
 
-export function resolveShippingQuote(
+export async function resolveShippingQuote(
   input: { address?: string; city?: string; district?: string; lat?: number; lng?: number },
   settings: Record<string, unknown>
 ) {
@@ -324,7 +346,7 @@ export function resolveShippingQuote(
     const isFree = config.freeDistricts.includes(matchedDistrictNorm) ||
                    config.freeDistricts.some((fd: string) => matchedDistrictNorm.includes(fd))
 
-    const distanceKm = haversineKm(config.originLat, config.originLng, matched.lat, matched.lng)
+    const distanceKm = await osrmDistanceKm(config.originLat, config.originLng, matched.lat, matched.lng)
     const exactFee = config.baseFee + (distanceKm * config.perKmFee)
     const rawFee = Math.ceil(exactFee / 1000) * 1000
 
