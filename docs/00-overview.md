@@ -18,7 +18,7 @@
 | **Database** | PostgreSQL |
 | **Cache / Queue** | Redis |
 | **File Storage** | AWS S3 (hoặc tương thích S3) |
-| **Frontend Storefront** | React + Vite |
+| **Frontend Frontend** | React + Vite |
 | **Frontend Admin** | React SPA (MedusaJS Admin + custom) |
 | **Authentication** | JWT (customer) / Session Bearer (admin) |
 
@@ -29,7 +29,7 @@
 ```mermaid
 graph TB
     subgraph Client
-        SF["Storefront\n(React + Vite)"]
+        SF["Frontend\n(React + Vite)"]
         ADM["Admin SPA\n(React + Vite)"]
     end
 
@@ -37,7 +37,7 @@ graph TB
         API["REST API\n/store/* & /admin/*"]
         CORE["Medusa Core Modules\n(Cart, Order, Product, Promotion)"]
         RBAC["Custom: RBAC Module"]
-        SITE["Custom: Site Module\n(Banner, Review, Chatbot, Settings)"]
+        SITE["Custom: Site Module\n(Banner, Blog, Chatbot, Settings)"]
         SHIP["Custom: Shipping\n(Haversine distance)"]
         FIN["Custom: Finance\n(Profit calculation)"]
     end
@@ -85,7 +85,7 @@ graph TB
 ```mermaid
 sequenceDiagram
     participant KH as Khách hàng
-    participant SF as Storefront
+    participant SF as Frontend
     participant API as Backend API
     participant DB as PostgreSQL
     participant VQR as VietQR

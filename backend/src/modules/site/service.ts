@@ -1,10 +1,9 @@
 import { MedusaService } from "@medusajs/framework/utils"
-import { Banner, SiteSetting, Review, ChatbotQuestionLog, ContactMessage, BlogPost, BlogCategory } from "./models"
+import { Banner, SiteSetting, ChatbotQuestionLog, ContactMessage, BlogPost, BlogCategory } from "./models"
 
 class SiteModuleService extends MedusaService({
   Banner,
   SiteSetting,
-  Review,
   ChatbotQuestionLog,
   ContactMessage,
   BlogPost,

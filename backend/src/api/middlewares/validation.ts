@@ -102,17 +102,6 @@ export const PromotionValidationBodySchema = z.object({
 })
 export type PromotionValidationBody = z.infer<typeof PromotionValidationBodySchema>
 
-export const ReviewBodySchema = z.object({
-  rating: z.number().int().min(1).max(5),
-  comment: z.string().trim().min(1).max(5000),
-  product_id: z.string().min(1),
-  product_title: z.string().trim().max(240).optional(),
-})
-export type ReviewBody = z.infer<typeof ReviewBodySchema>
-
-export const ReviewModerationBodySchema = z.object({ approved: z.boolean() })
-export type ReviewModerationBody = z.infer<typeof ReviewModerationBodySchema>
-
 export const RoleBodySchema = z.object({
   name: z.string().trim().min(1).max(120).optional(),
   description: optionalText,
@@ -181,12 +170,6 @@ export const UserListQuerySchema = z.object({
 })
 export type UserListQuery = z.infer<typeof UserListQuerySchema>
 
-export const ReviewListQuerySchema = z.object({
-  handle: z.string().trim().max(200).optional(),
-  approved: z.enum(["true", "false"]).optional(),
-})
-export type ReviewListQuery = z.infer<typeof ReviewListQuerySchema>
-
 export const MediaListQuerySchema = z.object({ q: z.string().trim().max(200).optional() })
 export type MediaListQuery = z.infer<typeof MediaListQuerySchema>
 
@@ -243,12 +226,10 @@ export const customValidationMiddlewares: MiddlewareRoute[] = [
   queryRoute("/admin/custom", AdminCustomQuerySchema, "POST"),
   queryRoute("/admin/media", MediaListQuerySchema),
   queryRoute("/admin/permissions", NameFilterQuerySchema),
-  queryRoute("/admin/reviews", ReviewListQuerySchema),
   queryRoute("/admin/roles", NameFilterQuerySchema),
   queryRoute("/admin/users", UserListQuerySchema),
   bodyRoute("/store/checkout", CheckoutBodySchema),
   bodyRoute("/store/promotions/validate", PromotionValidationBodySchema),
-  bodyRoute("/store/reviews/:handle", ReviewBodySchema),
   bodyRoute("/store/shipping/quote", ShippingQuoteBodySchema),
   bodyRoute("/admin/banners", BannerBodySchema),
   bodyRoute("/admin/banners/:id", BannerBodySchema),
@@ -264,7 +245,6 @@ export const customValidationMiddlewares: MiddlewareRoute[] = [
   bodyRoute("/admin/permissions", PermissionBodySchema),
   bodyRoute("/admin/permissions/:id", PermissionBodySchema),
   bodyRoute("/admin/promotions/:id/metadata", PromotionMetadataBodySchema),
-  bodyRoute("/admin/reviews/:id", ReviewModerationBodySchema),
   bodyRoute("/admin/roles", RoleBodySchema),
   bodyRoute("/admin/roles/:id", RoleBodySchema),
   bodyRoute("/admin/roles/:id/permissions", RolePermissionsBodySchema),

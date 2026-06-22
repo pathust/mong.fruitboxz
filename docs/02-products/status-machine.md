@@ -8,7 +8,7 @@
 
 ### Trạng thái
 
-| Status | Mô tả | Hiển thị Storefront | Có thể đặt hàng |
+| Status | Mô tả | Hiển thị Frontend | Có thể đặt hàng |
 |---|---|---|---|
 | `draft` | Đang soạn thảo, chưa phát hành | ❌ | ❌ |
 | `published` | Đang bán, công khai | ✅ | ✅ |
@@ -66,13 +66,13 @@ sequenceDiagram
     ADM->>PROD: Tạo product (status=draft)
     ADM->>VAR: Thêm variant + giá
     ADM->>PROD: Publish (status=published)
-    Note over PROD,VAR: Sản phẩm hiển thị storefront
+    Note over PROD,VAR: Sản phẩm hiển thị frontend
 
     ADM->>VAR: Cập nhật inventory_quantity
     Note over VAR: Tồn kho thay đổi real-time
 
     ADM->>PROD: Archive (status=archived)
-    Note over PROD: Ẩn khỏi storefront
+    Note over PROD: Ẩn khỏi frontend
 ```
 
 ---

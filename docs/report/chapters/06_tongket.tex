@@ -1,0 +1,96 @@
+% ============================================================
+%  06_tongket.tex – Chương 6: Tổng kết
+% ============================================================
+\chapter{Tổng Kết}
+
+\section{Kết Quả Đạt Được}
+
+Dự án đã hình thành một nền tảng thương mại điện tử tương đối đầy đủ cho Mọng Fruitboxz. Luồng mua hàng cốt lõi gồm duyệt catalog, tìm kiếm, chọn biến thể, quản lý giỏ, áp dụng khuyến mãi, tính phí giao hàng và tạo đơn. Khách hàng có thể đăng ký, đăng nhập và xem lịch sử đơn. Phần nội dung có banner, blog, chính sách, liên hệ và chatbot tư vấn.
+
+Ở phía vận hành, hệ thống có dashboard, quản lý sản phẩm, danh mục, đơn hàng, khách hàng, khuyến mãi, tồn kho, nguyên liệu, nội dung và người dùng nội bộ. Điểm mở rộng đáng chú ý là mô hình công thức BOM: biến thể sản phẩm được cấu thành từ các nguyên liệu, nhờ đó checkout có thể kiểm tra và trừ tồn theo thành phần thực tế.
+
+Về hạ tầng, PostgreSQL, Redis, Meilisearch và MinIO được tách thành các dịch vụ có thể chạy qua Docker Compose. Backend Medusa v2 kết hợp mô-đun lõi với mô-đun tùy biến; subscriber hỗ trợ đồng bộ chỉ mục, cache và xử lý hậu sự kiện. Frontend React dùng route động, lazy loading và các context dùng chung.
+
+\section{Đánh Giá Theo Nhóm Chức Năng}
+
+\begin{longtable}{@{}p{0.27\textwidth} p{0.18\textwidth} p{0.47\textwidth}@{}}
+  \toprule
+  \textbf{Nhóm} & \textbf{Mức độ} & \textbf{Nhận xét} \\
+  \midrule
+  \endhead
+  Catalog và tìm kiếm & Tốt & Có route động, biến thể, danh mục, chỉ mục Meilisearch và fallback. \\
+  Giỏ hàng & Tốt & Lưu cục bộ, đồng bộ phiên và vẫn hoạt động khi Redis lỗi. \\
+  Checkout & Khá & Kiểm tra giá/tồn/phí ship/khuyến mãi; cần workflow nguyên tử và thanh toán thật. \\
+  Quản trị & Khá & Phạm vi chức năng rộng, có RBAC; cần chuẩn hóa component và kiến trúc admin. \\
+  Nội dung và chatbot & Khá & CMS cơ bản, RAG theo FAQ/catalog, rate limit và fallback. \\
+  Hạ tầng & Khá & Có Compose và các dịch vụ phù hợp; cần hardening và quan sát production. \\
+  Kiểm thử/CI & Chưa hoàn thiện & Chưa thấy test suite và pipeline tự động trong phạm vi mã nguồn rà soát. \\
+  \bottomrule
+\end{longtable}
+
+\section{Kết Quả Chạy Thử và Rà Soát Mã Nguồn}
+
+Việc đánh giá không chỉ dựa trên đọc mã. Frontend đang chạy tại cổng 5173 và kết nối được backend/dữ liệu dự án. Các trang chủ, catalog, chi tiết sản phẩm, hộp tự chọn và chatbot đều tải được nội dung. Thao tác thêm Cam Vàng Mỹ vào giỏ làm số lượng giỏ chuyển từ 0 sang 1; trang checkout hiển thị tạm tính 100.000 đồng, phí giao hàng 30.000 đồng và tổng 130.000 đồng.
+
+Đăng nhập tài khoản quản trị seed thành công tại cùng origin. Sidebar đầy đủ và các trang dashboard, sản phẩm, đơn hàng, tồn kho đều tải được, cho thấy phiên xác thực và danh sách quyền đã được áp dụng. Dashboard ghi nhận 213 sản phẩm, 15 đơn hàng, 9 khách hàng, doanh thu 11,36 triệu đồng, lợi nhuận âm 1,46 triệu đồng và công nợ 8,76 triệu đồng. Đây là dữ liệu phù hợp để minh họa đồng thời góc nhìn quản trị catalog và vận hành tài chính.
+
+Lệnh \texttt{npm run build} của frontend hoàn tất: Vite biến đổi 2.074 module và sinh bundle production. Bundle chính sau minify khoảng 629~kB (gzip khoảng 181~kB), vượt ngưỡng cảnh báo 500~kB; vì vậy cần tiếp tục tách vendor/admin chunk dù route đã lazy-load. Dự án chưa có test suite tự động tương xứng với phạm vi chức năng, nên kết quả trên vẫn là smoke test, chưa thay thế kiểm thử hồi quy.
+
+\section{Các Hạn Chế Kỹ Thuật}
+
+\begin{enumerate}[leftmargin=2.2em, itemsep=5pt]
+  \item \textbf{Checkout chưa dùng workflow đầy đủ:} route đang gọi module service trực tiếp và tự phát \texttt{order.placed}. Nếu trừ kho hoặc tác vụ sau đó lỗi, hệ thống chưa có compensation thống nhất.
+  \item \textbf{Thanh toán và email chưa hoàn chỉnh:} đơn mới có \texttt{payment\_status=not\_paid}; email xác nhận mới là mock ghi log.
+  \item \textbf{Tối ưu truy vấn:} giới hạn lượt dùng khuyến mãi đang quét metadata đơn hàng; fallback search tải nhiều sản phẩm để lọc trong ứng dụng. Hai cách này không phù hợp khi dữ liệu lớn.
+  \item \textbf{Bảo mật cấu hình:} các secret mặc định trong template chỉ phù hợp development. Không nên để master key Meilisearch hoặc endpoint quản trị lộ tới client.
+  \item \textbf{RBAC còn hai cách lưu liên kết:} role vừa có module link với user, vừa được tham chiếu qua metadata; cần chọn một nguồn dữ liệu chuẩn.
+  \item \textbf{Cấu hình theo môi trường:} CORS, backend URL và publishable key phải được đồng bộ với origin triển khai; smoke test hiện xác nhận origin cổng 5173 hoạt động.
+  \item \textbf{Kích thước bundle:} production build thành công nhưng chunk chính còn lớn; cần tách nhóm thư viện và đo Core Web Vitals trên thiết bị thật.
+  \item \textbf{Mã lịch sử sau khi bỏ review:} route, model, module link và menu đã được gỡ; tuy nhiên matcher cũ trong \texttt{api/middlewares.ts} và nhánh migrate review trong \texttt{migrate-site-data.ts} nên được dọn để tránh lỗi khi chạy script bảo trì.
+  \item \textbf{Chất lượng phát hành:} cần bổ sung unit test, integration test, end-to-end test, lint/build bắt buộc và CI trước khi triển khai.
+  \item \textbf{Khả năng tiếp cận và SEO:} cần hoàn thiện keyboard navigation, aria-live cho giỏ, tối ưu ảnh, metadata và Product JSON-LD.
+\end{enumerate}
+
+\section{Hướng Phát Triển}
+
+\begin{itemize}[leftmargin=2em, itemsep=5pt]
+  \item Chuyển checkout sang Medusa workflow với các step xác minh giá, giữ/trừ tồn, áp dụng promotion, tạo payment session và tạo order; định nghĩa compensation cho từng bước.
+  \item Tích hợp cổng thanh toán phù hợp tại Việt Nam, webhook xác nhận và quy trình hoàn tiền/idempotency ở mức production.
+  \item Kết nối dịch vụ email như Resend hoặc SendGrid; dùng queue, retry và template xác nhận đơn.
+  \item Tạo bảng/bộ đếm usage cho promotion thay vì quét toàn bộ order; bổ sung index cho các trường lọc thường dùng.
+  \item Bổ sung monitoring, structured logging, health check, backup và quy trình phục hồi PostgreSQL/MinIO.
+  \item Chuẩn hóa một cổng development cho frontend, đồng bộ \texttt{STORE\_CORS}, \texttt{ADMIN\_CORS}, \texttt{AUTH\_CORS} và kiểm tra OPTIONS trong CI/E2E.
+  \item Duy trì \texttt{npm run build} và \texttt{npm run lint} bắt buộc trước khi merge; thiết lập manual chunk cho thư viện lớn.
+  \item Thiết lập test pyramid: unit test cho tính phí và khuyến mãi, integration test cho API, E2E cho browse--cart--checkout và smoke test cho admin.
+  \item Cải thiện chatbot bằng đánh giá câu trả lời, quản lý phiên hội thoại và cơ chế moderation; vẫn giữ nguyên nguyên tắc không truy cập dữ liệu cá nhân.
+  \item Tối ưu Core Web Vitals, ảnh responsive, SEO kỹ thuật và khả năng tiếp cận theo WCAG.
+\end{itemize}
+
+\section{Kiến Thức và Kinh Nghiệm Thu Được}
+
+Quá trình thực hiện giúp tác giả hiểu rõ hơn kiến trúc headless commerce, cách mở rộng Medusa bằng module và API, cách tổ chức SPA React, quản lý xác thực/phân quyền, thiết kế dữ liệu tồn kho theo BOM và phối hợp nhiều dịch vụ hạ tầng. Dự án cũng cho thấy một chức năng thương mại điện tử chỉ thực sự hoàn chỉnh khi xem xét đồng thời dữ liệu, tính nhất quán giao dịch, bảo mật, trải nghiệm người dùng và khả năng vận hành.
+
+\section{Kết Luận}
+
+Mọng Fruitboxz đã vượt qua mức một website giới thiệu sản phẩm để trở thành nền tảng bán hàng và vận hành có kiến trúc rõ ràng. Những chức năng đã triển khai bám sát đặc thù trái cây và hộp quà, đặc biệt ở tìm kiếm, giao hàng theo khu vực, nội dung tư vấn và tồn kho nguyên liệu. Dù vậy, để sẵn sàng cho production, dự án cần ưu tiên tính nguyên tử của checkout, thanh toán, kiểm thử tự động, bảo mật secret và quan sát hệ thống. Đây là nền tảng phù hợp để tiếp tục phát triển thành sản phẩm thương mại hoàn chỉnh.
+
+\section{Tài Liệu Tham Khảo}
+
+\begin{enumerate}[leftmargin=2em, itemsep=4pt]
+  \item Medusa Documentation. \url{https://docs.medusajs.com/}
+  \item React Documentation. \url{https://react.dev/}
+  \item Vite Documentation. \url{https://vite.dev/guide/}
+  \item Tailwind CSS Documentation. \url{https://tailwindcss.com/docs}
+  \item PostgreSQL 15 Documentation. \url{https://www.postgresql.org/docs/15/}
+  \item Redis Documentation. \url{https://redis.io/docs/latest/}
+  \item Meilisearch Documentation. \url{https://www.meilisearch.com/docs/}
+  \item MinIO Documentation. \url{https://min.io/docs/minio/}
+  \item Docker Compose Documentation. \url{https://docs.docker.com/compose/}
+  \item Groq API Documentation. \url{https://console.groq.com/docs/}
+\end{enumerate}
+
+\section{Mã Nguồn Dự Án}
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{GitHub:} \url{https://github.com/pathust/mong.fruitboxz}
+\end{itemize}

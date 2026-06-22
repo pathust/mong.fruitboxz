@@ -7,7 +7,7 @@
 ```mermaid
 sequenceDiagram
     participant U as Người dùng
-    participant SF as Storefront
+    participant SF as Frontend
     participant API as /auth/register
     participant DB as PostgreSQL
 
@@ -34,7 +34,7 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant U as Người dùng
-    participant SF as Storefront
+    participant SF as Frontend
     participant API as /auth/login
     participant DB as PostgreSQL
     participant LS as localStorage

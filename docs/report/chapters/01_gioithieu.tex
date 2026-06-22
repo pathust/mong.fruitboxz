@@ -1,0 +1,78 @@
+% ============================================================
+%  01_gioithieu.tex – Chương 1: Giới thiệu bài toán
+% ============================================================
+\chapter{Giới Thiệu Bài Toán}
+
+\section{Bối Cảnh}
+
+Mọng Fruitboxz là mô hình cửa hàng kinh doanh trái cây tươi, trái cây cắt sẵn và hộp quà. Với mô hình này, khách hàng cần xem được sản phẩm theo nhu cầu, lựa chọn biến thể, biết rõ giá và phí giao hàng trước khi đặt mua. Ở phía cửa hàng, nhân viên cần một công cụ thống nhất để quản lý sản phẩm, đơn hàng, khách hàng, tồn kho, nội dung truyền thông và các chương trình khuyến mãi.
+
+Nếu các nghiệp vụ trên được xử lý bằng nhiều công cụ rời rạc, dữ liệu giá, tồn kho và đơn hàng dễ mất đồng bộ. Việc tìm kiếm sản phẩm, theo dõi hiệu quả kinh doanh hoặc kiểm soát quyền thao tác của nhân viên cũng trở nên khó khăn. Do đó, đề tài hướng tới một nền tảng web tập trung nhưng vẫn có kiến trúc mô-đun để có thể mở rộng theo quy mô kinh doanh.
+
+\section{Mục Tiêu Đề Tài}
+
+Mục tiêu tổng quát là xây dựng một website thương mại điện tử có thể phục vụ trọn vẹn hành trình từ khám phá sản phẩm đến ghi nhận đơn hàng, đồng thời cung cấp công cụ vận hành cho cửa hàng. Các mục tiêu cụ thể gồm:
+
+\begin{itemize}[leftmargin=2em, itemsep=3pt]
+  \item Xây dựng catalog sản phẩm, danh mục, trang chi tiết, tìm kiếm và lọc sản phẩm.
+  \item Hỗ trợ giỏ hàng, mã khuyến mãi, tính phí giao hàng và đặt hàng cho cả khách vãng lai lẫn khách đã đăng nhập.
+  \item Cung cấp tài khoản khách hàng và khả năng tra cứu lịch sử đơn hàng.
+  \item Xây dựng khu vực quản trị cho sản phẩm, danh mục, đơn hàng, khách hàng, khuyến mãi, tồn kho, nội dung và người dùng nội bộ.
+  \item Quản lý tồn kho theo nguyên liệu và công thức cấu thành sản phẩm, phù hợp với sản phẩm trái cây cắt sẵn hoặc hộp phối sẵn.
+  \item Tích hợp tìm kiếm toàn văn, lưu trữ ảnh, bộ nhớ đệm và chatbot tư vấn có cơ chế dự phòng.
+  \item Tách biệt rõ giao diện, API, nghiệp vụ và hạ tầng để thuận tiện bảo trì, kiểm thử và triển khai.
+\end{itemize}
+
+\section{Phạm Vi Hệ Thống}
+
+\subsection{Giao diện khách hàng}
+
+Phần frontend cung cấp trang chủ, danh sách và chi tiết sản phẩm, danh mục, tìm kiếm, giỏ hàng, checkout, đăng ký/đăng nhập, tài khoản, lịch sử đơn, blog, liên hệ và các trang chính sách. Hệ thống còn có chức năng \textit{Hộp tự chọn}, cho phép khách xây dựng hộp trái cây theo nhu cầu.
+
+\subsection{Giao diện quản trị}
+
+Khu vực quản trị là một ứng dụng React trong cùng frontend, được bảo vệ bằng JWT và quyền RBAC. Nhân viên có thể truy cập dashboard, báo cáo tài chính, sản phẩm, danh mục, khách hàng, đơn hàng, khuyến mãi, kho, nguyên liệu, banner, blog, media, chatbot, cấu hình giao hàng và nội dung chính sách tùy theo quyền được cấp.
+
+\subsection{Backend và hạ tầng}
+
+Backend Medusa v2 cung cấp các mô-đun thương mại điện tử lõi và các API tùy biến. PostgreSQL lưu dữ liệu giao dịch; Redis hỗ trợ cache, event bus, rate limit và giỏ hàng phiên; Meilisearch lập chỉ mục tìm kiếm; MinIO lưu ảnh và tệp media. Các dịch vụ hạ tầng được mô tả bằng Docker Compose để thuận tiện khởi tạo môi trường phát triển.
+
+\section{Đối Tượng Sử Dụng}
+
+\begin{longtable}{@{}p{0.22\textwidth} p{0.70\textwidth}@{}}
+  \toprule
+  \textbf{Tác nhân} & \textbf{Quyền và nhu cầu chính} \\
+  \midrule
+  \endhead
+  Khách vãng lai & Duyệt và tìm kiếm sản phẩm, quản lý giỏ hàng, nhận báo giá giao hàng, đặt đơn khách, đọc blog và hỏi chatbot. \\[3pt]
+  Khách hàng & Có thêm khả năng quản lý tài khoản và xem lịch sử đơn hàng. \\[3pt]
+  Nhân viên quản trị & Vận hành từng nhóm chức năng được cấp quyền, ví dụ sản phẩm, đơn hàng, khách hàng, nội dung hoặc kho. \\[3pt]
+  Quản trị viên cấp cao & Quản lý người dùng nội bộ, vai trò, quyền hạn và toàn bộ cấu hình hệ thống. \\[3pt]
+  Dịch vụ ngoài & Meilisearch phục vụ tìm kiếm; MinIO lưu media; Nominatim hỗ trợ địa chỉ; Groq cung cấp mô hình ngôn ngữ cho chatbot. \\
+  \bottomrule
+\end{longtable}
+
+\section{Các Nhóm Chức Năng Chính}
+
+\begin{enumerate}[leftmargin=2.2em, itemsep=4pt]
+  \item \textbf{Catalog và nội dung:} sản phẩm, biến thể, danh mục, banner, blog và trang chính sách.
+  \item \textbf{Bán hàng:} giỏ hàng, khuyến mãi, phí giao hàng, checkout, mã đơn và lịch sử đơn.
+  \item \textbf{Tương tác khách hàng:} đăng ký, đăng nhập, liên hệ và chatbot tư vấn.
+  \item \textbf{Vận hành:} quản lý đơn, khách hàng, tồn kho, công thức nguyên liệu và dashboard tài chính.
+  \item \textbf{Quản trị hệ thống:} người dùng nội bộ, vai trò, quyền, cấu hình website, media và trạng thái tìm kiếm.
+\end{enumerate}
+
+\section{Yêu Cầu Phi Chức Năng}
+
+\begin{itemize}[leftmargin=2em, itemsep=4pt]
+  \item \textbf{Bảo mật:} xác thực bằng JWT, phân quyền ở cả giao diện và API, cấu hình CORS, giới hạn tần suất chatbot và không tin cậy giá tiền gửi từ trình duyệt.
+  \item \textbf{Nhất quán dữ liệu:} backend truy vấn lại giá biến thể, kiểm tra định mức nguyên liệu và áp dụng khuyến mãi trước khi tạo đơn.
+  \item \textbf{Khả dụng:} tìm kiếm và giỏ hàng có cơ chế dự phòng khi Meilisearch hoặc Redis chưa sẵn sàng.
+  \item \textbf{Hiệu năng:} lazy loading các trang React, cache dữ liệu thường dùng và đồng bộ chỉ mục bằng subscriber theo sự kiện.
+  \item \textbf{Khả năng mở rộng:} mô-đun tùy biến được tách khỏi lõi Medusa; hạ tầng lưu trữ, cache và tìm kiếm có thể triển khai độc lập.
+  \item \textbf{Khả năng sử dụng:} giao diện responsive, hỗ trợ tiếng Việt và tiếng Anh, có trạng thái loading, empty, error và phản hồi thao tác.
+\end{itemize}
+
+\section{Kết Cấu Báo Cáo}
+
+Chương 2 đặc tả yêu cầu và các luồng nghiệp vụ. Chương 3 trình bày kiến trúc, thành phần và luồng xử lý. Chương 4 mô tả mô hình dữ liệu. Chương 5 phân tích các nhóm giao diện. Chương 6 tổng kết kết quả, giới hạn và hướng phát triển.

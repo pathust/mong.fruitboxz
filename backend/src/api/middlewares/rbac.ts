@@ -13,7 +13,7 @@ function getRequiredPermissions(path: string, method: string) {
 
   const protectedModules = new Set([
     "products", "product-categories", "orders", "users", "banners", "roles",
-    "permissions", "settings", "reviews", "media", "search", "chatbot", "blog-posts",
+    "permissions", "settings", "media", "search", "chatbot", "blog-posts",
     "promotions", "customers", "inventory-items", "price-lists",
   ])
   if (!protectedModules.has(moduleName)) return []

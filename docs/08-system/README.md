@@ -11,7 +11,6 @@
 | Entity | Mô tả |
 |---|---|
 | `Banner` | Banner/slider trang chủ |
-| `Review` | Đánh giá sản phẩm |
 | `ChatbotQuestionLog` | Lịch sử câu hỏi chatbot |
 | `SiteSetting` | Key-value store cài đặt toàn cục |
 
@@ -73,59 +72,7 @@
 
 ---
 
-## 3. Review (Đánh giá sản phẩm)
-
-### Data Model
-
-| Trường | Kiểu | Mô tả |
-|---|---|---|
-| `id` | string | PK |
-| `handle` | string | Slug liên quan (nếu cần) |
-| `product_id` | string | FK → Product |
-| `customer_id` | string | FK → Customer |
-| `rating` | number | Số sao (1-5) |
-| `comment` | text | Nội dung đánh giá |
-| `approved` | boolean | Admin duyệt hiển thị |
-| `created_at` | timestamp | |
-
-### API Endpoints — Reviews
-
-| Method | Path | Mô tả | Auth |
-|---|---|---|---|
-| `POST` | `/store/reviews` | Gửi đánh giá | Customer token |
-| `GET` | `/store/products/:id/reviews` | Xem đánh giá (approved) | Public |
-| `GET` | `/admin/reviews` | Tất cả reviews | `settings:read` |
-| `PUT` | `/admin/reviews/:id/approve` | Duyệt review | `settings:write` |
-| `DELETE` | `/admin/reviews/:id` | Xóa review | `settings:write` |
-
-### Luồng duyệt Review
-
-```mermaid
-sequenceDiagram
-    participant U as Khách hàng
-    participant SF as Storefront
-    participant API as Backend
-    participant ADM as Admin
-
-    U->>SF: Viết đánh giá (sau khi mua hàng)
-    SF->>API: POST /store/reviews {product_id, rating, comment}
-    API->>API: Kiểm tra: customer đã mua product này chưa?
-    alt Chưa mua
-        API-->>SF: 403 "Chỉ khách đã mua mới được đánh giá"
-    else Đã mua
-        API->>API: INSERT review (approved=false)
-        API-->>SF: Review pending moderation
-    end
-
-    ADM->>API: GET /admin/reviews?approved=false
-    ADM->>API: PUT /admin/reviews/:id/approve
-    API-->>ADM: Review approved
-    Note over U: Review hiện trên storefront
-```
-
----
-
-## 4. ChatbotQuestionLog
+## 3. ChatbotQuestionLog
 
 ### Data Model
 
@@ -166,7 +113,7 @@ sequenceDiagram
 
 ---
 
-## 5. System Configuration (Infrastructure)
+## 4. System Configuration (Infrastructure)
 
 ### Environment Variables
 
@@ -185,7 +132,7 @@ sequenceDiagram
 
 ---
 
-## 6. Health Check
+## 5. Health Check
 
 | Endpoint | Mô tả |
 |---|---|
@@ -195,7 +142,7 @@ sequenceDiagram
 
 ---
 
-## 7. Luồng Settings Update
+## 6. Luồng Settings Update
 
 ```mermaid
 sequenceDiagram
@@ -220,7 +167,7 @@ sequenceDiagram
 
 ---
 
-## 8. Liên kết
+## 7. Liên kết
 
 - [Finance (cost settings)](../07-finance/README.md)
 - [Marketing (banners)](../06-marketing/README.md)

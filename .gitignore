@@ -41,8 +41,7 @@ scraped_data/
 raw_views.txt
 scraped_images.json
 targets.json
-storefront/public/images/
+frontend/public/images/
 
 # User requested ignores
 package-lock.json
-docs/

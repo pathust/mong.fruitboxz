@@ -1,6 +1,6 @@
 # 01 · Authentication — Tổng quan
 
-> Module xác thực phân hai loại actor: **Customer** (khách hàng storefront) và **Admin** (quản trị viên).
+> Module xác thực phân hai loại actor: **Customer** (khách hàng frontend) và **Admin** (quản trị viên).
 
 ---
 

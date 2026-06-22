@@ -9,11 +9,7 @@ import { customValidationMiddlewares } from "./middlewares/validation"
 export default defineMiddlewares({
   routes: [
     ...apiEnvelopeMiddlewares,
-    {
-      matcher: "/store/reviews/:handle",
-      method: "POST",
-      middlewares: [authenticate("customer", ["bearer", "session"])],
-    },
+
     {
       matcher: "/store/checkout",
       method: "GET",

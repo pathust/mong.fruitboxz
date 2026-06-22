@@ -1,6 +1,6 @@
 # 02 · Products — Tổng quan
 
-> Module quản lý sản phẩm bao gồm hai phần: **Storefront** (khách hàng xem) và **Admin** (quản trị viên CRUD).
+> Module quản lý sản phẩm bao gồm hai phần: **Frontend** (khách hàng xem) và **Admin** (quản trị viên CRUD).
 
 ---
 
@@ -68,7 +68,7 @@ Hệ thống sản phẩm của Mong Fruitboxz có các loại:
 
 ---
 
-## 3. API Endpoints — Storefront
+## 3. API Endpoints — Frontend
 
 | Method | Path | Mô tả |
 |---|---|---|
@@ -162,7 +162,7 @@ Hệ thống sản phẩm của Mong Fruitboxz có các loại:
 ```mermaid
 sequenceDiagram
     participant U as Khách hàng
-    participant SF as Storefront
+    participant SF as Frontend
     participant API as Backend
 
     U->>SF: Truy cập trang Custom Box
@@ -195,7 +195,7 @@ sequenceDiagram
 
 ---
 
-## 7. Trang chủ Storefront
+## 7. Trang chủ Frontend
 
 | Component | Data source |
 |---|---|
@@ -217,7 +217,7 @@ sequenceDiagram
 
 | Tình huống | Xử lý |
 |---|---|
-| Sản phẩm `draft` | Không hiển thị ở storefront |
+| Sản phẩm `draft` | Không hiển thị ở frontend |
 | Sản phẩm `archived` | Không hiển thị, không thể đặt hàng |
 | Hết tồn kho | Hiển thị "Hết hàng", disable nút thêm giỏ |
 | Ảnh upload > 5MB | Reject, trả về lỗi |

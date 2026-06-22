@@ -9,7 +9,7 @@
 - **Framework**: [Playwright](https://playwright.dev)
 - **Ngôn ngữ**: TypeScript
 - **Browser**: Chromium (primary), Firefox, Safari (smoke)
-- **Base URL Storefront**: `http://localhost:5173`
+- **Base URL Frontend**: `http://localhost:5173`
 - **Base URL Admin**: `http://localhost:5174`
 
 ```bash
@@ -32,7 +32,7 @@ npx playwright test --ui
 ```mermaid
 sequenceDiagram
     participant PW as Playwright
-    participant SF as Storefront
+    participant SF as Frontend
 
     PW->>SF: Navigate /register
     PW->>SF: Fill form (email, password, name)
@@ -114,7 +114,7 @@ test('Add product to cart', async ({ page }) => {
 ```mermaid
 sequenceDiagram
     participant PW as Playwright
-    participant SF as Storefront
+    participant SF as Frontend
     participant API as Backend
 
     PW->>SF: Thêm 2 sản phẩm vào giỏ

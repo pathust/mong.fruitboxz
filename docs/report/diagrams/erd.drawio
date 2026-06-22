@@ -1,0 +1,80 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" agent="Codex" version="30.2.4" type="device">
+  <diagram id="erd" name="erd">
+    <mxGraphModel dx="1700" dy="940" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="940" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="product" value="&lt;div style='text-align:center;background:#E9ECEF;padding:4px'&gt;&lt;b&gt;PRODUCT&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;&lt;div&gt;PK id&lt;/div&gt;&lt;div&gt;title&lt;/div&gt;&lt;div&gt;handle&lt;/div&gt;&lt;div&gt;status&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=8;fillColor=#FFFFFF;strokeColor=#333333;strokeWidth=1.5;fontFamily=Arial;fontSize=15;fontColor=#111111;" vertex="1" parent="1">
+          <mxGeometry x="20" y="60" width="245" height="148" as="geometry" />
+        </mxCell>
+        <mxCell id="variant" value="&lt;div style='text-align:center;background:#E9ECEF;padding:4px'&gt;&lt;b&gt;PRODUCT_VARIANT&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;&lt;div&gt;PK id&lt;/div&gt;&lt;div&gt;FK product_id&lt;/div&gt;&lt;div&gt;sku&lt;/div&gt;&lt;div&gt;price&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=8;fillColor=#FFFFFF;strokeColor=#333333;strokeWidth=1.5;fontFamily=Arial;fontSize=15;fontColor=#111111;" vertex="1" parent="1">
+          <mxGeometry x="300" y="60" width="245" height="148" as="geometry" />
+        </mxCell>
+        <mxCell id="recipe" value="&lt;div style='text-align:center;background:#E9ECEF;padding:4px'&gt;&lt;b&gt;RECIPE_ITEM&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;&lt;div&gt;PK id&lt;/div&gt;&lt;div&gt;FK variant_id&lt;/div&gt;&lt;div&gt;FK ingredient_id&lt;/div&gt;&lt;div&gt;quantity&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=8;fillColor=#FFFFFF;strokeColor=#333333;strokeWidth=1.5;fontFamily=Arial;fontSize=15;fontColor=#111111;" vertex="1" parent="1">
+          <mxGeometry x="580" y="60" width="245" height="148" as="geometry" />
+        </mxCell>
+        <mxCell id="ingredient" value="&lt;div style='text-align:center;background:#E9ECEF;padding:4px'&gt;&lt;b&gt;INGREDIENT&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;&lt;div&gt;PK id&lt;/div&gt;&lt;div&gt;FK inventory_item_id&lt;/div&gt;&lt;div&gt;name&lt;/div&gt;&lt;div&gt;unit&lt;/div&gt;&lt;div&gt;cost_price&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=8;fillColor=#FFFFFF;strokeColor=#333333;strokeWidth=1.5;fontFamily=Arial;fontSize=15;fontColor=#111111;" vertex="1" parent="1">
+          <mxGeometry x="860" y="60" width="245" height="173" as="geometry" />
+        </mxCell>
+        <mxCell id="inventory" value="&lt;div style='text-align:center;background:#E9ECEF;padding:4px'&gt;&lt;b&gt;INVENTORY_ITEM&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;&lt;div&gt;PK id&lt;/div&gt;&lt;div&gt;sku&lt;/div&gt;&lt;div&gt;stocked_quantity&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=8;fillColor=#FFFFFF;strokeColor=#333333;strokeWidth=1.5;fontFamily=Arial;fontSize=15;fontColor=#111111;" vertex="1" parent="1">
+          <mxGeometry x="1140" y="60" width="245" height="123" as="geometry" />
+        </mxCell>
+        <mxCell id="customer" value="&lt;div style='text-align:center;background:#E9ECEF;padding:4px'&gt;&lt;b&gt;CUSTOMER&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;&lt;div&gt;PK id&lt;/div&gt;&lt;div&gt;email&lt;/div&gt;&lt;div&gt;phone&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=8;fillColor=#FFFFFF;strokeColor=#333333;strokeWidth=1.5;fontFamily=Arial;fontSize=15;fontColor=#111111;" vertex="1" parent="1">
+          <mxGeometry x="20" y="690" width="245" height="123" as="geometry" />
+        </mxCell>
+        <mxCell id="order" value="&lt;div style='text-align:center;background:#E9ECEF;padding:4px'&gt;&lt;b&gt;ORDER&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;&lt;div&gt;PK id&lt;/div&gt;&lt;div&gt;FK customer_id&lt;/div&gt;&lt;div&gt;status&lt;/div&gt;&lt;div&gt;total&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=8;fillColor=#FFFFFF;strokeColor=#333333;strokeWidth=1.5;fontFamily=Arial;fontSize=15;fontColor=#111111;" vertex="1" parent="1">
+          <mxGeometry x="20" y="450" width="245" height="148" as="geometry" />
+        </mxCell>
+        <mxCell id="line" value="&lt;div style='text-align:center;background:#E9ECEF;padding:4px'&gt;&lt;b&gt;ORDER_LINE_ITEM&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;&lt;div&gt;PK id&lt;/div&gt;&lt;div&gt;FK order_id&lt;/div&gt;&lt;div&gt;FK variant_id&lt;/div&gt;&lt;div&gt;quantity&lt;/div&gt;&lt;div&gt;unit_price&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=8;fillColor=#FFFFFF;strokeColor=#333333;strokeWidth=1.5;fontFamily=Arial;fontSize=15;fontColor=#111111;" vertex="1" parent="1">
+          <mxGeometry x="300" y="430" width="245" height="173" as="geometry" />
+        </mxCell>
+        <mxCell id="user" value="&lt;div style='text-align:center;background:#E9ECEF;padding:4px'&gt;&lt;b&gt;USER&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;&lt;div&gt;PK id&lt;/div&gt;&lt;div&gt;email&lt;/div&gt;&lt;div&gt;metadata.roles&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=8;fillColor=#FFFFFF;strokeColor=#333333;strokeWidth=1.5;fontFamily=Arial;fontSize=15;fontColor=#111111;" vertex="1" parent="1">
+          <mxGeometry x="920" y="470" width="245" height="123" as="geometry" />
+        </mxCell>
+        <mxCell id="role" value="&lt;div style='text-align:center;background:#E9ECEF;padding:4px'&gt;&lt;b&gt;ROLE&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;&lt;div&gt;PK id&lt;/div&gt;&lt;div&gt;name&lt;/div&gt;&lt;div&gt;permissions (JSON)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=8;fillColor=#FFFFFF;strokeColor=#333333;strokeWidth=1.5;fontFamily=Arial;fontSize=15;fontColor=#111111;" vertex="1" parent="1">
+          <mxGeometry x="1220" y="470" width="210" height="123" as="geometry" />
+        </mxCell>
+        <mxCell id="permission" value="&lt;div style='text-align:center;background:#E9ECEF;padding:4px'&gt;&lt;b&gt;PERMISSION&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;&lt;div&gt;PK id&lt;/div&gt;&lt;div&gt;name&lt;/div&gt;&lt;div&gt;guard_name&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=8;fillColor=#FFFFFF;strokeColor=#333333;strokeWidth=1.5;fontFamily=Arial;fontSize=15;fontColor=#111111;" vertex="1" parent="1">
+          <mxGeometry x="1480" y="470" width="200" height="123" as="geometry" />
+        </mxCell>
+        <mxCell id="r1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;strokeColor=#333333;strokeWidth=1.3;fontFamily=Arial;fontSize=15;fontColor=#111111;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;" edge="1" parent="1" source="product" target="variant">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;strokeColor=#333333;strokeWidth=1.3;fontFamily=Arial;fontSize=15;fontColor=#111111;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;" edge="1" parent="1" source="variant" target="recipe">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;strokeColor=#333333;strokeWidth=1.3;fontFamily=Arial;fontSize=15;fontColor=#111111;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;" edge="1" parent="1" source="ingredient" target="recipe">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;strokeColor=#333333;strokeWidth=1.3;fontFamily=Arial;fontSize=15;fontColor=#111111;startArrow=ERone;startFill=0;endArrow=ERone;endFill=0;" edge="1" parent="1" source="ingredient" target="inventory">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;strokeColor=#333333;strokeWidth=1.3;fontFamily=Arial;fontSize=15;fontColor=#111111;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;" edge="1" parent="1" source="order" target="line">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;strokeColor=#333333;strokeWidth=1.3;fontFamily=Arial;fontSize=15;fontColor=#111111;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;" edge="1" parent="1" source="customer" target="order">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;strokeColor=#333333;strokeWidth=1.3;fontFamily=Arial;fontSize=15;fontColor=#111111;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="420" y="198" as="sourcePoint" />
+            <mxPoint x="420" y="430" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;strokeColor=#333333;strokeWidth=1.3;fontFamily=Arial;fontSize=15;fontColor=#111111;startArrow=ERmany;startFill=0;endArrow=ERmany;endFill=0;" edge="1" parent="1" source="user" target="role">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r9" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;dashed=1;dashPattern=6 4;strokeColor=#555555;strokeWidth=1.3;fontFamily=Arial;fontSize=15;fontColor=#111111;" edge="1" parent="1" source="role" target="permission">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rbac_note1" value="metadata.roles / module link" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontFamily=Arial;fontSize=15;fontColor=#111111;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="610" width="250" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="rbac_note2" value="tham chiếu ID trong JSON" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontFamily=Arial;fontSize=15;fontColor=#111111;" vertex="1" parent="1">
+          <mxGeometry x="1370" y="610" width="250" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

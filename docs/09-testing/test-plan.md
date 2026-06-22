@@ -53,7 +53,7 @@
 | Tạo product (admin) → 201 | Integration | P0 |
 | Publish product thiếu variant → 422 | Integration | P0 |
 | Upload ảnh → S3 URL trả về | Integration | P1 |
-| Product draft không hiển thị storefront | Integration | P0 |
+| Product draft không hiển thị frontend | Integration | P0 |
 | Variant out_of_stock flag đúng | Unit | P0 |
 
 ### 3.3 CART & CHECKOUT Module
@@ -103,10 +103,7 @@
 | Test case | Loại | Priority |
 |---|---|---|
 | Lấy banners active | Integration | P0 |
-| Banner inactive không trả về storefront | Integration | P0 |
-| Gửi review (customer đã mua) → thành công | Integration | P0 |
-| Gửi review (chưa mua) → 403 | Integration | P0 |
-| Admin duyệt review → approved=true | Integration | P1 |
+| Banner inactive không trả về frontend | Integration | P0 |
 | Chatbot log lưu đúng message | Integration | P1 |
 | Site settings update | Integration | P0 |
 

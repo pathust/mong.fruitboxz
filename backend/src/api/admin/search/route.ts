@@ -26,7 +26,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
     if (!result.enabled) {
       return res.status(503).json({
         ...result,
-        message: "MeiliSearch is not configured or not reachable. Storefront search will keep using catalog fallback.",
+        message: "MeiliSearch is not configured or not reachable. Frontend search will keep using catalog fallback.",
       })
     }
     const updatedSettings = await updateGlobalSettings(siteService, {
@@ -42,7 +42,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
     logger.error("Search reindex failed", error)
     res.status(503).json({
       code: "SEARCH_REINDEX_FAILED",
-      message: "Reindex failed. Storefront search will keep using catalog fallback.",
+      message: "Reindex failed. Frontend search will keep using catalog fallback.",
     })
   }
 }

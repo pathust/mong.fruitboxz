@@ -13,7 +13,7 @@ export default async function syncProductImages({ container }: ExecArgs) {
   const query = container.resolve(ContainerRegistrationKeys.QUERY)
   const sourceProducts = JSON.parse(fs.readFileSync(PRODUCTS_FILE, "utf8"))
   const sourceByHandle = new Map(
-    sourceProducts.map((product: any, index: number) => [
+    sourceProducts.map((product: Record<string, unknown>, index: number) => [
       product.handle || product.id || `handle-${index}`,
       product,
     ])

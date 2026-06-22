@@ -9,7 +9,7 @@
 ```mermaid
 sequenceDiagram
     participant U as Khách hàng
-    participant SF as Storefront (React)
+    participant SF as Frontend (React)
     participant LS as localStorage
     participant SHIP as /store/shipping/quote
     participant PROMO as /store/promotions/validate

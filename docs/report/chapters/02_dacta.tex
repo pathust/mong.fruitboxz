@@ -1,0 +1,171 @@
+% ============================================================
+%  02_dacta.tex – Chương 2: Đặc tả yêu cầu
+% ============================================================
+\chapter{Đặc Tả Yêu Cầu}
+
+\section{Mục Đích và Phạm Vi Đặc Tả}
+
+Chương này mô tả các yêu cầu được rút ra từ mã nguồn hiện tại, thay vì mô tả một hệ thống giả định. Mỗi yêu cầu được gắn với tác nhân, đầu vào, kết quả và trạng thái triển khai. Cách tiếp cận này giúp báo cáo có thể dùng làm tài liệu kiểm tra chéo giữa giao diện, API và dữ liệu.
+
+\section{Công Nghệ và Ràng Buộc}
+
+\begin{longtable}{@{}p{0.22\textwidth} p{0.25\textwidth} p{0.45\textwidth}@{}}
+  \toprule
+  \textbf{Thành phần} & \textbf{Công nghệ} & \textbf{Vai trò trong dự án} \\
+  \midrule
+  \endhead
+  Frontend & React 19, Vite 7, Tailwind CSS 4 & Giao diện mua sắm và khu vực quản trị tùy biến. \\[3pt]
+  Backend & Medusa.js 2.15, Node.js 20, TypeScript & API, mô-đun thương mại điện tử, xác thực và nghiệp vụ. \\[3pt]
+  Cơ sở dữ liệu & PostgreSQL 15 & Dữ liệu giao dịch, catalog, người dùng và mô-đun tùy biến. \\[3pt]
+  Cache và sự kiện & Redis 7 & Cache, event bus, rate limit và đồng bộ giỏ hàng phiên khi được bật. \\[3pt]
+  Tìm kiếm & Meilisearch 1.13 & Lập chỉ mục và tìm kiếm sản phẩm theo từ khóa, danh mục, mức giá. \\[3pt]
+  Lưu trữ đối tượng & MinIO, giao thức S3 & Ảnh sản phẩm, banner và media quản trị. \\[3pt]
+  AI tư vấn & Groq API & Sinh câu trả lời từ FAQ và ngữ cảnh sản phẩm, có fallback khi dịch vụ lỗi. \\[3pt]
+  Môi trường & Docker Compose & Khởi tạo PostgreSQL, Redis, Meilisearch và MinIO cục bộ. \\
+  \bottomrule
+\end{longtable}
+
+Backend yêu cầu Node.js phiên bản từ 20 đến dưới 23; cấu hình của dự án khuyến nghị Node 20 LTS. Frontend gọi API thông qua Medusa JS SDK; địa chỉ backend và publishable key được lấy từ biến môi trường.
+
+\section{Danh Sách Use Case}
+
+\begin{longtable}{@{}p{0.10\textwidth} p{0.25\textwidth} p{0.20\textwidth} p{0.37\textwidth}@{}}
+  \toprule
+  \textbf{Mã} & \textbf{Use case} & \textbf{Tác nhân} & \textbf{Kết quả mong đợi} \\
+  \midrule
+  \endhead
+  UC01 & Duyệt catalog & Mọi khách & Xem danh sách, danh mục và chi tiết sản phẩm đang bán. \\
+  UC02 & Tìm kiếm sản phẩm & Mọi khách & Nhận kết quả theo từ khóa, bộ lọc và thứ tự; fallback khi máy tìm kiếm lỗi. \\
+  UC03 & Quản lý giỏ hàng & Mọi khách & Thêm, xóa, đổi số lượng; lưu cục bộ và đồng bộ phiên khi có Redis. \\
+  UC04 & Đăng ký/đăng nhập & Khách hàng & Nhận JWT hợp lệ và truy cập chức năng tài khoản. \\
+  UC05 & Đặt hàng & Khách hoặc khách hàng & Backend xác minh giá, tồn kho, phí ship, mã giảm giá và tạo đơn. \\
+  UC06 & Xem lịch sử đơn & Khách hàng & Chỉ xem các đơn gắn với định danh khách đang đăng nhập. \\
+  UC07 & Hộp tự chọn & Mọi khách & Chọn thành phần hộp theo cấu hình sản phẩm và thêm vào giỏ. \\
+  UC08 & Tư vấn chatbot & Mọi khách & Trả lời dựa trên FAQ và kết quả catalog; ghi log câu hỏi chưa giải quyết. \\
+  UC09 & Quản lý catalog & Nhân viên có quyền & Tạo/sửa sản phẩm, danh mục, công thức và dữ liệu tồn kho. \\
+  UC10 & Quản lý đơn hàng & Nhân viên có quyền & Tra cứu chi tiết và cập nhật trạng thái xử lý đơn. \\
+  UC11 & Quản lý nội dung & Nhân viên có quyền & Quản lý banner, blog, media, FAQ và các trang chính sách. \\
+  UC12 & Báo cáo vận hành & Nhân viên có quyền & Xem chỉ số doanh thu, chi phí, lợi nhuận và dữ liệu tổng hợp. \\
+  UC13 & Quản lý người dùng và RBAC & Quản trị viên & Gán vai trò, quyền và giới hạn chức năng theo mô-đun/hành động. \\
+  \bottomrule
+\end{longtable}
+
+Hình~\ref{fig:use-case-overview} nhóm các use case theo hai tác nhân chính. Đây là sơ đồ tổng quan; các điều kiện và luồng thay thế được đặc tả chi tiết ở các mục tiếp theo.
+
+\begin{diagramlandscape}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.96\linewidth,height=0.82\textheight,keepaspectratio]{images/use-case.drawio.png}
+  \caption{Use case tổng quan của hệ thống Mọng Fruitboxz}
+  \label{fig:use-case-overview}
+\end{figure}
+\end{diagramlandscape}
+
+\subsection{Quy ước mô hình hóa}
+
+Các sơ đồ trong báo cáo tuân theo quy ước UML được sử dụng trong học phần: tác nhân nằm ngoài biên hệ thống; use case được biểu diễn bằng hình ellipse; quan hệ \textit{include}/\textit{extend} dùng đường nét đứt và mũi tên phụ thuộc; lớp có các ngăn tên--thuộc tính; biểu đồ trình tự đọc từ trên xuống; trạng thái chỉ nối bằng các chuyển tiếp có ý nghĩa nghiệp vụ. Màu sắc chỉ dùng để phân vùng hoặc làm tiêu đề, không mã hóa thêm ngữ nghĩa khi chưa có chú giải. Cách trình bày này giúp người đọc phân biệt rõ sơ đồ phân tích với ảnh giao diện và sơ đồ triển khai.
+
+\section{Đặc Tả Các Luồng Nghiệp Vụ Chính}
+
+\subsection{UC02 -- Tìm kiếm sản phẩm}
+
+\begin{longtable}{@{}p{0.23\textwidth}p{0.69\textwidth}@{}}
+  \toprule
+  \textbf{Thuộc tính} & \textbf{Đặc tả} \\
+  \midrule
+  Tác nhân & Mọi khách truy cập. \\
+  Tiền điều kiện & Frontend kết nối được backend; Meilisearch là thành phần tối ưu tùy chọn. \\
+  Kích hoạt & Người dùng nhập từ khóa hoặc đổi danh mục, mức giá, thứ tự sắp xếp. \\
+  Luồng chính & (1) Gửi tiêu chí tìm kiếm; (2) chỉ lấy product \texttt{published}; (3) áp dụng filter, sort và phân trang; (4) trả tên, slug, ảnh, giá, danh mục và trạng thái tồn. \\
+  Luồng thay thế & Nếu Meilisearch lỗi hoặc chưa cấu hình, backend dùng Medusa Query, chuẩn hóa chuỗi và lọc catalog tại ứng dụng. \\
+  Hậu điều kiện & Danh sách kết quả và tổng số bản ghi khớp tiêu chí được hiển thị; dữ liệu không bị thay đổi. \\
+  \bottomrule
+\end{longtable}
+
+\subsection{UC03 -- Quản lý giỏ hàng}
+
+\begin{longtable}{@{}p{0.23\textwidth}p{0.69\textwidth}@{}}
+  \toprule
+  \textbf{Thuộc tính} & \textbf{Đặc tả} \\
+  \midrule
+  Tác nhân & Mọi khách truy cập. \\
+  Tiền điều kiện & Sản phẩm có biến thể hợp lệ và còn khả năng mua. \\
+  Luồng chính & Thêm sản phẩm, đổi số lượng, chọn dòng hàng hoặc xóa; reducer cập nhật trạng thái và lưu \techterm{localStorage}. \\
+  Đồng bộ & Mỗi trình duyệt có session ID; frontend thử đồng bộ qua \texttt{/store/session-cart/:id} khi Redis hoạt động. \\
+  Luồng suy giảm & Redis lỗi không chặn mua hàng; localStorage trở thành nguồn dữ liệu hoạt động. Ảnh cũ được đối chiếu lại thumbnail từ catalog. \\
+  Hậu điều kiện & Tổng số lượng và tạm tính được cập nhật; giỏ còn tồn tại sau khi tải lại trang. \\
+  \bottomrule
+\end{longtable}
+
+\subsection{UC05 -- Đặt hàng}
+
+\textbf{Tiền điều kiện:} giỏ có ít nhất một sản phẩm, người nhận cung cấp tên, điện thoại, email và địa chỉ hợp lệ.
+
+\begin{enumerate}[leftmargin=2.2em, itemsep=3pt]
+  \item Frontend gửi danh sách \texttt{variant\_id}, số lượng, thông tin giao hàng, mã khuyến mãi và khóa idempotency.
+  \item Backend kiểm tra khóa idempotency để hạn chế tạo trùng đơn khi người dùng bấm nhiều lần.
+  \item Backend truy vấn lại toàn bộ biến thể và giá VND; giá gửi từ trình duyệt không được sử dụng làm nguồn tin cậy.
+  \item Mô-đun nguyên liệu kiểm tra số lượng cần dùng theo công thức BOM của từng biến thể.
+  \item Dịch vụ giao hàng ước tính phí theo địa chỉ hoặc tọa độ; có bảng phí dự phòng.
+  \item Dịch vụ khuyến mãi kiểm tra thời gian, giới hạn lượt dùng, giá trị đơn tối thiểu và mức giảm tối đa.
+  \item Hệ thống tạo đơn ở trạng thái \texttt{pending}, ghi metadata giao hàng, thanh toán, khuyến mãi và mã đơn dạng \texttt{MONG-YYYYMMDD-XXXXXX}.
+  \item Sự kiện \texttt{order.placed} kích hoạt trừ tồn nguyên liệu và tác vụ email xác nhận giả lập.
+  \item Frontend xóa giỏ hàng và hiển thị thông tin xác nhận.
+\end{enumerate}
+
+\textbf{Luồng lỗi:} từ chối tạo đơn nếu biến thể đã bị xóa, chưa có giá VND, nguyên liệu không đủ hoặc mã khuyến mãi không hợp lệ. Lỗi được trả về để giao diện hiển thị cho người dùng.
+
+\subsection{UC08 -- Chatbot tư vấn}
+
+Chatbot thu thập ngữ cảnh từ FAQ do quản trị viên cấu hình và tối đa bốn sản phẩm phù hợp. Ngữ cảnh được gửi tới mô hình Groq với ràng buộc không bịa sản phẩm, không truy cập đơn hàng hay dữ liệu cá nhân và không tiết lộ prompt. Câu trả lời được cache; API giới hạn số yêu cầu theo địa chỉ IP. Nếu dịch vụ AI lỗi, hệ thống lần lượt fallback sang FAQ, kết quả catalog hoặc thông báo liên hệ hotline.
+
+\subsection{UC13 -- Phân quyền quản trị}
+
+Sau khi đăng nhập, admin nhận JWT và tải danh sách quyền từ API. Giao diện dùng \texttt{RequirePermission} để ẩn/chặn route nhạy cảm. Ở backend, middleware xác định mô-đun từ đường dẫn, ánh xạ HTTP method sang hành động \texttt{read}, \texttt{create}, \texttt{edit} hoặc \texttt{delete}, sau đó kiểm tra quyền của người dùng. Tài khoản super admin có quyền đại diện bằng ký tự \texttt{*}.
+
+\section{Yêu Cầu Phi Chức Năng}
+
+\begin{longtable}{@{}p{0.22\textwidth} p{0.70\textwidth}@{}}
+  \toprule
+  \textbf{Thuộc tính} & \textbf{Yêu cầu và cách kiểm chứng} \\
+  \midrule
+  \endhead
+  Hiệu năng & Route giao diện được tách bundle; ảnh tải lười; tìm kiếm ưu tiên chỉ mục Meilisearch và có phân trang. \\
+  Tin cậy & Checkout dùng khóa idempotency; giá được xác minh tại server; cache, Redis và tìm kiếm đều có phương án suy giảm chức năng. \\
+  Bảo mật & JWT tách customer/admin; backend kiểm tra RBAC; payload được xác thực; secret lấy từ biến môi trường. \\
+  Khả dụng & Luồng browse--cart--checkout có thông báo loading/error; các trang chính hoạt động ở kích thước desktop và mobile. \\
+  Bảo trì & API chia namespace, nghiệp vụ chia module, migration đi cùng module và thành phần giao diện được tái sử dụng. \\
+  Quan sát & Lỗi API có mã trạng thái rõ; chatbot lưu log câu hỏi; production cần bổ sung structured log và metric. \\
+  \bottomrule
+\end{longtable}
+
+\section{Yêu Cầu Dữ Liệu và Kiểm Tra Hợp Lệ}
+
+\begin{itemize}[leftmargin=2em, itemsep=4pt]
+  \item Định danh sản phẩm và biến thể phải tồn tại tại thời điểm checkout.
+  \item Số lượng mua phải là số nguyên dương và không vượt quá lượng nguyên liệu khả dụng.
+  \item Giá đơn hàng luôn được lấy từ backend và dùng tiền tệ VND.
+  \item Email, số điện thoại, địa chỉ và payload contact/chatbot được kiểm tra qua middleware Zod.
+  \item Khách vãng lai không được tự động gắn đơn vào tài khoản đã tồn tại chỉ dựa trên email.
+  \item API admin yêu cầu xác thực; các mô-đun nhạy cảm yêu cầu thêm quyền RBAC tương ứng.
+\end{itemize}
+
+\section{Tiêu Chí Chấp Nhận}
+
+\begin{longtable}{@{}p{0.28\textwidth} p{0.64\textwidth}@{}}
+  \toprule
+  \textbf{Nhóm} & \textbf{Tiêu chí} \\
+  \midrule
+  \endhead
+  Catalog & Sản phẩm xuất bản hiển thị đúng tên, ảnh, giá, biến thể và danh mục. \\
+  Checkout & Không tạo đơn nếu giá/tồn kho không hợp lệ; tổng tiền thể hiện được giảm giá và phí giao hàng. \\
+  Bảo mật & Route admin từ chối người chưa xác thực; người thiếu quyền nhận mã 403. \\
+  Khả dụng & Giỏ hàng vẫn hoạt động khi Redis lỗi; tìm kiếm có kết quả fallback khi Meilisearch lỗi. \\
+  Quản trị & Thay đổi catalog/nội dung được phản ánh ở frontend và chỉ mục liên quan được vô hiệu hóa hoặc cập nhật. \\
+  Responsive & Các luồng mua hàng chính sử dụng được trên màn hình desktop và thiết bị di động. \\
+  \bottomrule
+\end{longtable}
+
+\section{Giới Hạn Phạm Vi Hiện Tại}
+
+Phiên bản được rà soát chưa tích hợp cổng thanh toán trực tuyến; đơn mới được ghi nhận với trạng thái \texttt{not\_paid}. Subscriber email mới ghi nội dung ra log thay vì gửi qua nhà cung cấp thực. Dự án chưa có bộ kiểm thử tự động và pipeline CI rõ ràng. Những nội dung này được xem là hướng hoàn thiện, không được tính là chức năng đã triển khai đầy đủ.

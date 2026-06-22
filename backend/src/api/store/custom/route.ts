@@ -17,6 +17,6 @@ export async function GET(req: MedusaRequest<unknown, StoreCustomQuery>, res: Me
 
     res.json(mode === "homepage" ? { settings, banners } : { settings })
   } catch (error: unknown) {
-    sendInternalError(req, res, error, "Unable to load storefront settings", "STOREFRONT_SETTINGS_FAILED")
+    sendInternalError(req, res, error, "Unable to load frontend settings", "FRONTEND_SETTINGS_FAILED")
   }
 }

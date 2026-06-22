@@ -64,26 +64,20 @@ function haversineKm(aLat: number, aLng: number, bLat: number, bLng: number) {
   return 2 * earthRadiusKm * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x))
 }
 
+// Replacing OSRM blocking HTTP call with an instant heuristic calculation.
+// Using Haversine distance * 1.3 (a standard routing detour factor for urban areas like Hanoi).
+// This prevents checkout timeouts if the public OSRM server is down or rate-limiting.
 async function osrmDistanceKm(originLat: number, originLng: number, destLat: number, destLng: number): Promise<number> {
-  // Use memoryCache for origin-dest pairs to prevent rate-limiting
-  const cacheKey = `osrm:${originLat.toFixed(3)},${originLng.toFixed(3)}-${destLat.toFixed(3)},${destLng.toFixed(3)}`;
+  const cacheKey = `osrm:heuristic:${originLat.toFixed(3)},${originLng.toFixed(3)}-${destLat.toFixed(3)},${destLng.toFixed(3)}`;
   if (memoryCache.has(cacheKey)) {
     return memoryCache.get(cacheKey) as number;
   }
 
-  const url = `http://router.project-osrm.org/route/v1/driving/${originLng},${originLat};${destLng},${destLat}?overview=false`;
-  try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(1500) });
-    const data = await res.json();
-    if (data.code === "Ok" && data.routes && data.routes.length > 0) {
-      const dist = data.routes[0].distance / 1000;
-      memoryCache.set(cacheKey, dist);
-      return dist;
-    }
-  } catch (error) {
-    console.error("OSRM error, falling back to haversine:", error);
-  }
-  return haversineKm(originLat, originLng, destLat, destLng);
+  const straightLineKm = haversineKm(originLat, originLng, destLat, destLng);
+  const heuristicDrivingKm = straightLineKm * 1.3;
+  
+  memoryCache.set(cacheKey, heuristicDrivingKm);
+  return heuristicDrivingKm;
 }
 
 function getShippingConfig(settings: Record<string, unknown>) {

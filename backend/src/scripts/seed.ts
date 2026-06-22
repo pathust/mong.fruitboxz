@@ -71,9 +71,9 @@ const updateStoreCurrencies = createWorkflow(
   }
 );
 
-const dataDir = path.resolve(process.cwd(), "../storefront/src/data");
-let categories: any[] = [];
-let products: any[] = [];
+const dataDir = path.resolve(process.cwd(), "../frontend/src/data");
+let categories: Record<string, unknown>[] = [];
+let products: Record<string, unknown>[] = [];
 
 try {
   categories = JSON.parse(fs.readFileSync(path.join(dataDir, "categories.json"), "utf8"));
@@ -286,17 +286,17 @@ export default async function seedDemoData({ container }: ExecArgs) {
 
   const parsedProducts = products.map((p, idx) => {
     const cleanTitle = p.title.split("-")[0].replace(/(Box|Hộp)\s+/g, "").trim().substring(0, 100) || `Product ${idx}`;
-    const sourceCat = categories.find((c: any) => c.name === p.category);
+    const sourceCat = categories.find((c: Record<string, unknown>) => c.name === p.category);
     const catSlug = sourceCat ? sourceCat.slug : null;
     const category = categoryResult.find(c => c.handle === catSlug) || categoryResult[0];
 
     const seenLabels = new Set();
-    const mappedVariants = (p.variants || []).filter((v: any) => {
+    const mappedVariants = (p.variants || []).filter((v: Record<string, unknown>) => {
       const label = v.label || "Standard";
       if (seenLabels.has(label)) return false;
       seenLabels.add(label);
       return true;
-    }).map((v: any, vIdx: number) => {
+    }).map((v: Record<string, unknown>, vIdx: number) => {
       const price = v.price || 100000;
       return {
         title: v.label || "Standard",
@@ -337,7 +337,7 @@ function slugify(str: string) {
       thumbnail: imagesToAssign[0]?.url,
       images: imagesToAssign,
       category_ids: category ? [category.id] : [],
-      options: [{ title: "Size", values: mappedVariants.map((v: any) => v.title) }],
+      options: [{ title: "Size", values: mappedVariants.map((v: Record<string, unknown>) => v.title) }],
       variants: mappedVariants,
       sales_channels: [{ id: defaultSalesChannel[0].id }],
     };
@@ -360,37 +360,87 @@ function slugify(str: string) {
   }
 
   logger.info("Seeding RBAC (roles, permissions, users)...");
-  const rbacService = container.resolve("rbac") as any
-  const authModuleService = container.resolve("auth") as any
+  const rbacService = container.resolve("rbac") as Record<string, any>
+  const authModuleService = container.resolve("auth") as Record<string, any>
 
   // Create permissions
   const permissionData = [
-    { name: "users.list", description: "List users" },
+    { name: "users.read", description: "View users" },
     { name: "users.create", description: "Create users" },
     { name: "users.edit", description: "Edit users" },
     { name: "users.delete", description: "Delete users" },
-    { name: "roles.list", description: "List roles" },
+    { name: "roles.read", description: "View roles" },
     { name: "roles.create", description: "Create roles" },
     { name: "roles.edit", description: "Edit roles" },
     { name: "roles.delete", description: "Delete roles" },
-    { name: "permissions.list", description: "List permissions" },
+    { name: "permissions.read", description: "View permissions" },
     { name: "permissions.create", description: "Create permissions" },
     { name: "permissions.edit", description: "Edit permissions" },
     { name: "permissions.delete", description: "Delete permissions" },
     { name: "orders.read", description: "View orders" },
-    { name: "orders.edit", description: "Edit orders" },
     { name: "orders.create", description: "Create orders" },
+    { name: "orders.edit", description: "Edit orders" },
     { name: "orders.delete", description: "Delete orders" },
     { name: "products.read", description: "View products" },
-    { name: "products.edit", description: "Edit products" },
     { name: "products.create", description: "Create products" },
+    { name: "products.edit", description: "Edit products" },
     { name: "products.delete", description: "Delete products" },
-    { name: "inventory.read", description: "View inventory" },
-    { name: "inventory.edit", description: "Edit inventory" },
+    { name: "categories.read", description: "View categories" },
+    { name: "categories.create", description: "Create categories" },
+    { name: "categories.edit", description: "Edit categories" },
+    { name: "categories.delete", description: "Delete categories" },
     { name: "customers.read", description: "View customers" },
+    { name: "customers.create", description: "Create customers" },
     { name: "customers.edit", description: "Edit customers" },
+    { name: "customers.delete", description: "Delete customers" },
+    { name: "promotions.read", description: "View promotions" },
+    { name: "promotions.create", description: "Create promotions" },
+    { name: "promotions.edit", description: "Edit promotions" },
+    { name: "promotions.delete", description: "Delete promotions" },
+    { name: "inventory.read", description: "View inventory" },
+    { name: "inventory.create", description: "Create inventory" },
+    { name: "inventory.edit", description: "Edit inventory" },
+    { name: "inventory.delete", description: "Delete inventory" },
+    { name: "ingredients.read", description: "View ingredients" },
+    { name: "ingredients.create", description: "Create ingredients" },
+    { name: "ingredients.edit", description: "Edit ingredients" },
+    { name: "ingredients.delete", description: "Delete ingredients" },
+    { name: "banners.read", description: "View banners" },
+    { name: "banners.create", description: "Create banners" },
+    { name: "banners.edit", description: "Edit banners" },
+    { name: "banners.delete", description: "Delete banners" },
+    { name: "media.read", description: "View media" },
+    { name: "media.create", description: "Create media" },
+    { name: "media.edit", description: "Edit media" },
+    { name: "media.delete", description: "Delete media" },
+    { name: "blog.read", description: "View blog" },
+    { name: "blog.create", description: "Create blog" },
+    { name: "blog.edit", description: "Edit blog" },
+    { name: "blog.delete", description: "Delete blog" },
+    { name: "blog-categories.read", description: "View blog-categories" },
+    { name: "blog-categories.create", description: "Create blog-categories" },
+    { name: "blog-categories.edit", description: "Edit blog-categories" },
+    { name: "blog-categories.delete", description: "Delete blog-categories" },
+    { name: "finance.read", description: "View finance" },
+    { name: "finance.create", description: "Create finance" },
+    { name: "finance.edit", description: "Edit finance" },
+    { name: "finance.delete", description: "Delete finance" },
+    { name: "content.read", description: "View content" },
+    { name: "content.create", description: "Create content" },
+    { name: "content.edit", description: "Edit content" },
+    { name: "content.delete", description: "Delete content" },
+    { name: "chatbot.read", description: "View chatbot" },
+    { name: "chatbot.create", description: "Create chatbot" },
+    { name: "chatbot.edit", description: "Edit chatbot" },
+    { name: "chatbot.delete", description: "Delete chatbot" },
+    { name: "search.read", description: "View search" },
+    { name: "search.create", description: "Create search" },
+    { name: "search.edit", description: "Edit search" },
+    { name: "search.delete", description: "Delete search" },
     { name: "settings.read", description: "View settings" },
+    { name: "settings.create", description: "Create settings" },
     { name: "settings.edit", description: "Edit settings" },
+    { name: "settings.delete", description: "Delete settings" },
   ]
   const permissions = await rbacService.createPermissions(permissionData)
   const permMap: Record<string, string> = {}
@@ -412,8 +462,12 @@ function slugify(str: string) {
       is_default: true,
       permissions: [
         permMap["orders.read"], permMap["orders.edit"], permMap["orders.create"],
+        permMap["finance.read"],
         permMap["products.read"], permMap["products.edit"], permMap["products.create"],
+        permMap["promotions.read"], permMap["promotions.edit"], permMap["promotions.create"],
+        permMap["categories.read"], permMap["categories.edit"], permMap["categories.create"],
         permMap["inventory.read"], permMap["inventory.edit"],
+        permMap["ingredients.read"], permMap["ingredients.edit"],
         permMap["customers.read"], permMap["customers.edit"],
       ],
     },
@@ -430,7 +484,7 @@ function slugify(str: string) {
   ])
 
   // Create users
-  const userService = container.resolve("user") as any
+  const userService = container.resolve("user") as Record<string, any>
   const users = await Promise.all([
     userService.createUsers({ email: "admin@mongfruitbox.com", first_name: "Admin", last_name: "" }),
     userService.createUsers({ email: "pat@mongfruitbox.com", first_name: "Pat", last_name: "" }),

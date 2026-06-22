@@ -101,7 +101,7 @@ const customApiMatchers = [
   "/store/geocode*",
   "/store/ingredients*",
   "/store/promotions/validate*",
-  "/store/reviews*",
+
   "/store/search*",
   "/store/session-cart*",
   "/store/shipping/quote*",
@@ -113,7 +113,7 @@ const customApiMatchers = [
   "/admin/media*",
   "/admin/permissions*",
   "/admin/promotions/:id/metadata*",
-  "/admin/reviews*",
+
   "/admin/roles*",
   "/admin/search*",
   "/admin/settings*",

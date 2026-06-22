@@ -106,46 +106,12 @@ export async function POST(req: MedusaStoreRequest<CheckoutBody>, res: MedusaRes
 
   // 3. Inventory Validation using BOM
   try {
-    const { data: recipeItems } = await query.graph({
-      entity: "recipe_item",
-      fields: [
-        "*",
-        "ingredient.*",
-        "ingredient.inventory_item.*",
-        "ingredient.inventory_item.location_levels.*"
-      ],
-      filters: { variant_id: variantIds }
-    })
-
-    const requiredIngredients: Record<string, { name: string, required: number, stock: number }> = {}
-
-    for (const item of items) {
-      const variantRecipeItems = (recipeItems as any[] || []).filter((r) => r.variant_id === item.variant_id)
-      for (const reqItem of variantRecipeItems) {
-        const ingId = reqItem.ingredient?.id
-        if (!ingId) continue
-        
-        if (!requiredIngredients[ingId]) {
-          const invItem = reqItem.ingredient?.inventory_item
-          const stock = invItem?.location_levels?.reduce((sum: number, l: any) => sum + (l.stocked_quantity || 0), 0) || 0
-          requiredIngredients[ingId] = {
-            name: reqItem.ingredient?.name || "Nguyên liệu",
-            required: 0,
-            stock: stock
-          }
-        }
-        
-        requiredIngredients[ingId].required += reqItem.quantity * item.quantity
-      }
+    const ingredientsModuleService = req.scope.resolve("ingredients") as any
+    await ingredientsModuleService.validateOrderIngredients(items)
+  } catch (error: any) {
+    if (error.message && error.message.includes("vượt quá số lượng")) {
+      return res.status(400).json({ message: error.message })
     }
-
-    for (const ingId in requiredIngredients) {
-      const ing = requiredIngredients[ingId]
-      if (ing.required > ing.stock) {
-        return res.status(400).json({ message: `Đơn hàng vượt quá số lượng nguyên liệu trong kho. Vui lòng giảm số lượng. (Nguyên liệu: ${ing.name} - Cần: ${ing.required}, Còn: ${ing.stock})` })
-      }
-    }
-  } catch (error: unknown) {
     return sendInternalError(req, res, error, "Không thể kiểm tra tồn kho nguyên liệu", "INVENTORY_CHECK_FAILED")
   }
 
@@ -228,28 +194,9 @@ export async function POST(req: MedusaStoreRequest<CheckoutBody>, res: MedusaRes
   const customerEmail = shipping.email?.toLowerCase().trim() || first_name.toLowerCase() + "@example.com"
 
   if (!customerId) {
-    const existingCustomers = await customerModuleService.listCustomers(
-      { email: customerEmail },
-      { take: 1 }
-    )
-    
-    if (existingCustomers && existingCustomers.length > 0) {
-      customerId = existingCustomers[0].id
-    } else {
-      try {
-        const newCustomer = await customerModuleService.createCustomers({
-          email: customerEmail,
-          first_name,
-          last_name,
-          phone: shipping.phone || undefined,
-        })
-        customerId = newCustomer.id
-      } catch (err) {
-        // Fallback gracefully if customer creation fails
-        const logger = req.scope.resolve<{ error(message: string, error?: unknown): void }>("logger")
-        logger.error("Failed to create customer record during checkout", err)
-      }
-    }
+    // SECURITY FIX: We no longer auto-bind guest checkouts to existing customers by email.
+    // If you are not authenticated, you are checked out purely as a guest (customer_id will be undefined).
+    // The email is still recorded on the order directly.
   }
 
   const order = await orderModuleService.createOrders({
@@ -270,7 +217,7 @@ export async function POST(req: MedusaStoreRequest<CheckoutBody>, res: MedusaRes
     status: "pending",
     metadata: {
       note: shipping.note || "",
-      source: "storefront",
+      source: "frontend",
       shipping_fee: shippingFee,
       shipping_quote_mode: shippingQuote.mode,
       shipping_distance_km: shippingQuote.distance_km || null,

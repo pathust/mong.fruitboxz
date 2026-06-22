@@ -1,0 +1,83 @@
+\babel@toc {vietnamese}{}\relax 
+\contentsline {chapter}{Lời Nói Đầu}{i}{chapter*.1}%
+\contentsline {chapter}{\numberline {1}Giới Thiệu Bài Toán}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Bối Cảnh}{1}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Mục Tiêu Đề Tài}{1}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Phạm Vi Hệ Thống}{1}{section.1.3}%
+\contentsline {subsection}{\numberline {1.3.1}Giao diện khách hàng}{2}{subsection.1.3.1}%
+\contentsline {subsection}{\numberline {1.3.2}Giao diện quản trị}{2}{subsection.1.3.2}%
+\contentsline {subsection}{\numberline {1.3.3}Backend và hạ tầng}{2}{subsection.1.3.3}%
+\contentsline {section}{\numberline {1.4}Đối Tượng Sử Dụng}{2}{section.1.4}%
+\contentsline {section}{\numberline {1.5}Các Nhóm Chức Năng Chính}{2}{section.1.5}%
+\contentsline {section}{\numberline {1.6}Yêu Cầu Phi Chức Năng}{3}{section.1.6}%
+\contentsline {section}{\numberline {1.7}Kết Cấu Báo Cáo}{3}{section.1.7}%
+\contentsline {chapter}{\numberline {2}Đặc Tả Yêu Cầu}{4}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Mục Đích và Phạm Vi Đặc Tả}{4}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Công Nghệ và Ràng Buộc}{4}{section.2.2}%
+\contentsline {section}{\numberline {2.3}Danh Sách Use Case}{4}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Quy ước mô hình hóa}{6}{subsection.2.3.1}%
+\contentsline {section}{\numberline {2.4}Đặc Tả Các Luồng Nghiệp Vụ Chính}{6}{section.2.4}%
+\contentsline {subsection}{\numberline {2.4.1}UC02 -- Tìm kiếm sản phẩm}{6}{subsection.2.4.1}%
+\contentsline {subsection}{\numberline {2.4.2}UC03 -- Quản lý giỏ hàng}{7}{subsection.2.4.2}%
+\contentsline {subsection}{\numberline {2.4.3}UC05 -- Đặt hàng}{7}{subsection.2.4.3}%
+\contentsline {subsection}{\numberline {2.4.4}UC08 -- Chatbot tư vấn}{7}{subsection.2.4.4}%
+\contentsline {subsection}{\numberline {2.4.5}UC13 -- Phân quyền quản trị}{8}{subsection.2.4.5}%
+\contentsline {section}{\numberline {2.5}Yêu Cầu Phi Chức Năng}{8}{section.2.5}%
+\contentsline {section}{\numberline {2.6}Yêu Cầu Dữ Liệu và Kiểm Tra Hợp Lệ}{8}{section.2.6}%
+\contentsline {section}{\numberline {2.7}Tiêu Chí Chấp Nhận}{8}{section.2.7}%
+\contentsline {section}{\numberline {2.8}Giới Hạn Phạm Vi Hiện Tại}{9}{section.2.8}%
+\contentsline {chapter}{\numberline {3}Thiết Kế Hệ Thống}{10}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Chuyển Từ Phân Tích Sang Thiết Kế}{10}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Kiến Trúc Tổng Thể}{10}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Thiết Kế Storefront}{11}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Tổ chức ứng dụng}{11}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Nguyên tắc giao tiếp API}{11}{subsection.3.3.2}%
+\contentsline {section}{\numberline {3.4}Thiết Kế Backend Medusa}{11}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}Mô-đun lõi và mô-đun mở rộng}{11}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}API, workflow và subscriber}{12}{subsection.3.4.2}%
+\contentsline {section}{\numberline {3.5}Luồng Checkout}{12}{section.3.5}%
+\contentsline {subsection}{\numberline {3.5.1}Biểu đồ hoạt động}{12}{subsection.3.5.1}%
+\contentsline {subsection}{\numberline {3.5.2}Biểu đồ trình tự}{13}{subsection.3.5.2}%
+\contentsline {section}{\numberline {3.6}Mô Hình Lớp Miền}{14}{section.3.6}%
+\contentsline {section}{\numberline {3.7}Tìm Kiếm và Chatbot}{14}{section.3.7}%
+\contentsline {section}{\numberline {3.8}Bảo Mật}{15}{section.3.8}%
+\contentsline {section}{\numberline {3.9}Vòng Đời Đơn Hàng}{16}{section.3.9}%
+\contentsline {section}{\numberline {3.10}Mô Hình Triển Khai}{16}{section.3.10}%
+\contentsline {chapter}{\numberline {4}Thiết Kế Dữ Liệu}{18}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Tổng Quan}{18}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Nhóm Thực Thể Lõi Của Medusa}{18}{section.4.2}%
+\contentsline {section}{\numberline {4.3}Các Model Tùy Biến}{18}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Mô-đun Site}{18}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Mô-đun RBAC}{19}{subsection.4.3.2}%
+\contentsline {subsection}{\numberline {4.3.3}Mô-đun Ingredients}{19}{subsection.4.3.3}%
+\contentsline {subsection}{\numberline {4.3.4}Các mô-đun khác}{20}{subsection.4.3.4}%
+\contentsline {section}{\numberline {4.4}Quan Hệ Dữ Liệu}{20}{section.4.4}%
+\contentsline {section}{\numberline {4.5}Ánh Xạ Mô Hình Miền Sang Lưu Trữ}{21}{section.4.5}%
+\contentsline {section}{\numberline {4.6}Nhất Quán Giao Dịch}{21}{section.4.6}%
+\contentsline {section}{\numberline {4.7}Dữ Liệu Phi Quan Hệ}{21}{section.4.7}%
+\contentsline {subsection}{\numberline {4.7.1}Redis}{21}{subsection.4.7.1}%
+\contentsline {subsection}{\numberline {4.7.2}Meilisearch}{21}{subsection.4.7.2}%
+\contentsline {subsection}{\numberline {4.7.3}MinIO}{22}{subsection.4.7.3}%
+\contentsline {section}{\numberline {4.8}Toàn Vẹn, Sao Lưu và Bảo Mật Dữ Liệu}{22}{section.4.8}%
+\contentsline {chapter}{\numberline {5}Thiết Kế Giao Diện}{23}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Định Hướng Thiết Kế}{23}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Sơ Đồ Điều Hướng Storefront}{23}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Các Màn Hình Khách Hàng}{23}{section.5.3}%
+\contentsline {section}{\numberline {5.4}Ảnh Chụp Giao Diện Từ Phiên Chạy Thử}{24}{section.5.4}%
+\contentsline {subsection}{\numberline {5.4.1}Trang sản phẩm và chi tiết}{25}{subsection.5.4.1}%
+\contentsline {subsection}{\numberline {5.4.2}Giỏ hàng và checkout}{26}{subsection.5.4.2}%
+\contentsline {subsection}{\numberline {5.4.3}Chatbot}{26}{subsection.5.4.3}%
+\contentsline {section}{\numberline {5.5}Khu Vực Quản Trị}{26}{section.5.5}%
+\contentsline {section}{\numberline {5.6}Khả Năng Tiếp Cận và Responsive}{28}{section.5.6}%
+\contentsline {section}{\numberline {5.7}Đánh Giá Tính Nhất Quán}{28}{section.5.7}%
+\contentsline {chapter}{\numberline {6}Tổng Kết}{29}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Kết Quả Đạt Được}{29}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Đánh Giá Theo Nhóm Chức Năng}{29}{section.6.2}%
+\contentsline {section}{\numberline {6.3}Kết Quả Chạy Thử và Rà Soát Mã Nguồn}{30}{section.6.3}%
+\contentsline {section}{\numberline {6.4}Các Hạn Chế Kỹ Thuật}{30}{section.6.4}%
+\contentsline {section}{\numberline {6.5}Hướng Phát Triển}{31}{section.6.5}%
+\contentsline {section}{\numberline {6.6}Kiến Thức và Kinh Nghiệm Thu Được}{32}{section.6.6}%
+\contentsline {section}{\numberline {6.7}Kết Luận}{32}{section.6.7}%
+\contentsline {section}{\numberline {6.8}Tài Liệu Tham Khảo}{32}{section.6.8}%
+\contentsline {section}{\numberline {6.9}Mã Nguồn Dự Án}{33}{section.6.9}%
+\contentsfinish 

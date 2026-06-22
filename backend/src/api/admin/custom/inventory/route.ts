@@ -71,7 +71,8 @@ export async function POST(req: MedusaRequest<InventoryLevelBody>, res: MedusaRe
             stocked_quantity: quantity
           }
         ])
-      } catch (err: any) {
+      } catch (error: unknown) {
+        const err = error as { message?: string, type?: string };
         // If it fails (e.g. level doesn't exist), create it
         if (err.message?.includes("not found") || err.type === "not_found") {
           await inventoryModule.createInventoryLevels([
@@ -82,7 +83,7 @@ export async function POST(req: MedusaRequest<InventoryLevelBody>, res: MedusaRe
             }
           ])
         } else {
-          throw err
+          throw error
         }
       }
     }

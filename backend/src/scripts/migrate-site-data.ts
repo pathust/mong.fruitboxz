@@ -19,7 +19,7 @@ export default async function migrateSiteData({ container }: ExecArgs) {
   const dataDir = path.join(process.cwd(), ".medusa", "data")
   const settingsFile = path.join(dataDir, "settings.json")
   const bannersFile = path.join(dataDir, "banners.json")
-  const reviewsFile = path.join(dataDir, "reviews.json")
+
 
   const [existingSettings] = await siteService.listAndCountSiteSettings({ key: "global" })
   if (!existingSettings?.length) {
@@ -45,24 +45,6 @@ export default async function migrateSiteData({ container }: ExecArgs) {
         }))
       )
       logger.info(`Migrated ${banners.length} banners -> site_banner`)
-    }
-  }
-
-  const [existingReviews] = await siteService.listAndCountReviews({})
-  if (!existingReviews?.length) {
-    const reviews = readJson<Record<string, unknown>[]>(reviewsFile, [])
-    if (reviews.length > 0) {
-      await siteService.createReviews(
-        reviews.map((r) => ({
-          handle: String(r.handle || ""),
-          product_id: r.product_id ? String(r.product_id) : null,
-          customer_id: String(r.customer_id || "unknown"),
-          rating: Number(r.rating) || 5,
-          comment: String(r.comment || ""),
-          approved: true,
-        }))
-      )
-      logger.info(`Migrated ${reviews.length} reviews -> site_review`)
     }
   }
 

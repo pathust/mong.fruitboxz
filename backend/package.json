@@ -14,7 +14,7 @@
   ],
   "scripts": {
     "prebuild": "node ./scripts/check-node-version.js",
-    "build": "medusa build",
+    "build": "NODE_OPTIONS=--max-old-space-size=4096 medusa build",
     "preseed": "node ./scripts/check-node-version.js",
     "seed": "medusa exec ./src/scripts/seed.ts",
     "sync:product-images": "medusa exec ./src/scripts/sync-product-images.ts",

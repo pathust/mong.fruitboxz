@@ -14,7 +14,7 @@ graph LR
         BLOG["Blog\n(Static/CMS)"]
     end
 
-    subgraph Storefront
+    subgraph Frontend
         HOME["Trang chủ\n(banners + featured)"]
         CART["Checkout\n(apply promo code)"]
         BLOG_PAGE["Trang blog"]
