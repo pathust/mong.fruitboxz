@@ -14,8 +14,26 @@ export default function CategoriesList() {
   const [query, setQuery] = useState("");
 
   useEffect(() => {
-    api("/admin/product-categories")
-      .then((d) => setCategories(d.product_categories || []))
+    Promise.all([
+      api("/admin/product-categories"),
+      api("/admin/products?fields=id,thumbnail,*categories&limit=1000")
+    ])
+      .then(([catsRes, prodsRes]) => {
+        const categoriesData = catsRes.product_categories || [];
+        const productsData = prodsRes.products || [];
+
+        categoriesData.forEach(cat => {
+          if (!cat.metadata?.image) {
+            const product = productsData.find(p => p.categories?.some(c => c.id === cat.id) && p.thumbnail);
+            if (product) {
+              if (!cat.metadata) cat.metadata = {};
+              cat.metadata.image = product.thumbnail;
+            }
+          }
+        });
+
+        setCategories(categoriesData);
+      })
       .catch((err) => console.error("Failed to load categories:", err))
       .finally(() => setLoading(false));
   }, [api]);
