@@ -93,7 +93,9 @@ export default function CategoryForm() {
           <label className="block text-sm font-medium text-secondary mb-1">Ảnh đại diện</label>
           <div className="flex items-center gap-4">
             {form.image &&
-              <img src={form.image} alt="Thumbnail" className="h-16 w-16 rounded-xl object-cover border border-gray-200" />
+              <a href={form.image} target="_blank" rel="noopener noreferrer" className="block h-16 w-16">
+                <img src={form.image} alt="Thumbnail" className="h-16 w-16 rounded-md object-cover border border-gray-200 hover:opacity-80 transition-opacity" />
+              </a>
               }
             <button
                 type="button"
