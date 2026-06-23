@@ -157,17 +157,16 @@ export default function ShippingSettings() {
 
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto space-y-6">
       <AdminHeaderPortal>
         <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between w-full pr-4">
           <div>
-            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Hệ thống</p>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Bán hàng</p>
             <h1 className="text-lg font-extrabold text-[#4d4339] flex items-center gap-2">
-              <Truck className="w-5 h-5 text-primary" /> Cài đặt phí ship
+              <Truck className="w-5 h-5 text-primary" /> Phí vận chuyển
             </h1>
-            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Cấu hình phí vận chuyển mặc định và biểu phí theo khoảng cách.</p>
+            <p className="text-xs font-semibold text-[#8d7f6f] hidden md:block">Cấu hình các quy tắc và biểu phí giao hàng tự động.</p>
           </div>
-          
         </div>
       </AdminHeaderPortal>
       <div className="mb-6 flex justify-end">

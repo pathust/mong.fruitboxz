@@ -20,6 +20,7 @@ const navGroups = [
       { label: "Danh mục", path: "/admin/categories", icon: FolderKanban, permission: "categories.read" },
       { label: "Khuyến mãi", path: "/admin/promotions", icon: Tag, permission: "promotions.read" },
       { label: "Hộp tự chọn", path: "/admin/content/custom-box", icon: Gift, permission: "content.read" },
+      { label: "Phí vận chuyển", path: "/admin/settings/shipping", icon: Truck, permission: "settings.read" },
     ],
   },
   {
@@ -54,8 +55,7 @@ const navGroups = [
     items: [
       { label: "Quản trị viên", path: "/admin/users", icon: Users, permission: "users.read" },
       { label: "Phân quyền", path: "/admin/roles", icon: Shield, permission: "roles.read" },
-      { label: "Cài đặt phí ship", path: "/admin/settings/shipping", icon: Truck, permission: "users.read" },
-      { label: "Cài đặt chung", path: "/admin/settings", icon: Settings, permission: "users.read" },
+      { label: "Cài đặt chung", path: "/admin/settings", icon: Settings, permission: "settings.read" },
     ],
   },
 ]
