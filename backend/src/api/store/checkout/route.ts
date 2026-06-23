@@ -7,6 +7,7 @@ import { processCheckoutPromotions } from "../../../lib/checkout"
 import type { CheckoutBody } from "../../middlewares/validation"
 import { resolveSiteService } from "../../../lib/module-services"
 import { sendInternalError } from "../../../lib/api-error"
+import { checkoutOrderWorkflow } from "../../../workflows/checkout-order"
 
 type ProductVariantRecord = {
   id: string
@@ -35,19 +36,7 @@ type PromotionRecord = {
   } | null
 }
 
-function generateOrderCode(order: { id?: string; created_at?: string | Date }) {
-  const date = order.created_at ? new Date(order.created_at) : new Date()
-  const datePart = Number.isNaN(date.getTime())
-    ? "LOCAL"
-    : date.toISOString().slice(0, 10).replace(/-/g, "")
-  const suffix = String(order.id || "")
-    .replace(/[^a-zA-Z0-9]/g, "")
-    .slice(-6)
-    .toUpperCase()
-    .padStart(6, "0")
 
-  return `MONG-${datePart}-${suffix}`
-}
 
 export async function POST(req: MedusaStoreRequest<CheckoutBody>, res: MedusaResponse) {
   const { items, shipping, idempotency_key, promotion_code } = req.validatedBody
@@ -199,7 +188,7 @@ export async function POST(req: MedusaStoreRequest<CheckoutBody>, res: MedusaRes
     // The email is still recorded on the order directly.
   }
 
-  const order = await orderModuleService.createOrders({
+  const orderData = {
     email: customerEmail,
     currency_code: "vnd",
     region_id: region?.id || undefined,
@@ -229,45 +218,22 @@ export async function POST(req: MedusaStoreRequest<CheckoutBody>, res: MedusaRes
       discount_total: discountAmount,
       original_subtotal: originalSubtotal
     },
-  })
-  const orderCode = generateOrderCode(order)
-  let responseOrder = order
+  };
 
+  let responseOrder;
   try {
-    const updated = await orderModuleService.updateOrders([{
-      id: order.id,
-      metadata: {
-        ...(order.metadata || {}),
-        order_code: orderCode,
-      },
-    }])
-    responseOrder = Array.isArray(updated) ? updated[0] : updated
+    const { result } = await checkoutOrderWorkflow(req.scope).run({
+      input: orderData
+    });
+    responseOrder = result;
   } catch (error: unknown) {
     const logger = req.scope.resolve<{ error(message: string, error?: unknown): void }>("logger")
-    logger.error("Failed to persist order code", error)
-    responseOrder = {
-      ...responseOrder,
-      metadata: {
-      ...(responseOrder.metadata || {}),
-      order_code: orderCode,
-      },
-    }
+    logger.error("Failed to checkout order", error)
+    return sendInternalError(req, res, error, "Không thể tạo đơn hàng", "ORDER_CREATE_FAILED")
   }
 
   const subtotal = normalizedItems.reduce((sum, item) => sum + item.unit_price * item.quantity, 0)
   const total = subtotal + shippingFee
-
-  // Emit order.placed event manually because we bypassed the standard workflow
-  try {
-    const eventBus = req.scope.resolve(Modules.EVENT_BUS)
-    await eventBus.emit({
-      name: "order.placed",
-      data: { id: responseOrder.id }
-    })
-  } catch (err) {
-    const logger = req.scope.resolve<{ error(message: string, error?: unknown): void }>("logger")
-    logger.error("Failed to emit order.placed event", err)
-  }
 
   res.json({ order: responseOrder, summary: { original_subtotal: originalSubtotal, subtotal, discount: discountAmount, shipping: shippingFee, total } })
 }

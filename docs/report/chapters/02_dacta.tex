@@ -52,14 +52,14 @@ Backend yêu cầu Node.js phiên bản từ 20 đến dưới 23; cấu hình c
 
 Hình~\ref{fig:use-case-overview} nhóm các use case theo hai tác nhân chính. Đây là sơ đồ tổng quan; các điều kiện và luồng thay thế được đặc tả chi tiết ở các mục tiếp theo.
 
-\begin{diagramlandscape}
+\begin{diagramcanvas}
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.96\linewidth,height=0.82\textheight,keepaspectratio]{images/use-case.drawio.png}
+  \includegraphics[width=\linewidth,height=0.48\textheight,keepaspectratio]{images/use-case.drawio.png}
   \caption{Use case tổng quan của hệ thống Mọng Fruitboxz}
   \label{fig:use-case-overview}
 \end{figure}
-\end{diagramlandscape}
+\end{diagramcanvas}
 
 \subsection{Quy ước mô hình hóa}
 
@@ -99,29 +99,80 @@ Các sơ đồ trong báo cáo tuân theo quy ước UML được sử dụng tr
 
 \subsection{UC05 -- Đặt hàng}
 
-\textbf{Tiền điều kiện:} giỏ có ít nhất một sản phẩm, người nhận cung cấp tên, điện thoại, email và địa chỉ hợp lệ.
+\begin{longtable}{@{}p{0.23\textwidth}p{0.69\textwidth}@{}}
+  \toprule
+  \textbf{Thuộc tính} & \textbf{Đặc tả} \\
+  \midrule
+  Tác nhân & Khách vãng lai hoặc khách hàng đã đăng nhập. \\
+  Tiền điều kiện & Giỏ có ít nhất một dòng hàng; tên, điện thoại và địa chỉ hợp lệ. Email là tùy chọn. \\
+  Đầu vào & \texttt{variant\_id}, số lượng, thông tin người nhận, địa chỉ hoặc tọa độ, mã khuyến mãi; backend hỗ trợ khóa idempotency tùy chọn. \\
+  Luồng chuẩn bị & Người dùng có thể cho phép định vị. Frontend gọi reverse geocode để điền địa chỉ; mỗi khi địa chỉ/tọa độ thay đổi, hiệu ứng debounce 300 ms tự gọi \texttt{/store/shipping/quote} và cập nhật phí, chế độ tính cùng khoảng cách ước lượng. \\
+  Luồng chính & (1) Xác thực payload; (2) nếu có khóa idempotency thì tìm đơn đã xử lý; (3) tải lại biến thể và giá VND; (4) tính nhu cầu BOM, kiểm tra tồn; (5) tính lại ship và promotion tại server; (6) tạo order \texttt{pending} và mã \texttt{MONG-...}; (7) phát \texttt{order.placed}; (8) trả order và bảng tổng hợp. \\
+  Luồng lỗi & Từ chối khi biến thể không tồn tại, thiếu giá, thiếu nguyên liệu, promotion không hợp lệ hoặc dữ liệu giao hàng sai. Nếu reverse geocode lỗi, giữ tọa độ và yêu cầu người dùng bổ sung địa chỉ; nếu API quote lỗi, frontend dùng ước lượng cục bộ. \\
+  Quy tắc tin cậy & Không dùng giá/tổng tiền gửi từ trình duyệt làm nguồn chuẩn. Phí giao hàng và giảm giá được tính lại ở backend; idempotency chỉ có hiệu lực khi client cung cấp khóa. \\
+  Hậu điều kiện & Order và metadata giao hàng được lưu; frontend xóa giỏ và hiển thị mã đơn, tổng thanh toán cùng QR chuyển khoản. \\
+  \bottomrule
+\end{longtable}
 
-\begin{enumerate}[leftmargin=2.2em, itemsep=3pt]
-  \item Frontend gửi danh sách \texttt{variant\_id}, số lượng, thông tin giao hàng, mã khuyến mãi và khóa idempotency.
-  \item Backend kiểm tra khóa idempotency để hạn chế tạo trùng đơn khi người dùng bấm nhiều lần.
-  \item Backend truy vấn lại toàn bộ biến thể và giá VND; giá gửi từ trình duyệt không được sử dụng làm nguồn tin cậy.
-  \item Mô-đun nguyên liệu kiểm tra số lượng cần dùng theo công thức BOM của từng biến thể.
-  \item Dịch vụ giao hàng ước tính phí theo địa chỉ hoặc tọa độ; có bảng phí dự phòng.
-  \item Dịch vụ khuyến mãi kiểm tra thời gian, giới hạn lượt dùng, giá trị đơn tối thiểu và mức giảm tối đa.
-  \item Hệ thống tạo đơn ở trạng thái \texttt{pending}, ghi metadata giao hàng, thanh toán, khuyến mãi và mã đơn dạng \texttt{MONG-YYYYMMDD-XXXXXX}.
-  \item Sự kiện \texttt{order.placed} kích hoạt trừ tồn nguyên liệu và tác vụ email xác nhận giả lập.
-  \item Frontend xóa giỏ hàng và hiển thị thông tin xác nhận.
-\end{enumerate}
+Hình~\ref{fig:checkout-activity} mô tả luồng nghiệp vụ từ góc nhìn trách nhiệm; Hình~\ref{fig:shipping-quote-sequence} mô tả bước định vị và báo phí; Hình~\ref{fig:checkout-flow} mô tả các bước kiểm tra khi tạo đơn. Như vậy UC05 được đặc tả bằng cả bảng văn bản, biểu đồ hoạt động và các sơ đồ luồng, phù hợp cách mô hình hóa chức năng--hành vi trong slide học phần.
 
-\textbf{Luồng lỗi:} từ chối tạo đơn nếu biến thể đã bị xóa, chưa có giá VND, nguyên liệu không đủ hoặc mã khuyến mãi không hợp lệ. Lỗi được trả về để giao diện hiển thị cho người dùng.
+\subsubsection{Bảng quyết định phí giao hàng}
+
+\begin{longtable}{@{}p{0.29\textwidth}p{0.25\textwidth}p{0.38\textwidth}@{}}
+  \toprule
+  \textbf{Điều kiện} & \textbf{Chế độ} & \textbf{Kết quả} \\
+  \midrule
+  Chưa có địa chỉ/tọa độ & \texttt{fallback-empty} & Dùng phí Hà Nội mặc định để tạm tính. \\
+  Ngoài Hà Nội & \texttt{static-non-hanoi} & Dùng mức phí ngoài Hà Nội từ cấu hình. \\
+  Quận thuộc danh sách miễn phí & \texttt{district-free} & Phí giao hàng bằng 0. \\
+  Khớp quận hoặc có tọa độ & \texttt{distance-estimate} & Khoảng cách đường đi ước lượng bằng Haversine $\times 1{,}3$; phí = phí nền + đơn giá/km, làm tròn nghìn và chặn min--max. \\
+  Có địa chỉ Hà Nội nhưng không khớp quận & \texttt{static-hanoi} & Dùng phí Hà Nội mặc định. \\
+  API quote không khả dụng & \texttt{fallback} ở frontend & Ước lượng cục bộ theo quận đã nhận diện; nếu không nhận diện được thì dùng phí mặc định. \\
+  \bottomrule
+\end{longtable}
 
 \subsection{UC08 -- Chatbot tư vấn}
 
-Chatbot thu thập ngữ cảnh từ FAQ do quản trị viên cấu hình và tối đa bốn sản phẩm phù hợp. Ngữ cảnh được gửi tới mô hình Groq với ràng buộc không bịa sản phẩm, không truy cập đơn hàng hay dữ liệu cá nhân và không tiết lộ prompt. Câu trả lời được cache; API giới hạn số yêu cầu theo địa chỉ IP. Nếu dịch vụ AI lỗi, hệ thống lần lượt fallback sang FAQ, kết quả catalog hoặc thông báo liên hệ hotline.
+\begin{longtable}{@{}p{0.23\textwidth}p{0.69\textwidth}@{}}
+  \toprule
+  \textbf{Thuộc tính} & \textbf{Đặc tả} \\
+  \midrule
+  Tác nhân & Mọi khách truy cập. \\
+  Đầu vào & Câu hỏi tự nhiên; không nhận dữ liệu đơn hàng hoặc thông tin thanh toán. \\
+  Luồng chính & Chuẩn hóa câu hỏi, tìm FAQ và tối đa bốn sản phẩm liên quan, tạo prompt có ngữ cảnh rồi gọi Groq. \\
+  Ràng buộc & Không bịa sản phẩm, không tiết lộ prompt, không truy cập dữ liệu cá nhân; có rate limit theo IP và cache câu trả lời. \\
+  Luồng thay thế & Trả FAQ trực tiếp; nếu AI lỗi thì dùng kết quả catalog hoặc hướng dẫn liên hệ hotline. \\
+  Hậu điều kiện & Nội dung trả lời, chế độ phản hồi và trạng thái resolved được ghi vào chatbot log. \\
+  \bottomrule
+\end{longtable}
 
 \subsection{UC13 -- Phân quyền quản trị}
 
-Sau khi đăng nhập, admin nhận JWT và tải danh sách quyền từ API. Giao diện dùng \texttt{RequirePermission} để ẩn/chặn route nhạy cảm. Ở backend, middleware xác định mô-đun từ đường dẫn, ánh xạ HTTP method sang hành động \texttt{read}, \texttt{create}, \texttt{edit} hoặc \texttt{delete}, sau đó kiểm tra quyền của người dùng. Tài khoản super admin có quyền đại diện bằng ký tự \texttt{*}.
+\begin{longtable}{@{}p{0.23\textwidth}p{0.69\textwidth}@{}}
+  \toprule
+  \textbf{Thuộc tính} & \textbf{Đặc tả} \\
+  \midrule
+  Tác nhân & Người dùng quản trị đã được cấp tài khoản. \\
+  Tiền điều kiện & JWT admin hợp lệ; metadata chứa danh sách role hiện hành. \\
+  Luồng chính & Tải permission; giao diện dùng \texttt{RequirePermission}; backend ánh xạ route và HTTP method sang \texttt{module.action}, sau đó cho phép hoặc trả 403. \\
+  Quy tắc & Kiểm tra quyền bắt buộc ở backend; ẩn menu chỉ là biện pháp UX. Super admin dùng permission đại diện \texttt{*}. \\
+  Hậu điều kiện & Chỉ các route và thao tác được cấp quyền mới thực thi; thay đổi role phản ánh khi tải lại quyền. \\
+  \bottomrule
+\end{longtable}
+
+\section{Truy Vết Yêu Cầu Sang Thiết Kế}
+
+\begin{longtable}{@{}p{0.15\textwidth}p{0.27\textwidth}p{0.25\textwidth}p{0.25\textwidth}@{}}
+  \toprule
+  \textbf{Use case} & \textbf{Mô hình hành vi} & \textbf{Thành phần thực thi} & \textbf{Bằng chứng giao diện} \\
+  \midrule
+  UC02 & Use case tổng quan & Search API, Meilisearch, fallback Query & Hình~\ref{fig:ui-discovery} \\
+  UC03 & Activity checkout, bước chuẩn bị giỏ & \texttt{CartContext}, session cart & Hình~\ref{fig:ui-assist-checkout} \\
+  UC05 & Activity, luồng định vị/báo phí, luồng tạo đơn, state order & Checkout UI/API, geocode, quote, Ingredient, Order, Event Bus & Hình~\ref{fig:ui-assist-checkout} \\
+  UC08 & Sequence chatbot & Chatbot API, FAQ/catalog retrieval, Groq & Hình~\ref{fig:ui-assist-checkout} \\
+  UC09--UC13 & Module, class, ERD và deployment & Admin routes, RBAC, module service & Hình~\ref{fig:ui-admin-overview} và \ref{fig:ui-admin-operations} \\
+  \bottomrule
+\end{longtable}
 
 \section{Yêu Cầu Phi Chức Năng}
 

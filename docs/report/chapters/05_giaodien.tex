@@ -45,13 +45,13 @@ Luồng mua hàng chính được tổ chức ngắn gọn theo chuỗi: \textit
 
 \section{Ảnh Chụp Giao Diện Từ Phiên Chạy Thử}
 
-Các hình dưới đây được chụp trực tiếp tại \texttt{localhost:5173}. Bộ ảnh được chọn theo hành trình sử dụng thay vì chụp mọi route: sáu màn hình khách hàng bao quát khám phá--cấu hình--tư vấn--checkout và bốn màn hình quản trị bao quát KPI--catalog--đơn hàng--tồn kho. Dữ liệu catalog, giá, ảnh, giỏ hàng và KPI đều đến từ API của dự án, không phải mockup tĩnh.
+Các hình dưới đây được chụp trực tiếp tại \texttt{localhost:5173}. Bộ ảnh được chọn theo hành trình sử dụng thay vì chụp mọi route: sáu màn hình khách hàng bao quát khám phá--cấu hình--tư vấn--checkout và bốn màn hình quản trị bao quát KPI--catalog--đơn hàng--tồn kho. Ảnh trang chủ được chụp sau khi banner động tải xong; ảnh checkout được chụp sau khi địa chỉ kích hoạt API báo phí. Dữ liệu catalog, giá, ảnh, giỏ hàng và KPI đều đến từ API của dự án, không phải mockup tĩnh.
 
 \begin{figure}[H]
   \centering
   \begin{subfigure}[t]{0.49\textwidth}
     \includegraphics[width=\linewidth]{images/ui-home.png}
-    \caption{Trang chủ và nhận diện thương hiệu}
+    \caption{Trang chủ sau khi banner động tải hoàn tất}
   \end{subfigure}\hfill
   \begin{subfigure}[t]{0.49\textwidth}
     \includegraphics[width=\linewidth]{images/ui-products.png}
@@ -83,7 +83,7 @@ Các hình dưới đây được chụp trực tiếp tại \texttt{localhost:5
   \end{subfigure}\hfill
   \begin{subfigure}[t]{0.49\textwidth}
     \includegraphics[width=\linewidth]{images/ui-checkout.png}
-    \caption{Checkout và tóm tắt tổng đơn}
+    \caption{Checkout sau khi tự động cập nhật phí giao hàng}
   \end{subfigure}
   \caption{Hỗ trợ quyết định mua và hoàn tất đơn hàng}
   \label{fig:ui-assist-checkout}
@@ -91,7 +91,7 @@ Các hình dưới đây được chụp trực tiếp tại \texttt{localhost:5
 
 \subsection{Trang sản phẩm và chi tiết}
 
-Card sản phẩm gom ảnh, tên, giá và hành động mua. Trang chi tiết dùng route động theo slug, nhờ đó không cần tạo file riêng cho từng sản phẩm. Khi sản phẩm có nhiều biến thể, người dùng phải chọn biến thể trước khi thêm vào giỏ. Giao diện review và thao tác gửi điểm đã được loại bỏ; phần dưới trang tập trung vào mô tả, thành phần nguyên liệu và sản phẩm liên quan.
+Card sản phẩm gom ảnh, tên, giá và hành động mua. Trang chi tiết dùng route động theo slug, nhờ đó không cần tạo file riêng cho từng sản phẩm. Khi sản phẩm có nhiều biến thể, người dùng phải chọn biến thể trước khi thêm vào giỏ. Phần dưới trang tập trung vào mô tả, thành phần nguyên liệu và sản phẩm liên quan.
 
 \subsection{Giỏ hàng và checkout}
 

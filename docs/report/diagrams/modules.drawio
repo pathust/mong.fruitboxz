@@ -44,7 +44,7 @@
         <mxCell id="rbac" value="RBAC · Role · Permission" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#333333;strokeWidth=1.5;fontFamily=Arial;fontSize=15;fontColor=#111111;" vertex="1" parent="1">
           <mxGeometry x="1215" y="335" width="360" height="70" as="geometry" />
         </mxCell>
-        <mxCell id="other" value="Bulk order · Voting" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#333333;strokeWidth=1.5;fontFamily=Arial;fontSize=15;fontColor=#111111;" vertex="1" parent="1">
+        <mxCell id="other" value="Bulk order" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#333333;strokeWidth=1.5;fontFamily=Arial;fontSize=15;fontColor=#111111;" vertex="1" parent="1">
           <mxGeometry x="1215" y="445" width="360" height="70" as="geometry" />
         </mxCell>
         <mxCell id="workflow" value="Workflow · Subscriber" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F4F4F4;strokeColor=#333333;strokeWidth=1.5;fontFamily=Arial;fontSize=15;fontColor=#111111;" vertex="1" parent="1">

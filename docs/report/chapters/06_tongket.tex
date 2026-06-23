@@ -28,26 +28,26 @@ Về hạ tầng, PostgreSQL, Redis, Meilisearch và MinIO được tách thành
   \bottomrule
 \end{longtable}
 
-\section{Kết Quả Chạy Thử và Rà Soát Mã Nguồn}
+\section{Rà Soát Giao Diện và Mã Nguồn}
 
-Việc đánh giá không chỉ dựa trên đọc mã. Frontend đang chạy tại cổng 5173 và kết nối được backend/dữ liệu dự án. Các trang chủ, catalog, chi tiết sản phẩm, hộp tự chọn và chatbot đều tải được nội dung. Thao tác thêm Cam Vàng Mỹ vào giỏ làm số lượng giỏ chuyển từ 0 sang 1; trang checkout hiển thị tạm tính 100.000 đồng, phí giao hàng 30.000 đồng và tổng 130.000 đồng.
+Việc đánh giá không chỉ dựa trên đọc mã. Giao diện đang chạy tại cổng 5173 và kết nối được backend/dữ liệu dự án, nhờ đó có thể đối chiếu trực tiếp giữa chức năng thật và phần mô tả trong báo cáo. Trang chủ được chụp sau khi banner động tải xong với nội dung ``Mọng chuẩn bị từng món quà bằng sự tử tế''. Ở checkout, giỏ có một sản phẩm số lượng 2 là ``Cóc bao tử dầm bò khô 500gr'', tạm tính 200.000 đồng. Trình duyệt kiểm thử từ chối quyền vị trí nên nhánh thông báo lỗi định vị cũng được xác nhận; sau khi nhập ``123 Đường Cầu Giấy, Quận Cầu Giấy, Hà Nội'', frontend tự gọi API báo phí và cập nhật phí giao hàng 18.000 đồng, tổng 218.000 đồng.
 
 Đăng nhập tài khoản quản trị seed thành công tại cùng origin. Sidebar đầy đủ và các trang dashboard, sản phẩm, đơn hàng, tồn kho đều tải được, cho thấy phiên xác thực và danh sách quyền đã được áp dụng. Dashboard ghi nhận 213 sản phẩm, 15 đơn hàng, 9 khách hàng, doanh thu 11,36 triệu đồng, lợi nhuận âm 1,46 triệu đồng và công nợ 8,76 triệu đồng. Đây là dữ liệu phù hợp để minh họa đồng thời góc nhìn quản trị catalog và vận hành tài chính.
 
-Lệnh \texttt{npm run build} của frontend hoàn tất: Vite biến đổi 2.074 module và sinh bundle production. Bundle chính sau minify khoảng 629~kB (gzip khoảng 181~kB), vượt ngưỡng cảnh báo 500~kB; vì vậy cần tiếp tục tách vendor/admin chunk dù route đã lazy-load. Dự án chưa có test suite tự động tương xứng với phạm vi chức năng, nên kết quả trên vẫn là smoke test, chưa thay thế kiểm thử hồi quy.
+Rà soát mã nguồn cho thấy dự án đã đổi thư mục giao diện từ \texttt{storefront} sang \texttt{frontend}; báo cáo và sơ đồ vì vậy sử dụng thống nhất tên mới. Phần checkout hiện có API báo phí riêng, reverse geocode, debounce khi địa chỉ thay đổi và tính lại phí ở backend khi tạo đơn. Các điểm cần cải thiện được ghi ở mục hạn chế kỹ thuật để tránh trộn lẫn giữa kết quả mô tả tài liệu và nhật ký chạy lệnh.
 
 \section{Các Hạn Chế Kỹ Thuật}
 
 \begin{enumerate}[leftmargin=2.2em, itemsep=5pt]
   \item \textbf{Checkout chưa dùng workflow đầy đủ:} route đang gọi module service trực tiếp và tự phát \texttt{order.placed}. Nếu trừ kho hoặc tác vụ sau đó lỗi, hệ thống chưa có compensation thống nhất.
+  \item \textbf{Khóa lặp và tổng tiền checkout:} backend đã có trường \texttt{idempotency\_key} nhưng frontend hiện chưa gửi khóa này. Response summary trả \texttt{discount} riêng, còn \texttt{total} đang cộng subtotal với phí ship mà chưa trừ giảm giá; frontend vì vậy phải tự tính lại tổng thanh toán hiển thị.
   \item \textbf{Thanh toán và email chưa hoàn chỉnh:} đơn mới có \texttt{payment\_status=not\_paid}; email xác nhận mới là mock ghi log.
   \item \textbf{Tối ưu truy vấn:} giới hạn lượt dùng khuyến mãi đang quét metadata đơn hàng; fallback search tải nhiều sản phẩm để lọc trong ứng dụng. Hai cách này không phù hợp khi dữ liệu lớn.
   \item \textbf{Bảo mật cấu hình:} các secret mặc định trong template chỉ phù hợp development. Không nên để master key Meilisearch hoặc endpoint quản trị lộ tới client.
   \item \textbf{RBAC còn hai cách lưu liên kết:} role vừa có module link với user, vừa được tham chiếu qua metadata; cần chọn một nguồn dữ liệu chuẩn.
   \item \textbf{Cấu hình theo môi trường:} CORS, backend URL và publishable key phải được đồng bộ với origin triển khai; smoke test hiện xác nhận origin cổng 5173 hoạt động.
-  \item \textbf{Kích thước bundle:} production build thành công nhưng chunk chính còn lớn; cần tách nhóm thư viện và đo Core Web Vitals trên thiết bị thật.
-  \item \textbf{Mã lịch sử sau khi bỏ review:} route, model, module link và menu đã được gỡ; tuy nhiên matcher cũ trong \texttt{api/middlewares.ts} và nhánh migrate review trong \texttt{migrate-site-data.ts} nên được dọn để tránh lỗi khi chạy script bảo trì.
-  \item \textbf{Chất lượng phát hành:} cần bổ sung unit test, integration test, end-to-end test, lint/build bắt buộc và CI trước khi triển khai.
+  \item \textbf{Hiệu năng giao diện:} cần tiếp tục tách nhóm thư viện lớn, tối ưu ảnh và đo Core Web Vitals trên thiết bị thật.
+  \item \textbf{Chất lượng phát hành:} cần bổ sung unit test, integration test, end-to-end test, kiểm tra lint và CI trước khi triển khai.
   \item \textbf{Khả năng tiếp cận và SEO:} cần hoàn thiện keyboard navigation, aria-live cho giỏ, tối ưu ảnh, metadata và Product JSON-LD.
 \end{enumerate}
 
@@ -60,7 +60,7 @@ Lệnh \texttt{npm run build} của frontend hoàn tất: Vite biến đổi 2.0
   \item Tạo bảng/bộ đếm usage cho promotion thay vì quét toàn bộ order; bổ sung index cho các trường lọc thường dùng.
   \item Bổ sung monitoring, structured logging, health check, backup và quy trình phục hồi PostgreSQL/MinIO.
   \item Chuẩn hóa một cổng development cho frontend, đồng bộ \texttt{STORE\_CORS}, \texttt{ADMIN\_CORS}, \texttt{AUTH\_CORS} và kiểm tra OPTIONS trong CI/E2E.
-  \item Duy trì \texttt{npm run build} và \texttt{npm run lint} bắt buộc trước khi merge; thiết lập manual chunk cho thư viện lớn.
+  \item Thiết lập kiểm tra tự động trước khi merge; bổ sung quy tắc lint, kiểm thử hồi quy và tối ưu manual chunk cho thư viện lớn.
   \item Thiết lập test pyramid: unit test cho tính phí và khuyến mãi, integration test cho API, E2E cho browse--cart--checkout và smoke test cho admin.
   \item Cải thiện chatbot bằng đánh giá câu trả lời, quản lý phiên hội thoại và cơ chế moderation; vẫn giữ nguyên nguyên tắc không truy cập dữ liệu cá nhân.
   \item Tối ưu Core Web Vitals, ảnh responsive, SEO kỹ thuật và khả năng tiếp cận theo WCAG.
@@ -87,10 +87,5 @@ Mọng Fruitboxz đã vượt qua mức một website giới thiệu sản phẩ
   \item MinIO Documentation. \url{https://min.io/docs/minio/}
   \item Docker Compose Documentation. \url{https://docs.docker.com/compose/}
   \item Groq API Documentation. \url{https://console.groq.com/docs/}
+  \item Mã nguồn Mọng Fruitboxz. \url{https://github.com/pathust/mong.fruitboxz}
 \end{enumerate}
-
-\section{Mã Nguồn Dự Án}
-
-\begin{itemize}[leftmargin=2em]
-  \item \textbf{GitHub:} \url{https://github.com/pathust/mong.fruitboxz}
-\end{itemize}
