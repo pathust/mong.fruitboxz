@@ -65,6 +65,7 @@ export default function CategoriesList() {
         <table className="w-full text-sm text-left">
           <thead className="bg-[#fffaf4] text-[#8d7f6f] text-xs uppercase tracking-wider font-bold border-b border-[#eadfcd]">
             <tr>
+              <th className="px-5 py-4 w-16">Ảnh</th>
               <th className="px-5 py-4">Name</th>
               <th className="px-5 py-4 text-right">Actions</th>
             </tr>
@@ -72,6 +73,15 @@ export default function CategoriesList() {
           <tbody className="divide-y divide-[#eadfcd]/50">
             {filteredCategories.map((c) =>
               <tr key={c.id} className="hover:bg-[#fffaf4]/50 transition-colors align-top">
+                <td className="px-5 py-4">
+                  {c.metadata?.image ? (
+                    <img src={c.metadata.image} alt={c.name} className="w-12 h-12 object-cover rounded-xl border border-gray-200" />
+                  ) : (
+                    <div className="w-12 h-12 bg-gray-100 rounded-xl border border-gray-200 flex items-center justify-center">
+                      <Tags className="w-5 h-5 text-gray-400" />
+                    </div>
+                  )}
+                </td>
                 <td className="px-5 py-4 font-bold text-secondary text-[15px]">{c.name}</td>
                 <td className="px-5 py-4 text-right">
                   <div className="flex justify-end gap-2">
