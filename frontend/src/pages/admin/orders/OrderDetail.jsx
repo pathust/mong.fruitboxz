@@ -22,10 +22,10 @@ const VALID_PAYMENT_TRANSITIONS = {
   refunded: []
 };
 const VALID_FULFILLMENT_TRANSITIONS = {
-  not_fulfilled: ["processing"],
-  processing: ["shipped", "not_fulfilled"],
-  shipped: ["delivered", "returned"],
-  delivered: [], // delivered → shipped is invalid
+  not_fulfilled: ["processing", "shipped", "delivered"],
+  processing: ["shipped", "delivered", "not_fulfilled"],
+  shipped: ["delivered", "returned", "not_fulfilled"],
+  delivered: ["returned"],
   returned: ["not_fulfilled"]
 };
 
