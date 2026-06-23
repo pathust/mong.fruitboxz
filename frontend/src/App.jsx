@@ -120,7 +120,7 @@ export default function App() {
           <Route path="roles" element={<Suspense fallback={<ScreenLoader />}><RequirePermission perm="roles.read"><RolesList /></RequirePermission></Suspense>} />
 
           <Route path="ingredients" element={<Suspense fallback={<ScreenLoader />}><RequirePermission perm="ingredients.read"><IngredientsList /></RequirePermission></Suspense>} />
-          <Route path="settings/shipping" element={<Suspense fallback={<ScreenLoader />}><ShippingSettings /></Suspense>} />
+          <Route path="shipping" element={<Suspense fallback={<ScreenLoader />}><ShippingSettings /></Suspense>} />
 
           <Route path="media" element={<Suspense fallback={<ScreenLoader />}><MediaLibrary /></Suspense>} />
           <Route path="search" element={<Suspense fallback={<ScreenLoader />}><SearchConsole /></Suspense>} />
@@ -134,7 +134,7 @@ export default function App() {
           <Route path="content/payment-policy" element={<Suspense fallback={<ScreenLoader />}><RequirePermission perm="content.read"><ContentSettingsPage type="paymentPolicy" /></RequirePermission></Suspense>} />
           <Route path="content/privacy-policy" element={<Suspense fallback={<ScreenLoader />}><RequirePermission perm="content.read"><ContentSettingsPage type="privacyPolicy" /></RequirePermission></Suspense>} />
           <Route path="content/shipping-policy" element={<Suspense fallback={<ScreenLoader />}><RequirePermission perm="content.read"><ContentSettingsPage type="shippingPolicy" /></RequirePermission></Suspense>} />
-          <Route path="content/custom-box" element={<Suspense fallback={<ScreenLoader />}><RequirePermission perm="content.read"><ContentSettingsPage type="customBox" /></RequirePermission></Suspense>} />
+          <Route path="custom-box" element={<Suspense fallback={<ScreenLoader />}><RequirePermission perm="content.read"><ContentSettingsPage type="customBox" /></RequirePermission></Suspense>} />
           <Route path="settings" element={<Suspense fallback={<ScreenLoader />}><RequirePermission perm="settings.read"><Settings /></RequirePermission></Suspense>} />
         </Route>
       </Route>

@@ -19,8 +19,8 @@ const navGroups = [
       { label: "Sản phẩm", path: "/admin/products", icon: Package, permission: "products.read" },
       { label: "Danh mục", path: "/admin/categories", icon: FolderKanban, permission: "categories.read" },
       { label: "Khuyến mãi", path: "/admin/promotions", icon: Tag, permission: "promotions.read" },
-      { label: "Hộp tự chọn", path: "/admin/content/custom-box", icon: Gift, permission: "content.read" },
-      { label: "Phí vận chuyển", path: "/admin/settings/shipping", icon: Truck, permission: "settings.read" },
+      { label: "Hộp tự chọn", path: "/admin/custom-box", icon: Gift, permission: "content.read" },
+      { label: "Phí vận chuyển", path: "/admin/shipping", icon: Truck, permission: "settings.read" },
     ],
   },
   {
