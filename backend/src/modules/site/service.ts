@@ -1,5 +1,5 @@
 import { MedusaService } from "@medusajs/framework/utils"
-import { Banner, SiteSetting, ChatbotQuestionLog, ContactMessage, BlogPost, BlogCategory } from "./models"
+import { Banner, SiteSetting, ChatbotQuestionLog, ContactMessage, BlogPost, BlogCategory, Review } from "./models"
 
 class SiteModuleService extends MedusaService({
   Banner,
@@ -8,6 +8,7 @@ class SiteModuleService extends MedusaService({
   ContactMessage,
   BlogPost,
   BlogCategory,
+  Review,
 }) {}
 
 export default SiteModuleService
