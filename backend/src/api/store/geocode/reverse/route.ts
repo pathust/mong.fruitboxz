@@ -1,10 +1,11 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
-import { reverseGeocodeLocation } from "../../../../lib/geocoding"
 import type { ReverseGeocodeQuery } from "../../../middlewares/validation"
+import ShippingModuleService from "../../../../modules/shipping/service"
+import { SHIPPING_MODULE } from "../../../../modules/shipping"
 
 export async function GET(req: MedusaRequest<unknown, ReverseGeocodeQuery>, res: MedusaResponse) {
   const { lat, lng } = req.validatedQuery
-
-  const location = await reverseGeocodeLocation(lat, lng)
+  const shippingService: ShippingModuleService = req.scope.resolve(SHIPPING_MODULE)
+  const location = await shippingService.reverseGeocodeLocation(lat, lng)
   return res.json(location)
 }
