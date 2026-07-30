@@ -7,7 +7,8 @@ function readJson<T>(filePath: string, fallback: T): T {
   try {
     if (!fs.existsSync(filePath)) return fallback
     return JSON.parse(fs.readFileSync(filePath, "utf-8")) as T
-  } catch {
+  } catch (error) {
+    console.error(`Failed to read JSON from ${filePath}:`, error)
     return fallback
   }
 }
