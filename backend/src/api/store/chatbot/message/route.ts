@@ -1,7 +1,7 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { buildChatbotReply } from "../../../../lib/chatbot"
 import { getGlobalSettings } from "../../../../lib/global-settings"
-import { normalizeAddress } from "../../../../lib/geocoding"
+import { normalizeAddress } from "../../../../modules/shipping/service"
 import { consumeRateLimit } from "../../../../lib/redis"
 import type { ChatbotMessageSchema } from "./middlewares"
 import { resolveSiteService } from "../../../../lib/module-services"

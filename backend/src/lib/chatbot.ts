@@ -1,6 +1,8 @@
 import { findFallbackProducts, searchProducts } from "./search"
 import type { ServiceScope } from "./module-services"
+import { enrichWithIngredientStock } from "./inventory"
 import Groq from "groq-sdk"
+import { cached, resolveCache } from "./cache"
 
 type Faq = {
   question: string
@@ -101,18 +103,22 @@ export async function buildChatbotReply({
   const faqs = getFaqs(settings)
   
   let searchResult = await searchProducts(trimmed, { limit: 4 }).catch(() => null)
-  let hits = searchResult?.hits?.map(mapHitToSuggestion) || []
+  let rawHits = searchResult?.hits || []
 
-  if (hits.length === 0) {
-    const fallbackHits = await findFallbackProducts(scope, trimmed, { limit: 4 }).catch(() => [])
-    hits = fallbackHits.map(mapHitToSuggestion)
+  if (rawHits.length === 0) {
+    const fallbackResult = await findFallbackProducts(scope, trimmed, { limit: 4 }).catch(() => ({ hits: [] }))
+    rawHits = fallbackResult.hits || []
   }
+  
+  const enrichedHits = await enrichWithIngredientStock(rawHits, scope)
+  const hits = enrichedHits
+    .filter((h: any) => h.in_stock !== false)
+    .map(mapHitToSuggestion)
 
   const phone = typeof settings.phone === "string" ? settings.phone : "0945.204.432"
 
   // 2. Groq LLM Generation
   try {
-    const { cached, resolveCache } = await import("./cache")
     const cache = resolveCache(scope)
     const cacheKey = `chatbot:reply:${encodeURIComponent(trimmed)}`
     
