@@ -38,7 +38,8 @@ export async function consumeRateLimit(
       remaining: Math.max(0, limit - count),
       retryAfter,
     }
-  } catch {
+  } catch (error) {
+    console.error("Redis rate limit error:", error)
     return { allowed: true, remaining: limit, retryAfter: 0 }
   }
 }

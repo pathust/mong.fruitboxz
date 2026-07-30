@@ -20,7 +20,7 @@ export function resolveLocalProductImage(source: ProductImageSource | null | und
   let filename = ""
   try {
     filename = path.basename(new URL(sourceUrl, "http://local").pathname)
-  } catch {
+  } catch (error) {
     filename = path.basename(sourceUrl)
   }
 

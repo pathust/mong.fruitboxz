@@ -8,9 +8,10 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
       { resolved: false },
       { order: { created_at: "DESC" }, take: 100 }
     )
-    res.json({ items: items || [] })
-  } catch {
-    res.json({ items: [] })
+    res.json({ data: { items: items || [] }, error: null, meta: {} })
+  } catch (error) {
+    req.scope.resolve("logger").error("Failed to fetch unanswered logs", error);
+    res.status(500).json({ data: null, error: { message: "Internal server error" }, meta: {} })
   }
 }
 
@@ -32,8 +33,9 @@ export async function DELETE(req: MedusaRequest, res: MedusaResponse) {
     if (idsToDelete.length > 0) {
       await siteService.deleteChatbotQuestionLogs(idsToDelete)
     }
-    res.json({ success: true, deleted: idsToDelete.length })
+    res.json({ data: { success: true, deleted: idsToDelete.length }, error: null, meta: {} })
   } catch (error) {
-    res.status(500).json({ error: "Failed to delete question logs" })
+    req.scope.resolve("logger").error("Failed to delete logs", error);
+    res.status(500).json({ data: null, error: { message: "Failed to delete question logs" }, meta: {} })
   }
 }

@@ -7,30 +7,32 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
   try {
     const query = req.scope.resolve(ContainerRegistrationKeys.QUERY)
 
-    // Fetch ingredients and their inventory items
-    const { data: ingredientsData } = await query.graph({
-      entity: "ingredient",
+    // Fetch product variants and their inventory items
+    const { data: variantsData } = await query.graph({
+      entity: "product_variant",
       fields: [
-        "name",
-        "unit",
-        "inventory_item.id",
-        "inventory_item.sku",
-        "inventory_item.location_levels.*",
+        "title",
+        "sku",
+        "product.title",
+        "inventory_items.inventory_item_id",
+        "inventory_items.inventory.id",
+        "inventory_items.inventory.sku",
+        "inventory_items.inventory.location_levels.*"
       ],
       pagination: { take: 500 }
     })
 
-    // Fetch default stock location just in case
     const stockLocationModule = req.scope.resolve(Modules.STOCK_LOCATION)
     const stockLocations = await stockLocationModule.listStockLocations({}, { take: 1 })
     const defaultLocationId = stockLocations[0]?.id
 
-    const ingredients = ingredientsData.map((ing: any) => {
-      const invItem = ing.inventory_item
+    const ingredients = variantsData.map((v: any) => {
+      const invItems = v.inventory_items || []
+      const invItemInfo = invItems[0]
+      const invItem = invItemInfo?.inventory
       const locationLevels = invItem?.location_levels || []
       
-      // If it has no location levels, mock one using the default location
-      if (locationLevels.length === 0 && defaultLocationId) {
+      if (locationLevels.length === 0 && defaultLocationId && invItem) {
         locationLevels.push({
           location_id: defaultLocationId,
           stocked_quantity: 0
@@ -39,15 +41,15 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
 
       return {
         id: invItem?.id, // Use inventory_item id for updates
-        title: ing.name,
-        sku: invItem?.sku,
+        title: `${v.product?.title || ''} - ${v.title || ''}`.trim(),
+        sku: invItem?.sku || v.sku || '',
         metadata: {
-          unit: ing.unit,
-          category: "Nguyên liệu"
+          unit: 'cái',
+          category: "Sản phẩm"
         },
         location_levels: locationLevels
       }
-    }).filter((ing: any) => ing.id) // Only those with linked inv items
+    }).filter((ing: any) => ing.id) 
 
     res.json({ ingredients })
   } catch (error: unknown) {

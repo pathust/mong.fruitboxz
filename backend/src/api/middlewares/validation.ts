@@ -47,9 +47,10 @@ export type ChatbotFaqBody = z.infer<typeof ChatbotFaqBodySchema>
 
 export const CheckoutBodySchema = z.object({
   items: z.array(z.object({
-    variant_id: z.string().min(1, "Thiếu variant_id"),
+    price: z.number().min(0).optional(),
     quantity: z.number().int().min(1, "Số lượng phải lớn hơn 0").default(1),
-    product_id: z.string().optional(),
+    variant_id: z.string().nullable().optional(),
+    product_id: z.string().nullable().optional(),
     title: z.string().optional(),
     variantLabel: z.string().optional(),
     image: z.string().optional(),
@@ -101,6 +102,20 @@ export const PromotionValidationBodySchema = z.object({
   subtotal: z.number().min(0),
 })
 export type PromotionValidationBody = z.infer<typeof PromotionValidationBodySchema>
+
+export const ReviewBodySchema = z.object({
+  rating: z.number().int().min(1).max(5),
+  comment: z.string().trim().max(2000).optional().default(""),
+  product_id: z.string().trim().min(1).max(120).optional(),
+  product_title: z.string().trim().min(1).max(240).optional(),
+})
+export type ReviewBody = z.infer<typeof ReviewBodySchema>
+
+export const ReviewModerationBodySchema = z.object({
+  approved: z.boolean().optional(),
+  comment: optionalText,
+}).refine((body) => Object.values(body).some((value) => value !== undefined), "At least one field is required")
+export type ReviewModerationBody = z.infer<typeof ReviewModerationBodySchema>
 
 export const RoleBodySchema = z.object({
   name: z.string().trim().min(1).max(120).optional(),
@@ -161,6 +176,13 @@ const numberQuery = (fallback: number) => z.preprocess(
   z.number().finite()
 )
 
+const booleanQuery = z.preprocess((value) => {
+  if (value === undefined || value === "") return undefined
+  if (value === true || value === "true") return true
+  if (value === false || value === "false") return false
+  return value
+}, z.boolean().optional())
+
 export const NameFilterQuerySchema = z.object({ name: z.string().trim().max(120).optional() })
 export type NameFilterQuery = z.infer<typeof NameFilterQuerySchema>
 
@@ -172,6 +194,12 @@ export type UserListQuery = z.infer<typeof UserListQuerySchema>
 
 export const MediaListQuerySchema = z.object({ q: z.string().trim().max(200).optional() })
 export type MediaListQuery = z.infer<typeof MediaListQuerySchema>
+
+export const ReviewListQuerySchema = z.object({
+  handle: z.string().trim().max(260).optional(),
+  approved: booleanQuery,
+})
+export type ReviewListQuery = z.infer<typeof ReviewListQuerySchema>
 
 export const AdminCustomQuerySchema = z.object({
   mode: z.enum(["dashboard", "settings"]).default("dashboard"),
@@ -226,10 +254,12 @@ export const customValidationMiddlewares: MiddlewareRoute[] = [
   queryRoute("/admin/custom", AdminCustomQuerySchema, "POST"),
   queryRoute("/admin/media", MediaListQuerySchema),
   queryRoute("/admin/permissions", NameFilterQuerySchema),
+  queryRoute("/admin/reviews", ReviewListQuerySchema),
   queryRoute("/admin/roles", NameFilterQuerySchema),
   queryRoute("/admin/users", UserListQuerySchema),
   bodyRoute("/store/checkout", CheckoutBodySchema),
   bodyRoute("/store/promotions/validate", PromotionValidationBodySchema),
+  bodyRoute("/store/reviews/:handle", ReviewBodySchema),
   bodyRoute("/store/shipping/quote", ShippingQuoteBodySchema),
   bodyRoute("/admin/banners", BannerBodySchema),
   bodyRoute("/admin/banners/:id", BannerBodySchema),
@@ -245,6 +275,7 @@ export const customValidationMiddlewares: MiddlewareRoute[] = [
   bodyRoute("/admin/permissions", PermissionBodySchema),
   bodyRoute("/admin/permissions/:id", PermissionBodySchema),
   bodyRoute("/admin/promotions/:id/metadata", PromotionMetadataBodySchema),
+  bodyRoute("/admin/reviews/:id", ReviewModerationBodySchema),
   bodyRoute("/admin/roles", RoleBodySchema),
   bodyRoute("/admin/roles/:id", RoleBodySchema),
   bodyRoute("/admin/roles/:id/permissions", RolePermissionsBodySchema),

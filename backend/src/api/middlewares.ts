@@ -20,6 +20,11 @@ export default defineMiddlewares({
       method: "POST",
       middlewares: [authenticate("customer", ["bearer", "session"], { allowUnauthenticated: true })],
     },
+    {
+      matcher: "/store/reviews/:handle",
+      method: "POST",
+      middlewares: [authenticate("customer", ["bearer", "session"])],
+    },
     ...customValidationMiddlewares,
     ...contactMiddlewares,
     ...chatbotMessageMiddlewares,

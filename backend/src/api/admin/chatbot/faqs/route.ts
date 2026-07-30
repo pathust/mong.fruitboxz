@@ -8,23 +8,37 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
     const siteService = resolveSiteService(req.scope)
     const settings = await getGlobalSettings(siteService)
     res.json({
-      faqs: Array.isArray(settings.chatbot_faqs) ? settings.chatbot_faqs : [],
-      enabled: settings.chatbot_enabled !== false,
+      data: {
+        faqs: Array.isArray(settings.chatbot_faqs) ? settings.chatbot_faqs : [],
+        enabled: settings.chatbot_enabled !== false,
+      },
+      error: null,
+      meta: {}
     })
-  } catch {
-    res.json({ faqs: [], enabled: true })
+  } catch (error) {
+    req.scope.resolve("logger").error("Failed to fetch FAQs", error);
+    res.status(500).json({ data: null, error: { message: "Internal server error" }, meta: {} })
   }
 }
 
 export async function POST(req: MedusaRequest<ChatbotFaqBody>, res: MedusaResponse) {
-  const siteService = resolveSiteService(req.scope)
-  const body = req.validatedBody
-  const settings = await updateGlobalSettings(siteService, {
-    chatbot_enabled: body.enabled !== false,
-    chatbot_faqs: Array.isArray(body.faqs) ? body.faqs : [],
-  })
-  res.json({
-    faqs: settings.chatbot_faqs || [],
-    enabled: settings.chatbot_enabled !== false,
-  })
+  try {
+    const siteService = resolveSiteService(req.scope)
+    const body = req.validatedBody
+    const settings = await updateGlobalSettings(siteService, {
+      chatbot_enabled: body.enabled !== false,
+      chatbot_faqs: Array.isArray(body.faqs) ? body.faqs : [],
+    })
+    res.json({
+      data: {
+        faqs: settings.chatbot_faqs || [],
+        enabled: settings.chatbot_enabled !== false,
+      },
+      error: null,
+      meta: {}
+    })
+  } catch (error) {
+    req.scope.resolve("logger").error("Failed to update FAQs", error);
+    res.status(500).json({ data: null, error: { message: "Failed to update FAQs" }, meta: {} })
+  }
 }
