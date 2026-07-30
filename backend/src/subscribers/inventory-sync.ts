@@ -1,4 +1,5 @@
 import { type SubscriberArgs, type SubscriberConfig } from "@medusajs/framework"
+import { Modules } from "@medusajs/framework/utils"
 import { INGREDIENTS_MODULE } from "../modules/ingredients"
 
 export default async function inventorySyncHandler({
@@ -34,7 +35,6 @@ export default async function inventorySyncHandler({
           const deductions = await ingredientsService.deductIngredientsForVariants(variantsToDeduct)
           
           if (Object.keys(deductions).length > 0) {
-            const { Modules } = await import("@medusajs/framework/utils")
             const inventoryService = container.resolve(Modules.INVENTORY)
             
             const ingredientIds = Object.keys(deductions)
