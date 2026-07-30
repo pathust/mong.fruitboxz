@@ -343,7 +343,11 @@ export async function findFallbackProducts(scope: ServiceScope, query: string, o
   if (sort === "price:desc") documents.sort((a, b) => b.price - a.price)
   if (sort === "sales_count:desc") documents.sort((a, b) => b.sales_count - a.sales_count)
   if (sort === "created_at:desc") documents.sort((a, b) => b.created_at.localeCompare(a.created_at))
-  return documents.slice(offset, offset + limit)
+  
+  return {
+    hits: documents.slice(offset, offset + limit),
+    total: documents.length
+  }
 }
 
 export function isSearchEnabled() {
