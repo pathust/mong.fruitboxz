@@ -20,7 +20,7 @@ Mục tiêu tổng quát là xây dựng một website thương mại điện t�
   \item Xây dựng khu vực quản trị cho sản phẩm, danh mục, đơn hàng, khách hàng, khuyến mãi, tồn kho, nội dung và người dùng nội bộ.
   \item Quản lý tồn kho theo nguyên liệu và công thức cấu thành sản phẩm, phù hợp với sản phẩm trái cây cắt sẵn hoặc hộp phối sẵn.
   \item Tích hợp tìm kiếm toàn văn, lưu trữ ảnh, bộ nhớ đệm và chatbot tư vấn có cơ chế dự phòng.
-  \item Tách biệt rõ giao diện, API, nghiệp vụ và hạ tầng để thuận tiện bảo trì, kiểm thử và triển khai.
+  \item Tách biệt rõ giao diện, API, nghiệp vụ và hạ tầng để thuận tiện bảo trì và triển khai.
 \end{itemize}
 
 \section{Phạm Vi Hệ Thống}
@@ -39,15 +39,16 @@ Backend Medusa v2 cung cấp các mô-đun thương mại điện tử lõi và 
 
 \section{Đối Tượng Sử Dụng}
 
-\begin{longtable}{@{}p{0.22\textwidth} p{0.70\textwidth}@{}}
+\begin{longtable}{@{}L{0.22\textwidth} L{0.70\textwidth}@{}}
   \toprule
   \textbf{Tác nhân} & \textbf{Quyền và nhu cầu chính} \\
   \midrule
   \endhead
   Khách vãng lai & Duyệt và tìm kiếm sản phẩm, quản lý giỏ hàng, nhận báo giá giao hàng, đặt đơn khách, đọc blog và hỏi chatbot. \\[3pt]
   Khách hàng & Có thêm khả năng quản lý tài khoản và xem lịch sử đơn hàng. \\[3pt]
-  Nhân viên quản trị & Vận hành từng nhóm chức năng được cấp quyền, ví dụ sản phẩm, đơn hàng, khách hàng, nội dung hoặc kho. \\[3pt]
-  Quản trị viên cấp cao & Quản lý người dùng nội bộ, vai trò, quyền hạn và toàn bộ cấu hình hệ thống. \\[3pt]
+  Biên tập viên & Quản lý banner, bài viết, media, nội dung chính sách và FAQ/chatbot khi được cấp quyền nội dung tương ứng. \\[3pt]
+  Quản lý cửa hàng & Vận hành catalog, đơn hàng, khách hàng, khuyến mãi, tồn kho, nguyên liệu và báo cáo kinh doanh. \\[3pt]
+  Super Admin & Có toàn quyền hệ thống, đặc biệt là quản lý người dùng nội bộ, vai trò, quyền hạn, cấu hình giao hàng và các thiết lập quan trọng. \\[3pt]
   Dịch vụ ngoài & Meilisearch phục vụ tìm kiếm; MinIO lưu media; Nominatim hỗ trợ địa chỉ; Groq cung cấp mô hình ngôn ngữ cho chatbot. \\
   \bottomrule
 \end{longtable}

@@ -26,7 +26,7 @@ Hệ thống áp dụng kiến trúc headless commerce. Giao diện React không
 
 Frontend được xây dựng dưới dạng single-page application. \techterm{React Router} ánh xạ URL tới trang; \techterm{React.lazy} và \techterm{Suspense} tách bundle theo route. Các provider ở cấp ứng dụng quản lý catalog, giỏ hàng, ngôn ngữ, xác thực khách hàng và xác thực quản trị.
 
-\begin{longtable}{@{}p{0.25\textwidth} p{0.67\textwidth}@{}}
+\begin{longtable}{@{}L{0.25\textwidth} L{0.67\textwidth}@{}}
   \toprule
   \textbf{Thành phần} & \textbf{Trách nhiệm} \\
   \midrule
@@ -48,13 +48,14 @@ Medusa SDK được cấu hình với backend URL, publishable key và cơ chế
 
 \subsection{Mô-đun lõi và mô-đun mở rộng}
 
-Medusa cung cấp các mô-đun lõi như Product, Pricing, Inventory, Order, Customer, User, Promotion và Region. Báo cáo tập trung vào bốn mô-đun mở rộng đang tham gia trực tiếp vào luồng chức năng hiện hành:
+Medusa cung cấp các mô-đun lõi như Product, Pricing, Inventory, Order, Customer, User, Promotion và Region. Báo cáo tập trung vào năm mô-đun mở rộng đang tham gia trực tiếp vào luồng chức năng hiện hành:
 
 \begin{itemize}[leftmargin=2em, itemsep=4pt]
   \item \textbf{Site:} banner, cấu hình website, blog, liên hệ và log chatbot.
   \item \textbf{RBAC:} role, permission và ánh xạ quyền của người dùng quản trị.
   \item \textbf{Ingredients:} nguyên liệu, công thức BOM và kiểm tra/trừ tồn kho.
   \item \textbf{Bulk orders:} lưu yêu cầu đặt hàng số lượng lớn.
+  \item \textbf{Shipping:} gợi ý khu vực, reverse geocode và tính phí giao hàng theo cấu hình cửa hàng.
 \end{itemize}
 
 Các module link nối User với Role và Ingredient với InventoryItem mà không đưa khóa ngoại của mô-đun khác trực tiếp vào model tùy biến.
@@ -70,7 +71,7 @@ Các module link nối User với Role và Ingredient với InventoryItem mà kh
 
 \subsection{API, workflow và subscriber}
 
-API được chia theo hai namespace: \texttt{/store} dành cho khách hàng và \texttt{/admin} dành cho vận hành. Middleware chung thực hiện xác thực, RBAC, validation và chuẩn hóa response. Workflow đã được sử dụng cho luồng tạo contact message. Các thay đổi sản phẩm và đơn hàng được xử lý tiếp bằng subscriber:
+API được chia theo hai namespace: \texttt{/store} dành cho khách hàng và \texttt{/admin} dành cho vận hành. Middleware chung thực hiện xác thực, RBAC, validation và chuẩn hóa response. Workflow được dùng cho luồng tạo contact message và checkout; riêng checkout đã tách các bước xác minh giá, kiểm tra tồn kho, tính phí giao hàng, áp dụng khuyến mãi, tạo đơn, cập nhật mã đơn và phát sự kiện. Các step ghi dữ liệu có compensation: tạo đơn có thể xóa lại order nếu workflow lỗi, cập nhật mã đơn có thể khôi phục metadata cũ; riêng sự kiện \texttt{order.placed} là tác vụ hậu xử lý nên được đặt sau khi đơn đã tạo. Các thay đổi sản phẩm và đơn hàng được xử lý tiếp bằng subscriber:
 
 \begin{itemize}[leftmargin=2em, itemsep=3pt]
   \item Sản phẩm tạo/cập nhật/xóa sẽ đồng bộ tài liệu tương ứng trong Meilisearch và vô hiệu cache.
@@ -104,7 +105,7 @@ Biểu đồ hoạt động trong Hình~\ref{fig:checkout-activity} tách trách
 \end{figure}
 \end{diagramcanvas}
 
-Khi người dùng chọn vị trí hiện tại, trình duyệt trả tọa độ cho frontend. Frontend gọi reverse geocode để điền địa chỉ có thể đọc được; thay đổi của địa chỉ hoặc tọa độ kích hoạt yêu cầu báo phí sau 300 ms. API sử dụng cấu hình điểm xuất phát, danh sách quận miễn phí và công thức khoảng cách để trả phí cùng \texttt{mode}. Checkout API vẫn tính lại cùng quy tắc khi tạo đơn, vì số tiền hiển thị phía client không phải nguồn dữ liệu tin cậy.
+Khi người dùng chọn vị trí hiện tại, trình duyệt trả tọa độ cho frontend. Frontend gọi reverse geocode để điền địa chỉ có thể đọc được; thay đổi của địa chỉ hoặc tọa độ kích hoạt yêu cầu báo phí sau 300 ms. API sử dụng \texttt{ShippingModuleService} để đọc cấu hình điểm xuất phát, danh sách quận miễn phí và công thức khoảng cách rồi trả phí cùng \texttt{mode}. Checkout workflow vẫn tính lại cùng quy tắc khi tạo đơn, vì số tiền hiển thị phía client không phải nguồn dữ liệu tin cậy.
 
 \subsection{Sơ đồ luồng xử lý đặt hàng}
 
@@ -117,7 +118,7 @@ Khi người dùng chọn vị trí hiện tại, trình duyệt trả tọa đ�
 \end{figure}
 \end{diagramcanvas}
 
-Điểm quan trọng của thiết kế là backend không chấp nhận giá do trình duyệt gửi. Tuy nhiên, route checkout hiện tạo đơn trực tiếp qua service và tự phát sự kiện, tức chưa sử dụng đầy đủ workflow có compensation của Medusa. Đây là điểm cần tái cấu trúc để đảm bảo rollback khi một bước sau tạo đơn thất bại.
+Điểm quan trọng của thiết kế là backend không chấp nhận giá do trình duyệt gửi. Route checkout chỉ chuẩn hóa request, kiểm tra khóa idempotency theo phạm vi khách hàng/email và gọi \texttt{checkoutOrderWorkflow}. Workflow lần lượt thực hiện \texttt{resolvePricesStep}, \texttt{validateInventoryStep}, \texttt{resolveShippingStep}, \texttt{resolvePromotionsStep}, tạo đơn, cập nhật mã đơn và phát sự kiện \texttt{order.placed}. Cách tách bước này giúp luồng đặt hàng rõ trách nhiệm hơn, có điểm hoàn tác rõ cho các thao tác ghi dữ liệu, đồng thời thuận lợi khi cần bổ sung thanh toán trực tuyến ở giai đoạn sau.
 
 \section{Mô Hình Lớp Miền}
 
@@ -136,9 +137,9 @@ Các bội số trên quan hệ giúp kiểm tra mô hình trước khi cài đ�
 
 \section{Tìm Kiếm và Chatbot}
 
-Tài liệu tìm kiếm chứa tên, mô tả, slug, danh mục, mức giá, giá nhỏ nhất/lớn nhất, ảnh và trạng thái tồn. Subscriber giữ chỉ mục đồng bộ với catalog. Khi tìm kiếm chính không hoạt động, backend xây tài liệu từ Query API và lọc tại ứng dụng.
+Tài liệu tìm kiếm chứa tên, mô tả, slug, danh mục, mức giá, giá nhỏ nhất/lớn nhất, ảnh và trạng thái tồn. Subscriber giữ chỉ mục đồng bộ với catalog. Khi tìm kiếm chính không hoạt động, backend xây tài liệu từ Query API và lọc tại ứng dụng. Phần làm giàu trạng thái tồn theo công thức nguyên liệu được tách thành hàm dùng chung, nên Search API và chatbot cùng tránh gợi ý các biến thể không còn đủ nguyên liệu.
 
-Chatbot sử dụng mô hình retrieval-augmented generation ở mức đơn giản: truy vấn FAQ và sản phẩm liên quan, tạo system prompt có giới hạn quyền hạn, sau đó gọi Groq. Response được cache 12 giờ theo câu hỏi. Log lưu message đã chuẩn hóa, chế độ phản hồi, trạng thái resolved và số gợi ý; nhờ đó quản trị viên có thể bổ sung FAQ cho câu hỏi chưa được giải quyết.
+Chatbot sử dụng mô hình retrieval-augmented generation ở mức đơn giản: truy vấn FAQ và sản phẩm liên quan, tạo system prompt có giới hạn quyền hạn, sau đó gọi Groq. FAQ không được xem là nhánh trả lời trực tiếp trong luồng chính; nếu FAQ chưa đủ thông tin thì ngữ cảnh sản phẩm và quy tắc trong prompt buộc chatbot hỏi thêm nhu cầu hoặc hướng dẫn liên hệ hotline thay vì bịa dữ liệu. Khi Groq lỗi, backend mới dùng fallback theo thứ tự: FAQ khớp điểm cao, gợi ý catalog, hoặc câu trả lời hotline và ghi log chưa giải quyết. Response được cache 12 giờ theo câu hỏi. Log lưu message đã chuẩn hóa, chế độ phản hồi, trạng thái resolved và số gợi ý; nhờ đó quản trị viên có thể bổ sung FAQ cho câu hỏi chưa được giải quyết.
 
 \begin{diagramcanvas}
 \begin{figure}[H]
@@ -161,7 +162,7 @@ Chatbot sử dụng mô hình retrieval-augmented generation ở mức đơn gi�
 
 \section{Vòng Đời Đơn Hàng}
 
-Trạng thái đơn được mô hình hóa riêng để tránh cập nhật tùy ý từ giao diện quản trị. Luồng chuẩn đi từ \texttt{pending} tới \texttt{confirmed}, \texttt{processing}, \texttt{shipping} và \texttt{completed}. Hủy đơn chỉ hợp lệ trước khi giao; lỗi giao vận hoặc xử lý có thể chuyển sang \texttt{failed} và được retry có kiểm soát.
+Code quản trị hiện tách trạng thái đơn thành ba nhóm để tránh trộn lẫn nghiệp vụ: \texttt{status} của order, \texttt{payment\_status} trong metadata và \texttt{fulfillment\_status} trong metadata. Nhân viên không được chuyển trạng thái tùy ý; giao diện kiểm tra transition trước khi gọi API cập nhật. Ví dụ, order \texttt{pending} chỉ có thể sang \texttt{completed} hoặc \texttt{canceled}; trạng thái \texttt{delivered} của giao hàng không được chuyển ngược về \texttt{shipped}.
 
 \begin{diagramcanvas}
 \begin{figure}[H]
@@ -172,11 +173,13 @@ Trạng thái đơn được mô hình hóa riêng để tránh cập nhật tù
 \end{figure}
 \end{diagramcanvas}
 
-Mỗi chuyển tiếp nên được thực hiện qua một command hoặc workflow có kiểm tra trạng thái nguồn, quyền người thao tác và tác dụng phụ tương ứng. Cách này ngăn các chuyển tiếp vô nghĩa như đưa đơn đã hoàn tất quay lại xử lý, đồng thời tạo điểm rõ ràng để phát sự kiện, ghi audit log và gửi thông báo.
+Mỗi chuyển tiếp nên được thực hiện qua một command hoặc workflow có kiểm tra trạng thái nguồn, quyền người thao tác và tác dụng phụ tương ứng. Cách này ngăn các chuyển tiếp vô nghĩa như đưa đơn đã giao thành công quay lại đang giao, đồng thời tạo điểm rõ ràng để phát sự kiện, ghi audit log và gửi thông báo.
 
 \section{Mô Hình Triển Khai}
 
-Trong môi trường phát triển, Docker Compose chạy bốn dịch vụ: PostgreSQL cổng 5432, Redis cổng 6379, Meilisearch cổng 7700 và MinIO (S3 API được ánh xạ ra cổng 9001, console cổng 9002). Backend chạy ở cổng 9000; frontend Vite hiện cấu hình cổng 5173 và proxy các đường dẫn \texttt{/auth}, \texttt{/store}, \texttt{/admin}, \texttt{/media} tới backend.
+Trong môi trường phát triển, Docker Compose chạy bốn dịch vụ: PostgreSQL cổng 5432, Redis cổng 6379, Meilisearch cổng 7700 và MinIO (S3 API được ánh xạ ra cổng 9001, console cổng 9002). PostgreSQL dùng image pgvector và mount thư mục \texttt{backend/scripts} để khởi tạo schema/extension khi tạo database mới. Backend chạy ở cổng 9000; frontend Vite hiện cấu hình cổng 5173 và proxy các đường dẫn \texttt{/auth}, \texttt{/store}, \texttt{/admin}, \texttt{/media} tới backend.
+
+Biểu đồ triển khai ở Hình~\ref{fig:deployment} được mô hình hóa ở mức logic. Node client thể hiện trình duyệt và artifact React SPA sau khi tải xuống, bao gồm cả storefront và khu vực admin. Node application server thể hiện môi trường Node.js 20 chạy Medusa v2 cùng artifact backend gồm Store/Admin API, workflow và subscriber. Nhóm data services có thể chạy bằng Docker Compose trong phát triển hoặc thay bằng dịch vụ quản lý ở production.
 
 \begin{diagramcanvas}
 \begin{figure}[H]

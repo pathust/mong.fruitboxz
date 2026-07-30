@@ -3,76 +3,62 @@
 % ============================================================
 \chapter{Tổng Kết}
 
-\section{Kết Quả Đạt Được}
+\section{Kết Quả Triển Khai}
 
-Dự án đã hình thành một nền tảng thương mại điện tử tương đối đầy đủ cho Mọng Fruitboxz. Luồng mua hàng cốt lõi gồm duyệt catalog, tìm kiếm, chọn biến thể, quản lý giỏ, áp dụng khuyến mãi, tính phí giao hàng và tạo đơn. Khách hàng có thể đăng ký, đăng nhập và xem lịch sử đơn. Phần nội dung có banner, blog, chính sách, liên hệ và chatbot tư vấn.
+Dự án đã xây dựng được một nền tảng thương mại điện tử cho Mọng Fruitboxz với hai khu vực sử dụng chính: giao diện mua sắm cho khách hàng và giao diện quản trị cho cửa hàng. Ở phía khách hàng, hệ thống hỗ trợ duyệt catalog, xem chi tiết sản phẩm, tìm kiếm, chọn biến thể, quản lý giỏ hàng, áp dụng khuyến mãi, tự động báo phí giao hàng và đặt đơn. Khách hàng đã đăng nhập có thêm khả năng quản lý tài khoản và theo dõi lịch sử mua hàng.
 
-Ở phía vận hành, hệ thống có dashboard, quản lý sản phẩm, danh mục, đơn hàng, khách hàng, khuyến mãi, tồn kho, nguyên liệu, nội dung và người dùng nội bộ. Điểm mở rộng đáng chú ý là mô hình công thức BOM: biến thể sản phẩm được cấu thành từ các nguyên liệu, nhờ đó checkout có thể kiểm tra và trừ tồn theo thành phần thực tế.
+Ở phía vận hành, hệ thống cung cấp các chức năng quản lý sản phẩm, danh mục, đơn hàng, khách hàng, khuyến mãi, tồn kho, nguyên liệu, banner, blog, media, FAQ, cấu hình website và người dùng nội bộ. Một đặc thù nghiệp vụ được thể hiện trong đề tài là mô hình tồn kho theo công thức nguyên liệu: mỗi biến thể sản phẩm có thể được cấu thành từ nhiều nguyên liệu khác nhau, nhờ đó quá trình đặt hàng phản ánh gần hơn nghiệp vụ bán trái cây cắt sẵn và hộp quà.
 
-Về hạ tầng, PostgreSQL, Redis, Meilisearch và MinIO được tách thành các dịch vụ có thể chạy qua Docker Compose. Backend Medusa v2 kết hợp mô-đun lõi với mô-đun tùy biến; subscriber hỗ trợ đồng bộ chỉ mục, cache và xử lý hậu sự kiện. Frontend React dùng route động, lazy loading và các context dùng chung.
+Về mặt tổ chức hệ thống, dự án đã tách rõ giao diện, backend, dữ liệu và các dịch vụ hỗ trợ. Backend Medusa được mở rộng bằng các mô-đun riêng cho nội dung, phân quyền, nguyên liệu, yêu cầu mua số lượng lớn và giao hàng. Frontend sử dụng React để xây dựng trải nghiệm mua hàng và khu vực quản trị trong cùng một mã nguồn, đồng thời kết nối với các dịch vụ tìm kiếm, lưu trữ ảnh và chatbot tư vấn.
 
-\section{Đánh Giá Theo Nhóm Chức Năng}
+\section{Đối Chiếu Kết Quả Theo Nhóm Chức Năng}
 
-\begin{longtable}{@{}p{0.27\textwidth} p{0.18\textwidth} p{0.47\textwidth}@{}}
+\begin{longtable}{@{}L{0.27\textwidth} L{0.25\textwidth} L{0.40\textwidth}@{}}
   \toprule
-  \textbf{Nhóm} & \textbf{Mức độ} & \textbf{Nhận xét} \\
+  \textbf{Nhóm chức năng} & \textbf{Hiện trạng triển khai} & \textbf{Minh chứng và giới hạn} \\
   \midrule
   \endhead
-  Catalog và tìm kiếm & Tốt & Có route động, biến thể, danh mục, chỉ mục Meilisearch và fallback. \\
-  Giỏ hàng & Tốt & Lưu cục bộ, đồng bộ phiên và vẫn hoạt động khi Redis lỗi. \\
-  Checkout & Khá & Kiểm tra giá/tồn/phí ship/khuyến mãi; cần workflow nguyên tử và thanh toán thật. \\
-  Quản trị & Khá & Phạm vi chức năng rộng, có RBAC; cần chuẩn hóa component và kiến trúc admin. \\
-  Nội dung và chatbot & Khá & CMS cơ bản, RAG theo FAQ/catalog, rate limit và fallback. \\
-  Hạ tầng & Khá & Có Compose và các dịch vụ phù hợp; cần hardening và quan sát production. \\
-  Kiểm thử/CI & Chưa hoàn thiện & Chưa thấy test suite và pipeline tự động trong phạm vi mã nguồn rà soát. \\
+  Catalog và tìm kiếm & Đã triển khai luồng chính & Sản phẩm, biến thể, danh mục, ảnh và bộ lọc đã có trên giao diện; backend có cơ chế trả kết quả dự phòng khi dịch vụ tìm kiếm không khả dụng. \\
+  Giỏ hàng và đặt hàng & Đã triển khai đặt đơn; thanh toán còn ở mức ghi nhận & Người dùng có thể thêm sản phẩm, chỉnh số lượng, nhập thông tin nhận hàng, áp dụng khuyến mãi và tạo đơn. Phí giao hàng được tính lại ở backend; thanh toán trực tuyến chưa được tích hợp. \\
+  Giao hàng theo khu vực & Đã có cấu hình và báo phí tự động & Hệ thống có gợi ý địa chỉ, định vị, báo phí theo quận/khoảng cách và lưu thông tin giao hàng trong đơn; lịch giao và đối tác vận chuyển chưa được mô hình hóa sâu. \\
+  Quản trị vận hành & Đã có các màn hình nghiệp vụ chính & Khu vực quản trị bao phủ catalog, đơn hàng, khách hàng, khuyến mãi, tồn kho, nội dung và phân quyền; thao tác hàng loạt và cách gọi trạng thái vẫn cần làm chặt hơn. \\
+  Nội dung và chăm sóc khách hàng & Đã có CMS và kênh tư vấn cơ bản & Banner, blog, FAQ, liên hệ và chatbot đã được kết nối với dữ liệu dự án; chất lượng tư vấn phụ thuộc vào việc bổ sung FAQ và dữ liệu sản phẩm khi vận hành. \\
+  Tồn kho theo nguyên liệu & Đã có mô hình BOM & Công thức BOM liên kết sản phẩm bán ra với lượng nguyên liệu thực tế; nếu dùng cho cửa hàng thật, cần xử lý kỹ hơn phần cạnh tranh tồn kho và nhập/xuất kho. \\
+  Báo cáo vận hành & Có dashboard tổng quan & Dashboard đã hiển thị một số chỉ số doanh thu, chi phí, lợi nhuận và công nợ; phân tích theo thời gian, nhóm sản phẩm và hiệu quả khuyến mãi là hướng mở rộng. \\
   \bottomrule
 \end{longtable}
 
-\section{Rà Soát Giao Diện và Mã Nguồn}
+\section{Những Điểm Cần Hoàn Thiện}
 
-Việc đánh giá không chỉ dựa trên đọc mã. Giao diện đang chạy tại cổng 5173 và kết nối được backend/dữ liệu dự án, nhờ đó có thể đối chiếu trực tiếp giữa chức năng thật và phần mô tả trong báo cáo. Trang chủ được chụp sau khi banner động tải xong với nội dung ``Mọng chuẩn bị từng món quà bằng sự tử tế''. Ở checkout, giỏ có một sản phẩm số lượng 2 là ``Cóc bao tử dầm bò khô 500gr'', tạm tính 200.000 đồng. Trình duyệt kiểm thử từ chối quyền vị trí nên nhánh thông báo lỗi định vị cũng được xác nhận; sau khi nhập ``123 Đường Cầu Giấy, Quận Cầu Giấy, Hà Nội'', frontend tự gọi API báo phí và cập nhật phí giao hàng 18.000 đồng, tổng 218.000 đồng.
-
-Đăng nhập tài khoản quản trị seed thành công tại cùng origin. Sidebar đầy đủ và các trang dashboard, sản phẩm, đơn hàng, tồn kho đều tải được, cho thấy phiên xác thực và danh sách quyền đã được áp dụng. Dashboard ghi nhận 213 sản phẩm, 15 đơn hàng, 9 khách hàng, doanh thu 11,36 triệu đồng, lợi nhuận âm 1,46 triệu đồng và công nợ 8,76 triệu đồng. Đây là dữ liệu phù hợp để minh họa đồng thời góc nhìn quản trị catalog và vận hành tài chính.
-
-Rà soát mã nguồn cho thấy dự án đã đổi thư mục giao diện từ \texttt{storefront} sang \texttt{frontend}; báo cáo và sơ đồ vì vậy sử dụng thống nhất tên mới. Phần checkout hiện có API báo phí riêng, reverse geocode, debounce khi địa chỉ thay đổi và tính lại phí ở backend khi tạo đơn. Các điểm cần cải thiện được ghi ở mục hạn chế kỹ thuật để tránh trộn lẫn giữa kết quả mô tả tài liệu và nhật ký chạy lệnh.
-
-\section{Các Hạn Chế Kỹ Thuật}
-
-\begin{enumerate}[leftmargin=2.2em, itemsep=5pt]
-  \item \textbf{Checkout chưa dùng workflow đầy đủ:} route đang gọi module service trực tiếp và tự phát \texttt{order.placed}. Nếu trừ kho hoặc tác vụ sau đó lỗi, hệ thống chưa có compensation thống nhất.
-  \item \textbf{Khóa lặp và tổng tiền checkout:} backend đã có trường \texttt{idempotency\_key} nhưng frontend hiện chưa gửi khóa này. Response summary trả \texttt{discount} riêng, còn \texttt{total} đang cộng subtotal với phí ship mà chưa trừ giảm giá; frontend vì vậy phải tự tính lại tổng thanh toán hiển thị.
-  \item \textbf{Thanh toán và email chưa hoàn chỉnh:} đơn mới có \texttt{payment\_status=not\_paid}; email xác nhận mới là mock ghi log.
-  \item \textbf{Tối ưu truy vấn:} giới hạn lượt dùng khuyến mãi đang quét metadata đơn hàng; fallback search tải nhiều sản phẩm để lọc trong ứng dụng. Hai cách này không phù hợp khi dữ liệu lớn.
-  \item \textbf{Bảo mật cấu hình:} các secret mặc định trong template chỉ phù hợp development. Không nên để master key Meilisearch hoặc endpoint quản trị lộ tới client.
-  \item \textbf{RBAC còn hai cách lưu liên kết:} role vừa có module link với user, vừa được tham chiếu qua metadata; cần chọn một nguồn dữ liệu chuẩn.
-  \item \textbf{Cấu hình theo môi trường:} CORS, backend URL và publishable key phải được đồng bộ với origin triển khai; smoke test hiện xác nhận origin cổng 5173 hoạt động.
-  \item \textbf{Hiệu năng giao diện:} cần tiếp tục tách nhóm thư viện lớn, tối ưu ảnh và đo Core Web Vitals trên thiết bị thật.
-  \item \textbf{Chất lượng phát hành:} cần bổ sung unit test, integration test, end-to-end test, kiểm tra lint và CI trước khi triển khai.
-  \item \textbf{Khả năng tiếp cận và SEO:} cần hoàn thiện keyboard navigation, aria-live cho giỏ, tối ưu ảnh, metadata và Product JSON-LD.
-\end{enumerate}
+\begin{itemize}[leftmargin=2em, itemsep=5pt]
+  \item \textbf{Thanh toán trực tuyến:} hiện đơn hàng chủ yếu dừng ở ghi nhận đơn và hướng dẫn chuyển khoản. Nếu triển khai thực tế, cần kết nối cổng thanh toán phù hợp và có cơ chế xác nhận trạng thái thanh toán.
+  \item \textbf{Thông báo sau đặt hàng:} email xác nhận và thông báo cho nhân viên cửa hàng cần được kết nối với nhà cung cấp gửi thư hoặc kênh nhắn tin thật.
+  \item \textbf{Quy trình giao vận:} trạng thái giao hàng đã được mô hình hóa ở mức cơ bản; có thể bổ sung lịch giao, khu vực phục vụ, người phụ trách và ghi chú xử lý đơn.
+  \item \textbf{Báo cáo kinh doanh:} dashboard hiện cho cái nhìn tổng quan; phần phân tích doanh thu, chi phí, lợi nhuận, tồn kho và hiệu quả khuyến mãi theo thời gian còn có thể trình bày sâu hơn.
+  \item \textbf{Trải nghiệm quản trị:} một số màn hình quản trị có nhiều chức năng; nên thống nhất lại cách lọc, tìm kiếm, phân trang và thao tác nhanh để nhân viên sử dụng thuận tiện hơn.
+  \item \textbf{Nội dung tư vấn:} chatbot đã hỗ trợ hỏi đáp cơ bản; chất lượng câu trả lời sẽ tốt hơn khi FAQ, dữ liệu sản phẩm và kịch bản tư vấn được bổ sung thường xuyên từ quá trình vận hành thực tế.
+\end{itemize}
 
 \section{Hướng Phát Triển}
 
 \begin{itemize}[leftmargin=2em, itemsep=5pt]
-  \item Chuyển checkout sang Medusa workflow với các step xác minh giá, giữ/trừ tồn, áp dụng promotion, tạo payment session và tạo order; định nghĩa compensation cho từng bước.
-  \item Tích hợp cổng thanh toán phù hợp tại Việt Nam, webhook xác nhận và quy trình hoàn tiền/idempotency ở mức production.
-  \item Kết nối dịch vụ email như Resend hoặc SendGrid; dùng queue, retry và template xác nhận đơn.
-  \item Tạo bảng/bộ đếm usage cho promotion thay vì quét toàn bộ order; bổ sung index cho các trường lọc thường dùng.
-  \item Bổ sung monitoring, structured logging, health check, backup và quy trình phục hồi PostgreSQL/MinIO.
-  \item Chuẩn hóa một cổng development cho frontend, đồng bộ \texttt{STORE\_CORS}, \texttt{ADMIN\_CORS}, \texttt{AUTH\_CORS} và kiểm tra OPTIONS trong CI/E2E.
-  \item Thiết lập kiểm tra tự động trước khi merge; bổ sung quy tắc lint, kiểm thử hồi quy và tối ưu manual chunk cho thư viện lớn.
-  \item Thiết lập test pyramid: unit test cho tính phí và khuyến mãi, integration test cho API, E2E cho browse--cart--checkout và smoke test cho admin.
-  \item Cải thiện chatbot bằng đánh giá câu trả lời, quản lý phiên hội thoại và cơ chế moderation; vẫn giữ nguyên nguyên tắc không truy cập dữ liệu cá nhân.
-  \item Tối ưu Core Web Vitals, ảnh responsive, SEO kỹ thuật và khả năng tiếp cận theo WCAG.
+  \item Tích hợp thanh toán trực tuyến, đối soát giao dịch và hiển thị trạng thái thanh toán rõ ràng cho khách hàng.
+  \item Hoàn thiện thông báo đơn hàng qua email, SMS hoặc kênh nội bộ để nhân viên xử lý đơn nhanh hơn.
+  \item Mở rộng cấu hình giao hàng theo khung giờ, khu vực phục vụ, phí theo thời điểm và lựa chọn đơn vị vận chuyển.
+  \item Phát triển báo cáo quản trị theo ngày, tuần, tháng, nhóm sản phẩm, khách hàng và hiệu quả chương trình khuyến mãi.
+  \item Cải thiện chatbot theo hướng ghi nhận câu hỏi phổ biến, gợi ý sản phẩm chính xác hơn và hỗ trợ nhân viên bổ sung FAQ từ trang quản trị.
+  \item Cải thiện phiên bản mobile và nội dung SEO để website dùng tốt hơn trong bối cảnh bán hàng thật.
 \end{itemize}
 
 \section{Kiến Thức và Kinh Nghiệm Thu Được}
 
-Quá trình thực hiện giúp tác giả hiểu rõ hơn kiến trúc headless commerce, cách mở rộng Medusa bằng module và API, cách tổ chức SPA React, quản lý xác thực/phân quyền, thiết kế dữ liệu tồn kho theo BOM và phối hợp nhiều dịch vụ hạ tầng. Dự án cũng cho thấy một chức năng thương mại điện tử chỉ thực sự hoàn chỉnh khi xem xét đồng thời dữ liệu, tính nhất quán giao dịch, bảo mật, trải nghiệm người dùng và khả năng vận hành.
+Quá trình thực hiện giúp sinh viên củng cố cách xây dựng một hệ thống thương mại điện tử theo kiến trúc headless commerce, cách tách giao diện khách hàng khỏi backend, cách tổ chức dữ liệu sản phẩm--đơn hàng--tồn kho và cách mở rộng Medusa bằng các mô-đun riêng. Đề tài cũng là dịp luyện kỹ năng đọc mã nguồn lớn, đối chiếu giữa giao diện và nghiệp vụ, vẽ sơ đồ phân tích--thiết kế, cũng như trình bày kết quả thành một báo cáo có cấu trúc.
+
+Một kinh nghiệm quan trọng là chức năng bán hàng không chỉ nằm ở trang sản phẩm hay nút đặt mua. Để tạo được một luồng mua hàng hoàn chỉnh, hệ thống phải phối hợp nhiều phần: dữ liệu sản phẩm, giá bán, tồn kho, phí giao hàng, khuyến mãi, tài khoản khách hàng, trạng thái đơn và công cụ cho nhân viên vận hành.
 
 \section{Kết Luận}
 
-Mọng Fruitboxz đã vượt qua mức một website giới thiệu sản phẩm để trở thành nền tảng bán hàng và vận hành có kiến trúc rõ ràng. Những chức năng đã triển khai bám sát đặc thù trái cây và hộp quà, đặc biệt ở tìm kiếm, giao hàng theo khu vực, nội dung tư vấn và tồn kho nguyên liệu. Dù vậy, để sẵn sàng cho production, dự án cần ưu tiên tính nguyên tử của checkout, thanh toán, kiểm thử tự động, bảo mật secret và quan sát hệ thống. Đây là nền tảng phù hợp để tiếp tục phát triển thành sản phẩm thương mại hoàn chỉnh.
+Mọng Fruitboxz đã triển khai được các thành phần chính của một website bán hàng cho cả khách hàng và cửa hàng. Hệ thống thể hiện được đặc thù của sản phẩm trái cây qua biến thể, hộp quà, giao hàng theo khu vực, chatbot tư vấn và tồn kho theo nguyên liệu. Dù vẫn còn các phần cần hoàn thiện như thanh toán trực tuyến, thông báo sau đặt hàng và báo cáo chuyên sâu, phiên bản hiện tại vẫn đủ để làm nền cho các bước phát triển tiếp theo của hệ thống.
 
 \section{Tài Liệu Tham Khảo}
 

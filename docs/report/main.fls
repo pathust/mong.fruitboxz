@@ -146,6 +146,8 @@ INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/tools/tabularx.sty
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/tools/tabularx.sty
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/multirow/multirow.sty
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/multirow/multirow.sty
+INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/ragged2e/ragged2e.sty
+INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/ragged2e/ragged2e.sty
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/caption/caption.sty
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/caption/caption.sty
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/caption/caption3.sty
@@ -490,6 +492,9 @@ INPUT ./images/ui-admin-orders.png
 INPUT ./images/ui-admin-inventory.png
 INPUT ./images/ui-admin-inventory.png
 INPUT ./images/ui-admin-inventory.png
+INPUT ./images/ui-admin-shipping.png
+INPUT ./images/ui-admin-shipping.png
+INPUT ./images/ui-admin-shipping.png
 INPUT ./chapters/06_tongket.tex
 INPUT ./chapters/06_tongket.tex
 OUTPUT chapters/06_tongket.aux

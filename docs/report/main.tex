@@ -23,6 +23,7 @@
 \usepackage{longtable}
 \usepackage{tabularx}
 \usepackage{multirow}
+\usepackage{ragged2e}
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{float}
@@ -126,6 +127,12 @@
   labelsep=period,
   justification=centering,
 }
+
+% ---- Table Columns ----
+% Narrow p-columns are fully justified by default, which can create visibly
+% stretched word spacing in Vietnamese text. Use ragged-right columns for
+% report tables while keeping normal paragraphs justified.
+\newcolumntype{L}[1]{>{\RaggedRight\arraybackslash}p{#1}}
 
 % ---- Figure Box ----
 \newenvironment{figurebox}{%

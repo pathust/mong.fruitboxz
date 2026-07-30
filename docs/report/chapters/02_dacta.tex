@@ -5,18 +5,18 @@
 
 \section{Mục Đích và Phạm Vi Đặc Tả}
 
-Chương này mô tả các yêu cầu được rút ra từ mã nguồn hiện tại, thay vì mô tả một hệ thống giả định. Mỗi yêu cầu được gắn với tác nhân, đầu vào, kết quả và trạng thái triển khai. Cách tiếp cận này giúp báo cáo có thể dùng làm tài liệu kiểm tra chéo giữa giao diện, API và dữ liệu.
+Chương này mô tả các yêu cầu được rút ra từ mã nguồn hiện tại, thay vì mô tả một hệ thống giả định. Mỗi yêu cầu được gắn với tác nhân, đầu vào, kết quả và trạng thái triển khai. Nhờ đó, từng phần trong báo cáo có thể đối chiếu lại với giao diện, API và dữ liệu trong mã nguồn.
 
 \section{Công Nghệ và Ràng Buộc}
 
-\begin{longtable}{@{}p{0.22\textwidth} p{0.25\textwidth} p{0.45\textwidth}@{}}
+\begin{longtable}{@{}L{0.22\textwidth} L{0.25\textwidth} L{0.45\textwidth}@{}}
   \toprule
   \textbf{Thành phần} & \textbf{Công nghệ} & \textbf{Vai trò trong dự án} \\
   \midrule
   \endhead
   Frontend & React 19, Vite 7, Tailwind CSS 4 & Giao diện mua sắm và khu vực quản trị tùy biến. \\[3pt]
   Backend & Medusa.js 2.15, Node.js 20, TypeScript & API, mô-đun thương mại điện tử, xác thực và nghiệp vụ. \\[3pt]
-  Cơ sở dữ liệu & PostgreSQL 15 & Dữ liệu giao dịch, catalog, người dùng và mô-đun tùy biến. \\[3pt]
+  Cơ sở dữ liệu & PostgreSQL 15 + pgvector & Dữ liệu giao dịch, catalog, người dùng, mô-đun tùy biến và hạ tầng vector chuẩn bị cho tìm kiếm/ngữ cảnh ngữ nghĩa. \\[3pt]
   Cache và sự kiện & Redis 7 & Cache, event bus, rate limit và đồng bộ giỏ hàng phiên khi được bật. \\[3pt]
   Tìm kiếm & Meilisearch 1.13 & Lập chỉ mục và tìm kiếm sản phẩm theo từ khóa, danh mục, mức giá. \\[3pt]
   Lưu trữ đối tượng & MinIO, giao thức S3 & Ảnh sản phẩm, banner và media quản trị. \\[3pt]
@@ -29,7 +29,7 @@ Backend yêu cầu Node.js phiên bản từ 20 đến dưới 23; cấu hình c
 
 \section{Danh Sách Use Case}
 
-\begin{longtable}{@{}p{0.10\textwidth} p{0.25\textwidth} p{0.20\textwidth} p{0.37\textwidth}@{}}
+\begin{longtable}{@{}L{0.10\textwidth} L{0.25\textwidth} L{0.20\textwidth} L{0.37\textwidth}@{}}
   \toprule
   \textbf{Mã} & \textbf{Use case} & \textbf{Tác nhân} & \textbf{Kết quả mong đợi} \\
   \midrule
@@ -42,15 +42,16 @@ Backend yêu cầu Node.js phiên bản từ 20 đến dưới 23; cấu hình c
   UC06 & Xem lịch sử đơn & Khách hàng & Chỉ xem các đơn gắn với định danh khách đang đăng nhập. \\
   UC07 & Hộp tự chọn & Mọi khách & Chọn thành phần hộp theo cấu hình sản phẩm và thêm vào giỏ. \\
   UC08 & Tư vấn chatbot & Mọi khách & Trả lời dựa trên FAQ và kết quả catalog; ghi log câu hỏi chưa giải quyết. \\
-  UC09 & Quản lý catalog & Nhân viên có quyền & Tạo/sửa sản phẩm, danh mục, công thức và dữ liệu tồn kho. \\
-  UC10 & Quản lý đơn hàng & Nhân viên có quyền & Tra cứu chi tiết và cập nhật trạng thái xử lý đơn. \\
-  UC11 & Quản lý nội dung & Nhân viên có quyền & Quản lý banner, blog, media, FAQ và các trang chính sách. \\
-  UC12 & Báo cáo vận hành & Nhân viên có quyền & Xem chỉ số doanh thu, chi phí, lợi nhuận và dữ liệu tổng hợp. \\
-  UC13 & Quản lý người dùng và RBAC & Quản trị viên & Gán vai trò, quyền và giới hạn chức năng theo mô-đun/hành động. \\
+  UC09 & Quản lý catalog, khuyến mãi, tồn kho & Quản lý cửa hàng & Tạo/sửa sản phẩm, danh mục, mã giảm giá, công thức và dữ liệu tồn kho. \\
+  UC10 & Quản lý đơn hàng và khách hàng & Quản lý cửa hàng & Tra cứu chi tiết, cập nhật trạng thái xử lý đơn và theo dõi hồ sơ khách hàng. \\
+  UC11 & Quản lý nội dung, media và FAQ & Biên tập viên & Quản lý banner, blog, media, FAQ và các trang chính sách. \\
+  UC12 & Báo cáo vận hành & Quản lý cửa hàng & Xem chỉ số doanh thu, chi phí, lợi nhuận và dữ liệu tổng hợp. \\
+  UC13 & Quản lý người dùng và RBAC & Super Admin & Gán vai trò, quyền và giới hạn chức năng theo mô-đun/hành động. \\
+  UC14 & Cấu hình giao hàng và website & Super Admin hoặc tài khoản được cấp quyền \texttt{settings.*} & Cập nhật phí vận chuyển, ngưỡng miễn phí, khu vực phục vụ và cấu hình website. \\
   \bottomrule
 \end{longtable}
 
-Hình~\ref{fig:use-case-overview} nhóm các use case theo hai tác nhân chính. Đây là sơ đồ tổng quan; các điều kiện và luồng thay thế được đặc tả chi tiết ở các mục tiếp theo.
+Hình~\ref{fig:use-case-overview} nhóm các use case theo hai vùng khách hàng và quản trị. Quan hệ kế thừa actor được dùng để tránh lặp đường nối: khách hàng kế thừa khả năng của mọi khách; Super Admin kế thừa phạm vi thao tác của biên tập viên và quản lý cửa hàng, đồng thời có thêm quyền RBAC và cấu hình hệ thống. Đây là sơ đồ tổng quan; các điều kiện và luồng thay thế được đặc tả chi tiết ở các mục tiếp theo.
 
 \begin{diagramcanvas}
 \begin{figure}[H]
@@ -63,13 +64,13 @@ Hình~\ref{fig:use-case-overview} nhóm các use case theo hai tác nhân chính
 
 \subsection{Quy ước mô hình hóa}
 
-Các sơ đồ trong báo cáo tuân theo quy ước UML được sử dụng trong học phần: tác nhân nằm ngoài biên hệ thống; use case được biểu diễn bằng hình ellipse; quan hệ \textit{include}/\textit{extend} dùng đường nét đứt và mũi tên phụ thuộc; lớp có các ngăn tên--thuộc tính; biểu đồ trình tự đọc từ trên xuống; trạng thái chỉ nối bằng các chuyển tiếp có ý nghĩa nghiệp vụ. Màu sắc chỉ dùng để phân vùng hoặc làm tiêu đề, không mã hóa thêm ngữ nghĩa khi chưa có chú giải. Cách trình bày này giúp người đọc phân biệt rõ sơ đồ phân tích với ảnh giao diện và sơ đồ triển khai.
+Các sơ đồ trong báo cáo tuân theo quy ước UML được sử dụng trong học phần: tác nhân nằm ngoài biên hệ thống; use case được biểu diễn bằng hình ellipse; quan hệ \textit{include}/\textit{extend} dùng đường nét đứt và mũi tên phụ thuộc; quan hệ kế thừa actor dùng nét đứt với tam giác rỗng hướng về actor tổng quát hơn; lớp có các ngăn tên--thuộc tính; biểu đồ trình tự đọc từ trên xuống; trạng thái chỉ nối bằng các chuyển tiếp có ý nghĩa nghiệp vụ. Màu sắc chỉ dùng để phân vùng hoặc làm tiêu đề, không mã hóa thêm ngữ nghĩa khi chưa có chú giải. Phần trình bày được tách rõ giữa sơ đồ phân tích, ảnh giao diện và sơ đồ triển khai.
 
 \section{Đặc Tả Các Luồng Nghiệp Vụ Chính}
 
 \subsection{UC02 -- Tìm kiếm sản phẩm}
 
-\begin{longtable}{@{}p{0.23\textwidth}p{0.69\textwidth}@{}}
+\begin{longtable}{@{}L{0.23\textwidth}L{0.69\textwidth}@{}}
   \toprule
   \textbf{Thuộc tính} & \textbf{Đặc tả} \\
   \midrule
@@ -84,7 +85,7 @@ Các sơ đồ trong báo cáo tuân theo quy ước UML được sử dụng tr
 
 \subsection{UC03 -- Quản lý giỏ hàng}
 
-\begin{longtable}{@{}p{0.23\textwidth}p{0.69\textwidth}@{}}
+\begin{longtable}{@{}L{0.23\textwidth}L{0.69\textwidth}@{}}
   \toprule
   \textbf{Thuộc tính} & \textbf{Đặc tả} \\
   \midrule
@@ -99,7 +100,7 @@ Các sơ đồ trong báo cáo tuân theo quy ước UML được sử dụng tr
 
 \subsection{UC05 -- Đặt hàng}
 
-\begin{longtable}{@{}p{0.23\textwidth}p{0.69\textwidth}@{}}
+\begin{longtable}{@{}L{0.23\textwidth}L{0.69\textwidth}@{}}
   \toprule
   \textbf{Thuộc tính} & \textbf{Đặc tả} \\
   \midrule
@@ -107,18 +108,18 @@ Các sơ đồ trong báo cáo tuân theo quy ước UML được sử dụng tr
   Tiền điều kiện & Giỏ có ít nhất một dòng hàng; tên, điện thoại và địa chỉ hợp lệ. Email là tùy chọn. \\
   Đầu vào & \texttt{variant\_id}, số lượng, thông tin người nhận, địa chỉ hoặc tọa độ, mã khuyến mãi; backend hỗ trợ khóa idempotency tùy chọn. \\
   Luồng chuẩn bị & Người dùng có thể cho phép định vị. Frontend gọi reverse geocode để điền địa chỉ; mỗi khi địa chỉ/tọa độ thay đổi, hiệu ứng debounce 300 ms tự gọi \texttt{/store/shipping/quote} và cập nhật phí, chế độ tính cùng khoảng cách ước lượng. \\
-  Luồng chính & (1) Xác thực payload; (2) nếu có khóa idempotency thì tìm đơn đã xử lý; (3) tải lại biến thể và giá VND; (4) tính nhu cầu BOM, kiểm tra tồn; (5) tính lại ship và promotion tại server; (6) tạo order \texttt{pending} và mã \texttt{MONG-...}; (7) phát \texttt{order.placed}; (8) trả order và bảng tổng hợp. \\
+  Luồng chính & (1) Xác thực payload; (2) nếu có khóa idempotency thì tìm đơn đã xử lý trong phạm vi khách đang đăng nhập hoặc email khách vãng lai; (3) workflow tải lại biến thể và giá VND; (4) tính nhu cầu BOM, kiểm tra tồn; (5) tính lại ship và promotion tại server; (6) tạo order \texttt{pending} và mã \texttt{MONG-...}; (7) phát \texttt{order.placed}; (8) trả order và bảng tổng hợp. \\
   Luồng lỗi & Từ chối khi biến thể không tồn tại, thiếu giá, thiếu nguyên liệu, promotion không hợp lệ hoặc dữ liệu giao hàng sai. Nếu reverse geocode lỗi, giữ tọa độ và yêu cầu người dùng bổ sung địa chỉ; nếu API quote lỗi, frontend dùng ước lượng cục bộ. \\
-  Quy tắc tin cậy & Không dùng giá/tổng tiền gửi từ trình duyệt làm nguồn chuẩn. Phí giao hàng và giảm giá được tính lại ở backend; idempotency chỉ có hiệu lực khi client cung cấp khóa. \\
+  Quy tắc tin cậy & Không dùng giá/tổng tiền gửi từ trình duyệt làm nguồn chuẩn. Phí giao hàng và giảm giá được tính lại ở backend; idempotency chỉ có hiệu lực khi client cung cấp khóa và khóa được kiểm tra theo đúng người dùng/email tương ứng. Giao diện checkout hiện chưa sinh khóa này, nhưng API đã có điểm mở rộng để bổ sung. \\
   Hậu điều kiện & Order và metadata giao hàng được lưu; frontend xóa giỏ và hiển thị mã đơn, tổng thanh toán cùng QR chuyển khoản. \\
   \bottomrule
 \end{longtable}
 
-Hình~\ref{fig:checkout-activity} mô tả luồng nghiệp vụ từ góc nhìn trách nhiệm; Hình~\ref{fig:shipping-quote-sequence} mô tả bước định vị và báo phí; Hình~\ref{fig:checkout-flow} mô tả các bước kiểm tra khi tạo đơn. Như vậy UC05 được đặc tả bằng cả bảng văn bản, biểu đồ hoạt động và các sơ đồ luồng, phù hợp cách mô hình hóa chức năng--hành vi trong slide học phần.
+Hình~\ref{fig:checkout-activity} mô tả luồng nghiệp vụ từ góc nhìn trách nhiệm; Hình~\ref{fig:shipping-quote-sequence} mô tả bước định vị và báo phí; Hình~\ref{fig:checkout-flow} mô tả các bước kiểm tra khi tạo đơn. Vì vậy, UC05 không chỉ được mô tả bằng bảng mà còn có sơ đồ thể hiện thứ tự xử lý và trách nhiệm giữa frontend, backend và các mô-đun liên quan.
 
 \subsubsection{Bảng quyết định phí giao hàng}
 
-\begin{longtable}{@{}p{0.29\textwidth}p{0.25\textwidth}p{0.38\textwidth}@{}}
+\begin{longtable}{@{}L{0.29\textwidth}L{0.25\textwidth}L{0.38\textwidth}@{}}
   \toprule
   \textbf{Điều kiện} & \textbf{Chế độ} & \textbf{Kết quả} \\
   \midrule
@@ -133,7 +134,7 @@ Hình~\ref{fig:checkout-activity} mô tả luồng nghiệp vụ từ góc nhìn
 
 \subsection{UC08 -- Chatbot tư vấn}
 
-\begin{longtable}{@{}p{0.23\textwidth}p{0.69\textwidth}@{}}
+\begin{longtable}{@{}L{0.23\textwidth}L{0.69\textwidth}@{}}
   \toprule
   \textbf{Thuộc tính} & \textbf{Đặc tả} \\
   \midrule
@@ -148,7 +149,7 @@ Hình~\ref{fig:checkout-activity} mô tả luồng nghiệp vụ từ góc nhìn
 
 \subsection{UC13 -- Phân quyền quản trị}
 
-\begin{longtable}{@{}p{0.23\textwidth}p{0.69\textwidth}@{}}
+\begin{longtable}{@{}L{0.23\textwidth}L{0.69\textwidth}@{}}
   \toprule
   \textbf{Thuộc tính} & \textbf{Đặc tả} \\
   \midrule
@@ -160,29 +161,43 @@ Hình~\ref{fig:checkout-activity} mô tả luồng nghiệp vụ từ góc nhìn
   \bottomrule
 \end{longtable}
 
+\subsection{UC14 -- Cấu hình giao hàng và website}
+
+\begin{longtable}{@{}L{0.23\textwidth}L{0.69\textwidth}@{}}
+  \toprule
+  \textbf{Thuộc tính} & \textbf{Đặc tả} \\
+  \midrule
+  Tác nhân & Super Admin hoặc tài khoản quản trị được cấp quyền \texttt{settings.*}. \\
+  Tiền điều kiện & JWT admin hợp lệ; người dùng có quyền cấu hình tương ứng, đặc biệt là nhóm quyền \texttt{settings}. \\
+  Luồng chính & Cập nhật phí giao hàng mặc định, ngưỡng miễn phí, danh sách khu vực miễn phí, tọa độ cửa hàng, nội dung website và các trang chính sách. \\
+  Ràng buộc & Các giá trị ảnh hưởng trực tiếp tới checkout như phí giao hàng và tọa độ xuất phát phải được lưu tại backend; frontend chỉ hiển thị và gửi yêu cầu cập nhật. \\
+  Hậu điều kiện & API báo phí và luồng checkout sử dụng cấu hình mới trong các lần tính tiếp theo. \\
+  \bottomrule
+\end{longtable}
+
 \section{Truy Vết Yêu Cầu Sang Thiết Kế}
 
-\begin{longtable}{@{}p{0.15\textwidth}p{0.27\textwidth}p{0.25\textwidth}p{0.25\textwidth}@{}}
+\begin{longtable}{@{}L{0.15\textwidth}L{0.27\textwidth}L{0.25\textwidth}L{0.25\textwidth}@{}}
   \toprule
   \textbf{Use case} & \textbf{Mô hình hành vi} & \textbf{Thành phần thực thi} & \textbf{Bằng chứng giao diện} \\
   \midrule
   UC02 & Use case tổng quan & Search API, Meilisearch, fallback Query & Hình~\ref{fig:ui-discovery} \\
   UC03 & Activity checkout, bước chuẩn bị giỏ & \texttt{CartContext}, session cart & Hình~\ref{fig:ui-assist-checkout} \\
-  UC05 & Activity, luồng định vị/báo phí, luồng tạo đơn, state order & Checkout UI/API, geocode, quote, Ingredient, Order, Event Bus & Hình~\ref{fig:ui-assist-checkout} \\
+  UC05 & Activity, luồng định vị/báo phí, luồng tạo đơn, state order & Checkout UI/API, Shipping module, Ingredient, Order, Event Bus & Hình~\ref{fig:ui-assist-checkout} \\
   UC08 & Sequence chatbot & Chatbot API, FAQ/catalog retrieval, Groq & Hình~\ref{fig:ui-assist-checkout} \\
-  UC09--UC13 & Module, class, ERD và deployment & Admin routes, RBAC, module service & Hình~\ref{fig:ui-admin-overview} và \ref{fig:ui-admin-operations} \\
+  UC09--UC14 & Module, class, ERD và deployment & Admin routes, RBAC, module service & Hình~\ref{fig:ui-admin-overview}, \ref{fig:ui-admin-operations} và \ref{fig:ui-admin-shipping} \\
   \bottomrule
 \end{longtable}
 
 \section{Yêu Cầu Phi Chức Năng}
 
-\begin{longtable}{@{}p{0.22\textwidth} p{0.70\textwidth}@{}}
+\begin{longtable}{@{}L{0.22\textwidth} L{0.70\textwidth}@{}}
   \toprule
   \textbf{Thuộc tính} & \textbf{Yêu cầu và cách kiểm chứng} \\
   \midrule
   \endhead
   Hiệu năng & Route giao diện được tách bundle; ảnh tải lười; tìm kiếm ưu tiên chỉ mục Meilisearch và có phân trang. \\
-  Tin cậy & Checkout dùng khóa idempotency; giá được xác minh tại server; cache, Redis và tìm kiếm đều có phương án suy giảm chức năng. \\
+  Tin cậy & Checkout hỗ trợ khóa idempotency ở backend; giá được xác minh tại server; cache, Redis và tìm kiếm đều có phương án suy giảm chức năng. \\
   Bảo mật & JWT tách customer/admin; backend kiểm tra RBAC; payload được xác thực; secret lấy từ biến môi trường. \\
   Khả dụng & Luồng browse--cart--checkout có thông báo loading/error; các trang chính hoạt động ở kích thước desktop và mobile. \\
   Bảo trì & API chia namespace, nghiệp vụ chia module, migration đi cùng module và thành phần giao diện được tái sử dụng. \\
@@ -196,6 +211,7 @@ Hình~\ref{fig:checkout-activity} mô tả luồng nghiệp vụ từ góc nhìn
   \item Định danh sản phẩm và biến thể phải tồn tại tại thời điểm checkout.
   \item Số lượng mua phải là số nguyên dương và không vượt quá lượng nguyên liệu khả dụng.
   \item Giá đơn hàng luôn được lấy từ backend và dùng tiền tệ VND.
+  \item Khóa idempotency của checkout chỉ được đối chiếu trong phạm vi khách đang đăng nhập hoặc email khách vãng lai.
   \item Email, số điện thoại, địa chỉ và payload contact/chatbot được kiểm tra qua middleware Zod.
   \item Khách vãng lai không được tự động gắn đơn vào tài khoản đã tồn tại chỉ dựa trên email.
   \item API admin yêu cầu xác thực; các mô-đun nhạy cảm yêu cầu thêm quyền RBAC tương ứng.
@@ -203,7 +219,7 @@ Hình~\ref{fig:checkout-activity} mô tả luồng nghiệp vụ từ góc nhìn
 
 \section{Tiêu Chí Chấp Nhận}
 
-\begin{longtable}{@{}p{0.28\textwidth} p{0.64\textwidth}@{}}
+\begin{longtable}{@{}L{0.28\textwidth} L{0.64\textwidth}@{}}
   \toprule
   \textbf{Nhóm} & \textbf{Tiêu chí} \\
   \midrule
@@ -219,4 +235,4 @@ Hình~\ref{fig:checkout-activity} mô tả luồng nghiệp vụ từ góc nhìn
 
 \section{Giới Hạn Phạm Vi Hiện Tại}
 
-Phiên bản được rà soát chưa tích hợp cổng thanh toán trực tuyến; đơn mới được ghi nhận với trạng thái \texttt{not\_paid}. Subscriber email mới ghi nội dung ra log thay vì gửi qua nhà cung cấp thực. Dự án chưa có bộ kiểm thử tự động và pipeline CI rõ ràng. Những nội dung này được xem là hướng hoàn thiện, không được tính là chức năng đã triển khai đầy đủ.
+Phiên bản được rà soát chưa tích hợp cổng thanh toán trực tuyến; đơn mới được ghi nhận với trạng thái \texttt{not\_paid}. Subscriber email mới ghi nội dung ra log thay vì gửi qua nhà cung cấp thực. Các phần sau bán hàng như gửi thông báo, đối soát thanh toán và chăm sóc đơn vẫn còn ở mức phác thảo, chưa nên xem là chức năng hoàn chỉnh.

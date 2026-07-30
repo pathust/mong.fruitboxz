@@ -5,13 +5,13 @@
 
 \section{Tổng Quan}
 
-Hệ thống sử dụng PostgreSQL 15. Phần lớn bảng thương mại điện tử được Medusa quản lý thông qua module và migration; dự án bổ sung các bảng riêng cho nội dung website, phân quyền, nguyên liệu và yêu cầu mua số lượng lớn. Vì Medusa khuyến khích cô lập mô-đun, quan hệ giữa mô-đun lõi và mô-đun tùy biến được khai báo bằng module link.
+Hệ thống sử dụng PostgreSQL 15. Phần lớn bảng thương mại điện tử được Medusa quản lý thông qua module và migration; dự án bổ sung các bảng riêng cho nội dung website, phân quyền, nguyên liệu và yêu cầu mua số lượng lớn. Cấu hình giao hàng được lưu trong nhóm thiết lập website, còn logic gợi ý địa chỉ và tính phí được tách thành module nghiệp vụ riêng. Vì Medusa khuyến khích cô lập mô-đun, quan hệ giữa mô-đun lõi và mô-đun tùy biến được khai báo bằng module link.
 
-Ngoài cơ sở dữ liệu quan hệ, hệ thống còn dùng Redis cho dữ liệu tạm thời, Meilisearch cho chỉ mục tìm kiếm và MinIO cho tệp nhị phân. Ba thành phần này không thay thế PostgreSQL mà phục vụ các kiểu truy cập chuyên biệt.
+Ngoài cơ sở dữ liệu quan hệ, hệ thống còn dùng Redis cho dữ liệu tạm thời, Meilisearch cho chỉ mục tìm kiếm và MinIO cho tệp nhị phân. PostgreSQL được cấu hình thêm pgvector trong môi trường Docker để chuẩn bị cột embedding cho sản phẩm và log chatbot, nhưng luồng tìm kiếm hiện hành vẫn dựa trên Meilisearch và fallback Query API. Các thành phần này không thay thế PostgreSQL mà phục vụ các kiểu truy cập chuyên biệt.
 
 \section{Nhóm Thực Thể Lõi Của Medusa}
 
-\begin{longtable}{@{}p{0.22\textwidth} p{0.28\textwidth} p{0.42\textwidth}@{}}
+\begin{longtable}{@{}L{0.22\textwidth} L{0.28\textwidth} L{0.42\textwidth}@{}}
   \toprule
   \textbf{Miền} & \textbf{Thực thể tiêu biểu} & \textbf{Ý nghĩa} \\
   \midrule
@@ -30,7 +30,7 @@ Ngoài cơ sở dữ liệu quan hệ, hệ thống còn dùng Redis cho dữ li
 
 \subsection{Mô-đun Site}
 
-\begin{longtable}{@{}p{0.23\textwidth} p{0.31\textwidth} p{0.38\textwidth}@{}}
+\begin{longtable}{@{}L{0.23\textwidth} L{0.31\textwidth} L{0.38\textwidth}@{}}
   \toprule
   \textbf{Model} & \textbf{Thuộc tính chính} & \textbf{Mục đích} \\
   \midrule
@@ -46,7 +46,7 @@ Ngoài cơ sở dữ liệu quan hệ, hệ thống còn dùng Redis cho dữ li
 
 \subsection{Mô-đun RBAC}
 
-\begin{longtable}{@{}p{0.22\textwidth} p{0.33\textwidth} p{0.37\textwidth}@{}}
+\begin{longtable}{@{}L{0.22\textwidth} L{0.33\textwidth} L{0.37\textwidth}@{}}
   \toprule
   \textbf{Model} & \textbf{Thuộc tính chính} & \textbf{Mục đích} \\
   \midrule
@@ -60,7 +60,7 @@ Danh sách ID role hiện được lưu trong metadata của User và đồng th
 
 \subsection{Mô-đun Ingredients}
 
-\begin{longtable}{@{}p{0.22\textwidth} p{0.33\textwidth} p{0.37\textwidth}@{}}
+\begin{longtable}{@{}L{0.22\textwidth} L{0.33\textwidth} L{0.37\textwidth}@{}}
   \toprule
   \textbf{Model} & \textbf{Thuộc tính chính} & \textbf{Mục đích} \\
   \midrule
@@ -82,6 +82,7 @@ trong đó $q_v$ là số lượng biến thể $v$ trong đơn và $r_{v,i}$ l�
 
 \begin{itemize}[leftmargin=2em, itemsep=4pt]
   \item \texttt{bulk\_order}: lưu tên công ty, email, điện thoại, ngày yêu cầu, ghi chú và trạng thái của đơn số lượng lớn.
+  \item \texttt{shipping}: không tạo bảng nghiệp vụ riêng trong phạm vi hiện tại; service đọc cấu hình từ \texttt{site\_setting} để gợi ý khu vực, reverse geocode và tính phí giao hàng.
 \end{itemize}
 
 \section{Quan Hệ Dữ Liệu}
@@ -107,7 +108,7 @@ Lược đồ hiện tại tập trung vào catalog, order, RBAC, site content, 
 
 \section{Nhất Quán Giao Dịch}
 
-Checkout chạm tới nhiều loại dữ liệu: giá và catalog, số lượng nguyên liệu, promotion, order và event hậu xử lý. PostgreSQL nên bao phủ phần ghi giao dịch cốt lõi; các tác vụ ngoài giao dịch như cập nhật Meilisearch hoặc gửi email nên đi qua event/outbox và có retry. Khóa idempotency phải gắn với kết quả tạo đơn để cùng một request lặp lại trả về cùng order thay vì trừ tồn hai lần. Với tồn kho cạnh tranh, bước giữ hoặc trừ hàng cần khóa/điều kiện cập nhật nguyên tử, không chỉ đọc số lượng rồi ghi lại.
+Checkout chạm tới nhiều loại dữ liệu: giá và catalog, số lượng nguyên liệu, promotion, order và event hậu xử lý. Luồng này hiện được đưa vào Medusa workflow để tách rõ các bước xác minh giá, tồn kho, giao hàng, khuyến mãi và tạo đơn. Workflow cung cấp transaction/execution boundary và compensation cho các step ghi dữ liệu, trong khi PostgreSQL vẫn bao phủ phần ghi giao dịch do module lõi thực hiện. Các tác vụ ngoài giao dịch như cập nhật Meilisearch hoặc gửi email nên đi qua event/outbox và có retry. Khóa idempotency được lưu trong metadata đơn và chỉ đối chiếu trong phạm vi khách hàng/email tương ứng để cùng một request lặp lại không tạo thêm đơn ngoài ý muốn. Với tồn kho cạnh tranh, bước giữ hoặc trừ hàng cần khóa/điều kiện cập nhật nguyên tử, không chỉ đọc số lượng rồi ghi lại.
 
 \section{Dữ Liệu Phi Quan Hệ}
 
@@ -118,6 +119,10 @@ Redis lưu cache có TTL, rate-limit counter và giỏ hàng phiên. Trong devel
 \subsection{Meilisearch}
 
 Mỗi tài liệu tìm kiếm được suy ra từ Product và các quan hệ liên quan. Các trường được tìm kiếm gồm title, description, slug và tên danh mục; trường lọc gồm trạng thái, category và price range; trường sort gồm thời gian và giá. PostgreSQL vẫn là nguồn dữ liệu chuẩn, còn Meilisearch là bản sao tối ưu truy vấn.
+
+\subsection{pgvector}
+
+Script khởi tạo \texttt{init\_vector.sql} tạo extension vector, bổ sung cột embedding cho bảng \texttt{product} và \texttt{site\_chatbot\_question\_log}, đồng thời tạo HNSW index theo cosine similarity. Phần này là nền tảng dữ liệu cho gợi ý hoặc truy xuất ngữ nghĩa trong tương lai; báo cáo không xem đây là chức năng tìm kiếm chính đã hoàn thiện.
 
 \subsection{MinIO}
 
@@ -131,5 +136,5 @@ MinIO cung cấp API tương thích S3. Cơ sở dữ liệu chỉ lưu object k
   \item PostgreSQL và bucket MinIO cần được sao lưu; chỉ mục Meilisearch có thể dựng lại từ catalog.
   \item Secret kết nối, khóa Groq, Meilisearch master key và thông tin MinIO không được dùng giá trị mặc định ở production.
   \item API không trả dữ liệu cá nhân cho chatbot; lịch sử đơn được lọc theo customer ID từ token.
-  \item Checkout nhiều bước cần workflow có giao dịch và hoàn tác để bảo đảm tính nguyên tử.
+  \item Checkout nhiều bước đã được tách thành workflow; nếu bổ sung thanh toán trực tuyến, phần giao dịch và hoàn tác cần được thiết kế chặt hơn.
 \end{itemize}

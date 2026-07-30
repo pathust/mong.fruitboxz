@@ -23,7 +23,7 @@ Luồng mua hàng chính được tổ chức ngắn gọn theo chuỗi: \textit
 
 \section{Các Màn Hình Khách Hàng}
 
-\begin{longtable}{@{}p{0.25\textwidth} p{0.24\textwidth} p{0.43\textwidth}@{}}
+\begin{longtable}{@{}L{0.25\textwidth} L{0.24\textwidth} L{0.43\textwidth}@{}}
   \toprule
   \textbf{Màn hình} & \textbf{Đường dẫn} & \textbf{Chức năng} \\
   \midrule
@@ -45,7 +45,7 @@ Luồng mua hàng chính được tổ chức ngắn gọn theo chuỗi: \textit
 
 \section{Ảnh Chụp Giao Diện Từ Phiên Chạy Thử}
 
-Các hình dưới đây được chụp trực tiếp tại \texttt{localhost:5173}. Bộ ảnh được chọn theo hành trình sử dụng thay vì chụp mọi route: sáu màn hình khách hàng bao quát khám phá--cấu hình--tư vấn--checkout và bốn màn hình quản trị bao quát KPI--catalog--đơn hàng--tồn kho. Ảnh trang chủ được chụp sau khi banner động tải xong; ảnh checkout được chụp sau khi địa chỉ kích hoạt API báo phí. Dữ liệu catalog, giá, ảnh, giỏ hàng và KPI đều đến từ API của dự án, không phải mockup tĩnh.
+Các hình dưới đây được chụp trực tiếp tại \texttt{localhost:5173}. Bộ ảnh được chọn theo hành trình sử dụng thay vì chụp mọi route: sáu màn hình khách hàng bao quát khám phá--cấu hình--tư vấn--checkout và năm màn hình quản trị bao quát KPI--catalog--đơn hàng--tồn kho--cấu hình giao hàng. Ảnh trang chủ được chụp sau khi banner động tải xong; ảnh checkout được chụp sau khi địa chỉ kích hoạt API báo phí. Dữ liệu catalog, giá, ảnh, giỏ hàng và KPI đều đến từ API của dự án, không phải mockup tĩnh.
 
 \begin{figure}[H]
   \centering
@@ -101,13 +101,13 @@ Giỏ hàng cho phép chọn một phần sản phẩm để checkout. Tại tra
 
 ChatbotWidget xuất hiện trên frontend dưới dạng nút nổi. Câu trả lời hỗ trợ Markdown và có thể kèm card gợi ý sản phẩm. UI cần phân biệt trạng thái đang gửi, lỗi giới hạn tần suất và phản hồi fallback để khách hiểu mức độ chắc chắn của thông tin.
 
-Qua phiên chạy thử, bố cục khách hàng có thứ bậc thị giác rõ: hành động chính dùng màu cam, nội dung bán hàng dùng card và ảnh lớn, chatbot nổi ở góc nhưng không che nút checkout. Điểm nên cải thiện là thống nhất chiều cao ảnh sản phẩm, tăng tương phản một số chữ phụ và hiển thị rõ hơn nguồn tính phí giao hàng trước khi người dùng xác nhận.
+Khi chạy thử trên các trang chính, luồng khách hàng khá dễ theo dõi: nút hành động chính dùng màu cam, nội dung bán hàng dùng card và ảnh lớn, chatbot đặt ở góc nên không che checkout. Một vài điểm còn cần chỉnh là chiều cao ảnh sản phẩm, độ tương phản của chữ phụ và cách giải thích nguồn tính phí giao hàng.
 
 \section{Khu Vực Quản Trị}
 
 Quản trị được đặt dưới namespace \texttt{/admin}. \texttt{AdminLayout} cung cấp sidebar, header và vùng nội dung; \texttt{ProtectedRoute} yêu cầu đăng nhập; \texttt{RequirePermission} chặn các màn hình cần quyền cụ thể.
 
-\begin{longtable}{@{}p{0.27\textwidth} p{0.26\textwidth} p{0.39\textwidth}@{}}
+\begin{longtable}{@{}L{0.27\textwidth} L{0.26\textwidth} L{0.39\textwidth}@{}}
   \toprule
   \textbf{Nhóm quản trị} & \textbf{Route tiêu biểu} & \textbf{Nghiệp vụ} \\
   \midrule
@@ -154,12 +154,15 @@ Các trang danh sách dùng chung \texttt{AdminListFilters} để tìm kiếm v�
   \label{fig:ui-admin-operations}
 \end{figure}
 
-Các bảng quản trị giữ bộ lọc và hành động ở vùng đầu trang, giúp nhân viên chuyển nhanh từ quan sát sang xử lý. Dashboard phù hợp để nhận biết xu hướng; trang đơn hàng cung cấp dữ liệu tác nghiệp; trang tồn kho hỗ trợ quyết định nhập hoặc điều chỉnh hàng. Cần tiếp tục chuẩn hóa tên trạng thái tiếng Việt, định dạng tiền và mật độ cột giữa các bảng để giảm thời gian làm quen.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.82\linewidth]{images/ui-admin-shipping.png}
+  \caption{Cấu hình miễn phí giao hàng, phí mặc định và điểm xuất phát}
+  \label{fig:ui-admin-shipping}
+\end{figure}
 
-\section{Khả Năng Tiếp Cận và Responsive}
+Các bảng quản trị giữ bộ lọc và hành động ở vùng đầu trang, giúp nhân viên chuyển nhanh từ quan sát sang xử lý. Dashboard phù hợp để nhận biết xu hướng; trang đơn hàng cung cấp dữ liệu tác nghiệp; trang tồn kho hỗ trợ quyết định nhập hoặc điều chỉnh hàng. Trang cấu hình giao hàng cho phép điều chỉnh mức phí mặc định, ngưỡng miễn phí, danh sách khu vực miễn phí và tọa độ cửa hàng dùng cho báo phí. Các phần còn nên chỉnh là tên trạng thái tiếng Việt, định dạng tiền và mật độ cột giữa các bảng.
 
-Một số nền tảng tốt đã có như lazy loading route, bottom navigation trên mobile và nhãn trạng thái rõ ràng. Tuy nhiên, cần tiếp tục rà soát khả năng dùng bàn phím, focus khi mở modal, vùng chạm tối thiểu 44 px và thông báo động cho trình đọc màn hình. Đặc biệt, số lượng giỏ nên dùng \texttt{aria-live="polite"}; ảnh dưới màn hình đầu nên đặt \texttt{loading="lazy"}; trang sản phẩm nên bổ sung JSON-LD và metadata SEO.
+\section{Nhận Xét Về Tính Nhất Quán}
 
-\section{Đánh Giá Tính Nhất Quán}
-
-Frontend và admin hiện cùng nằm trong một ứng dụng React nhưng phục vụ hai phong cách sử dụng khác nhau. Cách tổ chức này thuận tiện khi phát triển nhanh, song bundle và design system có thể trở nên lớn. Trong giai đoạn tiếp theo có thể tách admin thành workspace riêng hoặc chuyển các phần quản trị phù hợp sang Medusa Admin extensions, đồng thời chuẩn hóa màu, typography, component bảng và form dùng chung.
+Frontend và admin hiện cùng nằm trong một ứng dụng React nhưng phục vụ hai kiểu người dùng khác nhau. Cách làm này phù hợp với phạm vi đồ án vì giúp phát triển nhanh, nhưng về lâu dài bundle và design system dễ bị phình to. Nếu tiếp tục phát triển, admin có thể được tách thành workspace riêng hoặc chuyển một số phần phù hợp sang Medusa Admin extensions; các thành phần bảng, form, màu và typography cũng nên được gom thành bộ dùng chung.
