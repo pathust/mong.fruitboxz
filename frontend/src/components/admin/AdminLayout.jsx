@@ -26,7 +26,6 @@ const navGroups = [
   {
     label: "Kho & Chi phí",
     items: [
-      { label: "Nguyên liệu", path: "/admin/ingredients", icon: Leaf, permission: "ingredients.read" },
       { label: "Tồn kho", path: "/admin/inventory", icon: Package, permission: "inventory.read" },
 
     ],

@@ -78,7 +78,8 @@ export default function PromotionsList() {
             try {
               const result = await api(`/admin/promotions/${promotion.id}/metadata`)
               return { ...promotion, metadata: result.metadata || {} }
-            } catch {
+            } catch (error) {
+              console.error("Failed to fetch promotion metadata:", error)
               return { ...promotion, metadata: {} }
             }
           })

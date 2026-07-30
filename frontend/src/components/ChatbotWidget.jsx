@@ -89,7 +89,8 @@ export default function ChatbotWidget() {
           suggestions: response.suggestions || [],
         },
       ])
-    } catch {
+    } catch (error) {
+      console.error("Chatbot response error:", error)
       setMessages((prev) => [
         ...prev,
         {
@@ -168,29 +169,13 @@ export default function ChatbotWidget() {
                               <img src={item.thumbnail || '/media/placeholder.svg'} alt={item.title} className="h-full w-full object-cover" />
                             </a>
                             <div className="min-w-0 flex-1 flex flex-col justify-between h-14 py-0.5">
-                              <a href={`/products/${item.slug || item.handle || item.id}`} className="truncate text-[13px] font-semibold text-[#3c352d] hover:text-primary">
+                              <a href={`/products/${item.slug || item.handle || item.id}`} className="block truncate text-[13px] font-semibold text-[#3c352d] hover:text-primary">
                                 {item.title}
                               </a>
-                              <div className="flex items-center justify-between mt-auto">
+                              <div className="mt-auto">
                                 <p className="text-[12px] font-bold text-primary">
                                   {item.price ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price) : 'Xem chi tiết'}
                                 </p>
-                                <button 
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    addItem({
-                                      id: item.id,
-                                      title: item.title,
-                                      image: item.thumbnail,
-                                      price: item.price,
-                                      originalPrice: item.price,
-                                      quantity: 1
-                                    });
-                                  }}
-                                  className="rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold text-primary hover:bg-primary hover:text-white transition-colors">
-                                  Mua ngay
-                                </button>
                               </div>
                             </div>
                           </div>

@@ -38,7 +38,8 @@ function getInitialUser() {
 
   try {
     return JSON.parse(savedUser)
-  } catch {
+  } catch (error) {
+    console.error("Failed to parse admin user from local storage:", error)
     localStorage.removeItem("admin_token")
     localStorage.removeItem("admin_user")
     return null

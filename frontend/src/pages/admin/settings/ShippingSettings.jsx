@@ -46,7 +46,8 @@ export default function ShippingSettings() {
             shipping_origin_lng: lng,
             shipping_origin_address: data?.display_name?.replace(/, Việt Nam$/i, "").trim() || ""
           }));
-        } catch {
+        } catch (error) {
+          console.error("Geocoding reverse lookup failed:", error)
           setSettings((prev) => ({
             ...prev,
             shipping_origin_lat: lat,

@@ -10,7 +10,8 @@ export function decodeJwt(token) {
     const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4)
 
     return JSON.parse(atob(padded))
-  } catch {
+  } catch (error) {
+    console.error("Failed to decode JWT:", error)
     return null
   }
 }

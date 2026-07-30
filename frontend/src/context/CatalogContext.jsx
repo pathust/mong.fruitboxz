@@ -95,7 +95,8 @@ export function CatalogProvider({ children }) {
             displayName: category.name,
           })))
         }
-      } catch {
+      } catch (error) {
+        console.error("Failed to load catalog categories:", error)
         // API failed — keep empty arrays
       } finally {
         if (mounted) setLoading(false)

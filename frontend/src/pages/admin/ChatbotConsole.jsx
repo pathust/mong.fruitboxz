@@ -71,7 +71,8 @@ export default function ChatbotConsole() {
         }
       });
       pushToast('Đã lưu cấu hình chatbot thành công.', 'success');
-    } catch {
+    } catch (error) {
+      console.error("Failed to save FAQ config:", error)
       pushToast('Lưu cấu hình thất bại. Vui lòng thử lại.', 'error');
     } finally {
       setSaving(false);
@@ -89,7 +90,8 @@ export default function ChatbotConsole() {
         return next;
       });
       pushToast("Đã xoá câu hỏi", "success");
-    } catch {
+    } catch (error) {
+      console.error("Failed to delete unanswered question:", error)
       pushToast("Lỗi khi xoá câu hỏi", "error");
     }
   };
@@ -114,7 +116,8 @@ export default function ChatbotConsole() {
       }
       setSelectedIds(new Set());
       pushToast("Đã xoá thành công", "success");
-    } catch {
+    } catch (error) {
+      console.error("Failed to bulk delete unanswered questions:", error)
       pushToast("Lỗi khi xoá câu hỏi", "error");
     } finally {
       setDeleting(false);

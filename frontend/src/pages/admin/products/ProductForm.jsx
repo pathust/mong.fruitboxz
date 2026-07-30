@@ -5,7 +5,7 @@ import { Package, Plus, Trash2 } from "lucide-react";
 import AdminSelect from "../../../components/admin/AdminSelect";
 import { useAdminAuth } from "../../../context/AdminAuthContext";
 import ImagePicker from "../../../components/admin/ImagePicker";
-import RecipeManager from "./RecipeManager";
+
 import { AdminLoading } from "../../../components/admin/AdminStates"
 
 
@@ -371,18 +371,6 @@ export default function ProductForm() {
                       <Trash2 className="w-4 h-4" />
                     </button>
                   }
-
-
-
-                  <div className="w-full mt-2 pt-2 border-t border-gray-200">
-                    {!isNew && v.id ?
-                    <RecipeManager variantId={v.id} productId={id} /> :
-
-                    <div className="text-[13px] text-amber-600 font-medium py-3 px-4 bg-amber-50 rounded-lg border border-amber-100 mt-2">
-                        Vui lòng lưu lại sản phẩm để có thể cài đặt nguyên liệu cho phân loại này.
-                      </div>
-                    }
-                  </div>
                 </div>
                 )}
             </div>

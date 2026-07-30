@@ -79,7 +79,8 @@ export default function MediaLibrary() {
       await api(`/admin/media/${encodeURIComponent(key)}`, { method: 'DELETE' })
       await loadMedia(query)
       pushToast('Ảnh đã được xóa.', 'success')
-    } catch {
+    } catch (error) {
+      console.error("Failed to delete media:", error)
       pushToast('Không xóa được ảnh.', 'error')
     }
   }

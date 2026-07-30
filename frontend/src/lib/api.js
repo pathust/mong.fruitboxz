@@ -5,14 +5,24 @@ function normalizeBody(body) {
 
   try {
     return JSON.parse(body)
-  } catch {
+  } catch (error) {
+    console.error("normalizeBody parse error:", error)
     return body
   }
 }
 
 function unwrapEnvelope(payload) {
   if (!payload || typeof payload !== "object") return payload
-  if (!("data" in payload && "error" in payload && "meta" in payload)) return payload
+  
+  if (!("data" in payload && "error" in payload && "meta" in payload)) {
+    // If it has a message but no data/error/meta, it is a naked error response from a custom backend endpoint
+    if (payload.message && Object.keys(payload).length <= 2) {
+      throw new Error(payload.message)
+    }
+
+    console.warn("API Consistency Warning: Endpoint did not return { data, error, meta } envelope.", payload)
+    return payload
+  }
 
   if (payload.error) {
     const error = new Error(payload.error.message || "Request failed")

@@ -12,8 +12,6 @@ export default function ProductDetail() {
   const [selectedImage, setSelectedImage] = useState(0)
   const [quantity, setQuantity] = useState(1)
   const [addedToCart, setAddedToCart] = useState(false)
-  const [ingredients, setIngredients] = useState([])
-
   const heroRef = useRef(null)
   const buyButtonRef = useRef(null)
   const { products } = useCatalog() // we'll use this for related fallback or just ignore
@@ -47,18 +45,7 @@ export default function ProductDetail() {
       window.clearTimeout(timer)
     }
   }, [slug])
-  useEffect(() => {
-    if (!product) return
-    const productSlug = product.slug || product.id
-    apiFetch(`/store/ingredients/${productSlug}`)
-      .then((res) => {
-        const data = res?.data || res || {};
-        setIngredients(data.ingredients || []);
-      })
-      .catch(() => setIngredients([]))
 
-
-  }, [product])
   useEffect(() => {
     if (!product) return
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
@@ -303,21 +290,7 @@ export default function ProductDetail() {
           )}
         </div>
       </div>
-      <div className="grid grid-cols-1 gap-6 mb-12">
-        <section className="bg-white rounded-xl p-5 border border-[#efe7dc]">
-          <h2 className="section-title text-[22px] mb-3">Thành phần</h2>
-          {ingredients.length === 0 ? (
-            <p className="text-sm text-gray-500">Đang cập nhật thành phần</p>
-          ) : (
-            <ul className="space-y-2">
-              {ingredients.map((item) => (
-                <li key={item} className="text-sm text-secondary">• {item}</li>
-              ))}
-            </ul>
-          )}
-        </section>
 
-      </div>
       {related.length > 0 && (
         <div>
           <h2 className="text-xl font-bold text-secondary mb-6">Sản phẩm liên quan</h2>

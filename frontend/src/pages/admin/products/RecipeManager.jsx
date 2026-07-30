@@ -13,25 +13,26 @@ export default function RecipeManager({ productId, variantId }) {
 
   const fetchData = useCallback(async () => {
     try {
-      const [resIng, resGlobal, resRecipes] = await Promise.all([
-        api("/admin/ingredients"),
+      const [resIng, resGlobal, resProduct] = await Promise.all([
+        api("/admin/custom/inventory"),
         api("/admin/custom?mode=settings").catch(() => ({ settings: {} })),
-        api("/admin/recipes")
+        api(`/admin/products/${productId}?fields=*variants,*variants.inventory_items`)
       ])
 
-      const ingData = resIng?.data || resIng || {};
-      if (ingData.ingredients) {
-        setIngredients(ingData.ingredients)
+      if (resIng?.ingredients) {
+        setIngredients(resIng.ingredients)
       }
 
-      if (resRecipes?.recipes) {
-        const variantRecipes = resRecipes.recipes.filter(r => r.variant_id === variantId)
-        setItems(variantRecipes.map(r => ({
-          id: r.id,
-          ingredient_id: r.ingredient_id,
-          quantity: r.quantity,
-          isNew: false
-        })))
+      if (resProduct?.product?.variants) {
+        const variant = resProduct.product.variants.find(v => v.id === variantId)
+        if (variant && variant.inventory_items) {
+          const fetchedItems = variant.inventory_items.map(link => ({
+            inventory_item_id: link.inventory_item_id,
+            required_quantity: link.required_quantity,
+            isNew: false
+          }))
+          setItems(fetchedItems)
+        }
       }
 
       if (resGlobal?.settings) {
@@ -59,28 +60,20 @@ export default function RecipeManager({ productId, variantId }) {
       let errorMsgs = [];
 
       for (const item of items) {
-        if (!item.ingredient_id) {
+        if (!item.inventory_item_id) {
           errorMsgs.push(`Một dòng chưa chọn nguyên liệu`);
           continue;
         }
         try {
-          if (item.isNew) {
-            await api(`/admin/recipes`, {
-              method: "POST",
-              body: {
-                variant_id: variantId,
-                ingredient_id: item.ingredient_id,
-                quantity: Number(item.quantity)
-              }
-            })
-          } else {
-            // No edit endpoint for recipe item yet, we delete and recreate or if it was modified we can't tell easily.
-            // Wait, we didn't track changes. If they modify quantity, we might need a PUT endpoint or just delete and recreate.
-            // For now, let's just assume we POST new ones. Wait, if it's existing, do we need to save? 
-            // The old code always POSTed to Medusa endpoint which handles upsert.
-          }
+          await api(`/admin/products/${productId}/variants/${variantId}/inventory-items`, {
+            method: "POST",
+            body: {
+              inventory_item_id: item.inventory_item_id,
+              required_quantity: Number(item.required_quantity)
+            }
+          })
         } catch (err) {
-          errorMsgs.push(`Nguyên liệu ${item.ingredient_id}: ${err.message || JSON.stringify(err)}`);
+          errorMsgs.push(`Nguyên liệu ${item.inventory_item_id}: ${err.message || JSON.stringify(err)}`);
         }
       }
 
@@ -99,10 +92,10 @@ export default function RecipeManager({ productId, variantId }) {
 
   const handleDeleteLink = async (index) => {
     const item = items[index]
-    if (!item.isNew && item.id) {
+    if (!item.isNew) {
       if (!window.confirm("Xóa nguyên liệu này khỏi định mức?")) return
       try {
-        await api(`/admin/recipes/${item.id}`, {
+        await api(`/admin/products/${productId}/variants/${variantId}/inventory-items/${item.inventory_item_id}`, {
           method: "DELETE"
         })
       } catch (err) {
@@ -114,8 +107,8 @@ export default function RecipeManager({ productId, variantId }) {
   }
 
   const addItem = () => {
-    if (ingredients.length === 0) return alert("Vui lòng thêm nguyên liệu trước!")
-    setItems([...items, { ingredient_id: "", quantity: 1, isNew: true }])
+    if (ingredients.length === 0) return alert("Vui lòng thêm nguyên liệu (Inventory Items) trước!")
+    setItems([...items, { inventory_item_id: "", required_quantity: 1, isNew: true }])
   }
 
   const updateItem = (index, field, value) => {
@@ -128,9 +121,9 @@ export default function RecipeManager({ productId, variantId }) {
 
   // Tính toán tổng chi phí
   const ingredientCost = items.reduce((sum, item) => {
-    const ing = ingredients.find(i => i.id === item.ingredient_id)
-    const costPerUnit = ing?.cost_price ? Number(ing.cost_price) : 0
-    return sum + (costPerUnit * item.quantity)
+    const ing = ingredients.find(i => i.id === item.inventory_item_id)
+    const costPerUnit = ing?.metadata?.cost_per_unit ? Number(ing.metadata.cost_per_unit) : 0
+    return sum + (costPerUnit * item.required_quantity)
   }, 0)
 
   const totalCost = ingredientCost + globalCosts.packaging_cost + globalCosts.labor_cost_per_order
@@ -142,42 +135,41 @@ export default function RecipeManager({ productId, variantId }) {
           <Calculator className="h-4 w-4 text-primary" /> Định mức nguyên liệu (BOM)
         </h3>
         <button type="button" onClick={handleSave} disabled={saving} className="admin-button-primary px-4 py-2 text-sm">
-          {saving ? "Đang lưu..." : "Lưu định mức mới"}
+          {saving ? "Đang lưu..." : "Lưu định mức"}
         </button>
       </div>
 
       <div className="space-y-3 mb-6">
         {items.map((item, idx) => {
-          const selectedIng = ingredients.find(i => i.id === item.ingredient_id)
-          const costPerUnit = selectedIng?.cost_price ? Number(selectedIng.cost_price) : 0
-          const cost = costPerUnit * item.quantity
+          const selectedIng = ingredients.find(i => i.id === item.inventory_item_id)
+          const costPerUnit = selectedIng?.metadata?.cost_per_unit ? Number(selectedIng.metadata.cost_per_unit) : 0
+          const cost = costPerUnit * item.required_quantity
 
           return (
             <div key={idx} className="flex items-center gap-3">
               <AdminSelect
-                value={item.ingredient_id}
-                onChange={val => updateItem(idx, "ingredient_id", val)}
+                value={item.inventory_item_id}
+                onChange={val => updateItem(idx, "inventory_item_id", val)}
                 options={[
                   { value: "", label: "-- Chọn nguyên liệu --" },
                   ...ingredients.map(ing => ({
                     value: ing.id,
-                    label: `${ing.name} (${ing.unit || "unit"})`
+                    label: `${ing.title} (${ing.metadata?.unit || "unit"})`
                   }))
                 ]}
                 className="w-full bg-white border-gray-200"
-                searchable={true}
               />
 
               <input
                 type="number"
                 min={0}
-                step={['kg', 'lít', 'l'].includes(selectedIng?.unit?.toLowerCase()) ? "0.001" : "1"}
-                value={item.quantity}
-                onChange={e => updateItem(idx, "quantity", e.target.value)}
+                step={['kg', 'lít', 'l'].includes(selectedIng?.metadata?.unit?.toLowerCase()) ? "0.001" : "1"}
+                value={item.required_quantity}
+                onChange={e => updateItem(idx, "required_quantity", e.target.value)}
                 className="w-20 px-3 py-2 border border-gray-200 rounded-lg text-sm text-center focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
               />
 
-              <span className="w-10 text-sm text-gray-500">{selectedIng?.unit || "unit"}</span>
+              <span className="w-10 text-sm text-gray-500">{selectedIng?.metadata?.unit || "unit"}</span>
               <span className="w-20 text-sm font-semibold text-right text-gray-700">{cost.toLocaleString('vi-VN')}₫</span>
 
               <button type="button" onClick={() => handleDeleteLink(idx)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg">

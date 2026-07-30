@@ -18,9 +18,9 @@ function getCartSessionId() {
 function isExternalImage(url) {
   if (!url) return false
   try {
-    const parsed = new URL(url)
+    const parsed = new URL(url, window.location.origin)
     return parsed.origin !== window.location.origin
-  } catch {
+  } catch (error) {
     return false
   }
 }
@@ -29,7 +29,8 @@ function loadCart() {
   try {
     const saved = localStorage.getItem(CART_KEY)
     return saved ? JSON.parse(saved) : { items: [], count: 0 }
-  } catch {
+  } catch (error) {
+    console.error("Failed to load cart from local storage:", error)
     return { items: [], count: 0 }
   }
 }
@@ -127,7 +128,8 @@ export function CartProvider({ children }) {
             body: cart,
           })
         }
-      } catch {
+      } catch (error) {
+        console.error("Failed to hydrate remote cart:", error)
         // Local cart remains authoritative while Redis is unavailable.
       } finally {
         if (mounted) remoteReady.current = true
@@ -168,7 +170,8 @@ export function CartProvider({ children }) {
         if (freshImage) {
           dispatch({ type: 'PATCH_IMAGE', payload: { id: item.id, image: freshImage } })
         }
-      } catch {
+      } catch (error) {
+        console.error("Failed to patch image for item:", item.id, error)
         // Silently ignore – onError fallback in the UI handles the display
       }
     })

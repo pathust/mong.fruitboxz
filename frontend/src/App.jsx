@@ -2,11 +2,11 @@ import { lazy, Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Layout from './components/Layout'
 import { AdminAuthProvider } from './context/AdminAuthContext'
-import AdminLayout from './components/admin/AdminLayout'
 import ProtectedRoute from './components/admin/ProtectedRoute'
 import AdminLoginCheck from './components/admin/AdminLoginCheck'
 import { RequirePermission } from './components/admin/RequirePermission'
 
+const AdminLayout = lazy(() => import('./components/admin/AdminLayout'))
 const Home = lazy(() => import('./pages/Home'))
 const Products = lazy(() => import('./pages/Products'))
 const ProductDetail = lazy(() => import('./pages/ProductDetail'))
@@ -48,7 +48,7 @@ const RolesList = lazy(() => import('./pages/admin/RolesList'))
 
 const Settings = lazy(() => import('./pages/admin/Settings'))
 
-const IngredientsList = lazy(() => import('./pages/admin/costs/IngredientsList'))
+
 const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'))
 const MediaLibrary = lazy(() => import('./pages/admin/MediaLibrary'))
 const SearchConsole = lazy(() => import('./pages/admin/SearchConsole'))
@@ -98,7 +98,7 @@ export default function App() {
 
       <Route path="/admin" element={<AdminAuthProvider><AdminLoginCheck /></AdminAuthProvider>}>
         <Route path="login" element={<Suspense fallback={<ScreenLoader />}><AdminLogin /></Suspense>} />
-        <Route element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
+        <Route element={<ProtectedRoute><Suspense fallback={<ScreenLoader />}><AdminLayout /></Suspense></ProtectedRoute>}>
           <Route index element={<Suspense fallback={<ScreenLoader />}><AdminDashboard /></Suspense>} />
           <Route path="finance" element={<Suspense fallback={<ScreenLoader />}><RequirePermission perm="finance.read"><FinanceDashboard /></RequirePermission></Suspense>} />
           <Route path="customers" element={<Suspense fallback={<ScreenLoader />}><RequirePermission perm="customers.read"><CustomersList /></RequirePermission></Suspense>} />
@@ -119,7 +119,7 @@ export default function App() {
           <Route path="users" element={<Suspense fallback={<ScreenLoader />}><RequirePermission perm="users.read"><UsersList /></RequirePermission></Suspense>} />
           <Route path="roles" element={<Suspense fallback={<ScreenLoader />}><RequirePermission perm="roles.read"><RolesList /></RequirePermission></Suspense>} />
 
-          <Route path="ingredients" element={<Suspense fallback={<ScreenLoader />}><RequirePermission perm="ingredients.read"><IngredientsList /></RequirePermission></Suspense>} />
+
           <Route path="shipping" element={<Suspense fallback={<ScreenLoader />}><ShippingSettings /></Suspense>} />
 
           <Route path="media" element={<Suspense fallback={<ScreenLoader />}><MediaLibrary /></Suspense>} />

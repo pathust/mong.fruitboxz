@@ -108,7 +108,8 @@ function parseList(value) {
   try {
     const parsed = value ? JSON.parse(value) : [];
     return Array.isArray(parsed) ? parsed : [];
-  } catch {
+  } catch (error) {
+    console.error("parseList error:", error)
     return [];
   }
 }

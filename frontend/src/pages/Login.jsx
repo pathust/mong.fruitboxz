@@ -35,7 +35,8 @@ export default function Login() {
           navigate('/admin')
           return
         }
-      } catch {
+      } catch (error) {
+        console.debug("Admin login failed, falling back to customer:", error)
         // Continue with customer auth flow
       }
 

@@ -132,9 +132,14 @@ export default function Checkout() {
   const { address, lat, lng } = form
 
   const handleApplyPromo = async () => {
-    if (!promoCode.trim()) return
+    if (!promoCode.trim()) {
+      setDiscountData(null)
+      setPromoError('')
+      return
+    }
     setApplyingPromo(true)
     setPromoError('')
+    setDiscountData(null)
     try {
       const res = await apiFetch('/store/promotions/validate', {
         method: 'POST',
@@ -143,7 +148,7 @@ export default function Checkout() {
       if (res.valid) {
         setDiscountData(res)
       } else {
-        setPromoError('Mã giảm giá không hợp lệ')
+        setPromoError(res.message || 'Mã giảm giá không hợp lệ')
       }
     } catch (err) {
       setPromoError(err.message || 'Mã giảm giá không hợp lệ')
@@ -537,6 +542,12 @@ export default function Checkout() {
                     type="text"
                     value={promoCode}
                     onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleApplyPromo();
+                      }
+                    }}
                     placeholder="Mã giảm giá"
                     className="flex-1 px-4 py-2 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm uppercase"
                   />

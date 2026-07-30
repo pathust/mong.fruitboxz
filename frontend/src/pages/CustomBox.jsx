@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Check, LoaderCircle, PackageOpen, Info, ArrowRight, Minus, Search, X } from 'lucide-react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
-import { mapProduct, useCatalog } from '../context/CatalogContext'
+import { mapProduct } from '../context/CatalogContext'
 import { apiFetch } from '../lib/api'
 import { useSiteSettings } from '../hooks/useSiteSettings'
 
@@ -14,7 +14,8 @@ const formatPrice = (value) => new Intl.NumberFormat('vi-VN', {
 function parseJson(value, fallback) {
   try {
     return value ? JSON.parse(value) : fallback
-  } catch {
+  } catch (error) {
+    console.error("Parse JSON error:", error)
     return fallback
   }
 }
@@ -31,7 +32,6 @@ export default function CustomBox() {
   const navigate = useNavigate()
   const { addItem, setCartOpen } = useCart()
   const { settings, loading: settingsLoading, error: settingsError } = useSiteSettings()
-  const { categories } = useCatalog()
 
   const [allProducts, setAllProducts] = useState([])
   const [productsLoading, setProductsLoading] = useState(true)
@@ -70,75 +70,20 @@ export default function CustomBox() {
   // Fetch ALL products with categories
   useEffect(() => {
     let mounted = true
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setProductsLoading(true)
-    Promise.all([
-      apiFetch('/store/products?limit=200&fields=id,handle,title,thumbnail,*images,*variants,*variants.prices,+variants.inventory_quantity,*categories'),
-      apiFetch('/store/ingredients').catch(() => ({ data: { ingredients: [], recipeItems: [] } }))
-    ])
-      .then(([productsData, ingredientsResponse]) => {
+    apiFetch('/store/products?limit=200&fields=id,handle,title,thumbnail,*images,*variants,*variants.prices,+variants.inventory_quantity,*categories')
+      .then((productsData) => {
         if (!mounted) return
-        
-        // Handle both wrapped and unwrapped responses gracefully
-        const ingredientsData = ingredientsResponse?.data || ingredientsResponse || {}
-        
-        const ingredientsList = ingredientsData.ingredients || []
-        const recipeItems = ingredientsData.recipeItems || []
-
         const mapped = (productsData?.products || [])
           .map(mapProduct)
           .filter(p => p.price)
           .filter(p => !allowedSlugs.length || allowedSlugs.includes(p.slug))
           .map(p => {
-            // Check tồn kho qua bảng ingredient và recipe_item
-            const variantIds = (p.variants || []).map(v => v.id)
-            const pRecipes = recipeItems.filter(r => variantIds.includes(r.variant_id))
-            
-            if (pRecipes.length > 0) {
-              // Nếu sản phẩm có khai báo công thức (recipe_item), ta sẽ check tồn kho qua công thức đó
-              let productHasStock = false
-              let maxProductPurchasable = 0
-              
-              for (const v of p.variants || []) {
-                const vRecipes = pRecipes.filter(r => r.variant_id === v.id)
-                if (vRecipes.length === 0) {
-                  v.purchasable_quantity = v.inventory_quantity ?? Infinity
-                  if (v.purchasable_quantity > 0) {
-                    productHasStock = true
-                    maxProductPurchasable = Math.max(maxProductPurchasable, v.purchasable_quantity)
-                  }
-                  continue
-                }
-                
-                let variantInStock = true
-                let minCountX = Infinity
-                for (const r of vRecipes) {
-                  const stock = Number(r.ingredient?.stock_quantity || 0)
-                  const req = Number(r.quantity)
-                  if (stock < req) {
-                    variantInStock = false
-                  }
-                  if (req > 0) {
-                    const countX = Math.floor(stock / req)
-                    if (countX < minCountX) minCountX = countX
-                  }
-                }
-                
-                if (variantInStock) {
-                  productHasStock = true
-                }
-                const actualCount = minCountX === Infinity ? 0 : minCountX
-                v.purchasable_quantity = Math.min(actualCount, Math.max(5, Math.floor(actualCount * 0.8)))
-                maxProductPurchasable = Math.max(maxProductPurchasable, v.purchasable_quantity)
-              }
-              p.inStock = productHasStock
-              p.purchasable_quantity = maxProductPurchasable
-            } else {
-              // Fallback: Tìm ingredient trùng tên với title
-              const ing = ingredientsList.find(i => i.name === p.title)
-              if (ing) {
-                p.inStock = Number(ing.stock_quantity) > 0
-              }
-            }
+            // inStock đã được tính toán chính xác trong mapProduct của CatalogContext
+            // Tính số lượng tối đa có thể mua dựa trên mappedVariants
+            const maxVariantStock = Math.max(0, ...((p.variants || []).map(v => v.purchasable_quantity || 0)))
+            p.purchasable_quantity = maxVariantStock > 0 ? maxVariantStock : Infinity
             return p
           })
         setAllProducts(mapped)
@@ -180,6 +125,7 @@ export default function CustomBox() {
 
   // Reset filter when mode changes
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCategoryFilter('all')
     setSearchQuery('')
   }, [activeBoxSlug])
@@ -197,6 +143,7 @@ export default function CustomBox() {
   // Auto-trim multi-selection if switching box type
   useEffect(() => {
     if (activeBox && selected.length > Number(activeBox.max_items)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelected(cur => cur.slice(0, Number(activeBox.max_items)))
     }
   }, [activeBox, selected.length])

@@ -56,7 +56,8 @@ export default function Products() {
         const res = await apiFetch(`/store/search?${params}`, { signal: controller.signal })
         setProducts((res.hits || []).map(mapProduct))
         setTotal(Number(res.total || 0))
-      } catch {
+      } catch (error) {
+        console.error("Search API error:", error)
         if (!controller.signal.aborted) {
           setProducts([])
           setTotal(0)

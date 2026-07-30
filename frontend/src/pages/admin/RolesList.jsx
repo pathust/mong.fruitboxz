@@ -18,7 +18,6 @@ const REGISTRY_MODULES = [
   { key: "categories", label: "Danh mục Sản phẩm" },
   { key: "promotions", label: "Khuyến mãi" },
   { key: "inventory", label: "Tồn kho" },
-  { key: "ingredients", label: "Nguyên liệu" },
   { key: "customers", label: "Khách hàng" },
   { key: "blog", label: "Bài viết Blog" },
   { key: "blog-categories", label: "Danh mục Blog" },
