@@ -1,0 +1,202 @@
+[
+  {
+    "id": "fb-001",
+    "title": "Hộp Trái Cây Tổng Hợp Cao Cấp",
+    "category": "Hộp Trái Cây Tươi",
+    "price": 250000,
+    "variants": [
+      { "label": "1kg", "price": 250000 },
+      { "label": "2kg", "price": 450000 }
+    ]
+  },
+  {
+    "id": "fb-002",
+    "title": "Hộp Trái Cây Nhiệt Đới Mix",
+    "category": "Hộp Trái Cây Tươi",
+    "price": 220000,
+    "variants": [
+      { "label": "1kg", "price": 220000 },
+      { "label": "2kg", "price": 400000 }
+    ]
+  },
+  {
+    "id": "fb-003",
+    "title": "Hộp Trái Cây Văn Phòng",
+    "category": "Hộp Trái Cây Tươi",
+    "price": 150000,
+    "variants": [
+      { "label": "Nhỏ", "price": 150000 },
+      { "label": "Lớn", "price": 280000 }
+    ]
+  },
+  {
+    "id": "fb-004",
+    "title": "Hộp Trái Cây Gia Đình",
+    "category": "Hộp Trái Cây Tươi",
+    "price": 600000,
+    "variants": [
+      { "label": "3kg", "price": 600000 },
+      { "label": "5kg", "price": 950000 }
+    ]
+  },
+  {
+    "id": "im-001",
+    "title": "Táo Envy Mỹ",
+    "category": "Trái Cây Nhập Khẩu",
+    "price": 120000,
+    "variants": [
+      { "label": "500g", "price": 120000 },
+      { "label": "1kg", "price": 220000 }
+    ]
+  },
+  {
+    "id": "im-002",
+    "title": "Nho Mẫu Đơn Nhật Bản",
+    "category": "Trái Cây Nhập Khẩu",
+    "price": 450000,
+    "variants": [
+      { "label": "500g", "price": 450000 },
+      { "label": "1kg", "price": 850000 }
+    ]
+  },
+  {
+    "id": "im-003",
+    "title": "Cherry Mỹ Đỏ",
+    "category": "Trái Cây Nhập Khẩu",
+    "price": 280000,
+    "variants": [
+      { "label": "500g", "price": 280000 },
+      { "label": "1kg", "price": 520000 }
+    ]
+  },
+  {
+    "id": "im-004",
+    "title": "Cam Navel Úc",
+    "category": "Trái Cây Nhập Khẩu",
+    "price": 95000,
+    "variants": [
+      { "label": "1kg", "price": 95000 },
+      { "label": "2kg", "price": 180000 }
+    ]
+  },
+  {
+    "id": "im-005",
+    "title": "Kiwi Vàng New Zealand",
+    "category": "Trái Cây Nhập Khẩu",
+    "price": 110000,
+    "variants": [
+      { "label": "500g", "price": 110000 },
+      { "label": "1kg", "price": 200000 }
+    ]
+  },
+  {
+    "id": "sn-001",
+    "title": "Xoài Cát Hòa Lộc",
+    "category": "Trái Cây Theo Mùa",
+    "price": 85000,
+    "variants": [
+      { "label": "1kg", "price": 85000 },
+      { "label": "3kg", "price": 230000 }
+    ]
+  },
+  {
+    "id": "sn-002",
+    "title": "Vải Thiều Lục Ngạn",
+    "category": "Trái Cây Theo Mùa",
+    "price": 70000,
+    "variants": [
+      { "label": "1kg", "price": 70000 },
+      { "label": "3kg", "price": 190000 }
+    ]
+  },
+  {
+    "id": "sn-003",
+    "title": "Sầu Riêng Ri6",
+    "category": "Trái Cây Theo Mùa",
+    "price": 150000,
+    "variants": [
+      { "label": "1kg", "price": 150000 },
+      { "label": "3kg", "price": 420000 }
+    ]
+  },
+  {
+    "id": "sn-004",
+    "title": "Măng Cụt Miền Tây",
+    "category": "Trái Cây Theo Mùa",
+    "price": 65000,
+    "variants": [
+      { "label": "1kg", "price": 65000 },
+      { "label": "2kg", "price": 120000 }
+    ]
+  },
+  {
+    "id": "gf-001",
+    "title": "Hộp Quà Trái Cây Chúc Mừng",
+    "category": "Hộp Quà Tặng Cao Cấp",
+    "price": 550000,
+    "variants": [
+      { "label": "Tiêu Chuẩn", "price": 550000 },
+      { "label": "Deluxe", "price": 950000 }
+    ]
+  },
+  {
+    "id": "gf-002",
+    "title": "Hộp Quà Sức Khỏe Người Thân",
+    "category": "Hộp Quà Tặng Cao Cấp",
+    "price": 480000,
+    "variants": [
+      { "label": "Tiêu Chuẩn", "price": 480000 },
+      { "label": "Deluxe", "price": 850000 }
+    ]
+  },
+  {
+    "id": "gf-003",
+    "title": "Hộp Quà Khai Trương",
+    "category": "Hộp Quà Tặng Cao Cấp",
+    "price": 650000,
+    "variants": [
+      { "label": "Tiêu Chuẩn", "price": 650000 },
+      { "label": "Deluxe", "price": 1200000 }
+    ]
+  },
+  {
+    "id": "dr-001",
+    "title": "Xoài Sấy Dẻo",
+    "category": "Trái Cây Sấy & Mứt",
+    "price": 55000,
+    "variants": [
+      { "label": "200g", "price": 55000 },
+      { "label": "500g", "price": 120000 }
+    ]
+  },
+  {
+    "id": "dr-002",
+    "title": "Mít Sấy Giòn",
+    "category": "Trái Cây Sấy & Mứt",
+    "price": 45000,
+    "variants": [
+      { "label": "200g", "price": 45000 },
+      { "label": "500g", "price": 100000 }
+    ]
+  },
+  {
+    "id": "dr-003",
+    "title": "Chuối Sấy Dẻo",
+    "category": "Trái Cây Sấy & Mứt",
+    "price": 40000,
+    "variants": [
+      { "label": "200g", "price": 40000 },
+      { "label": "500g", "price": 90000 }
+    ]
+  },
+  {
+    "id": "dr-004",
+    "title": "Mứt Dừa Non",
+    "category": "Trái Cây Sấy & Mứt",
+    "price": 50000,
+    "variants": [
+      { "label": "200g", "price": 50000 },
+      { "label": "500g", "price": 110000 }
+    ]
+  }
+]

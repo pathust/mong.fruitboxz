@@ -508,6 +508,17 @@ function slugify(str: string) {
       authResult = await authModuleService.register("emailpass", {
         body: { email, password },
       })
+      if (authResult?.success) {
+        // Link the auth identity to the created user so authenticated
+        // requests can resolve an actor_id (otherwise JWTs are issued
+        // with an empty actor_id and every /admin/* request 401s).
+        await authModuleService.updateAuthIdentities({
+          id: authResult.authIdentity.id,
+          app_metadata: { user_id: user.id },
+        })
+      } else {
+        logger.warn(`  Auth registration for ${email}: ${authResult?.error}`)
+      }
     } catch (err: unknown) {
       logger.warn(`  Auth registration for ${email}: ${err instanceof Error ? err.message : String(err)}`)
     }

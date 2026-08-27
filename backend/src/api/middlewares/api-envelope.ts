@@ -76,6 +76,11 @@ export function apiEnvelopeMiddleware(
   const sendJson = res.json.bind(res)
 
   res.json = ((payload: unknown) => {
+    // The stock Medusa admin dashboard reads /admin/users/me as `{ user }`,
+    // not our `{ data: { user } }` envelope, so wrapping it breaks the
+    // dashboard's login/auth-check flow.
+    if (res.locals.__skipEnvelope) return sendJson(payload)
+
     if (isEnvelope(payload)) return sendJson(payload)
 
     if (res.statusCode >= 400) {
@@ -89,7 +94,16 @@ export function apiEnvelopeMiddleware(
   next()
 }
 
-const customApiMatchers = [
+function skipEnvelopeMiddleware(
+  _req: MedusaRequest,
+  res: MedusaResponse,
+  next: MedusaNextFunction
+) {
+  res.locals.__skipEnvelope = true
+  next()
+}
+
+const customApiMatchers: string[] = [
   "/media/*",
   "/store/blog*",
   "/store/blog-categories*",
@@ -120,7 +134,15 @@ const customApiMatchers = [
   "/admin/users*",
 ]
 
-export const apiEnvelopeMiddlewares: MiddlewareRoute[] = customApiMatchers.map((matcher) => ({
-  matcher,
-  middlewares: [apiEnvelopeMiddleware],
-}))
+export const apiEnvelopeMiddlewares: MiddlewareRoute[] = [
+  // Must run (and thus be registered) before the "/admin/users*" envelope
+  // matcher below so its skip flag is set first.
+  {
+    matcher: "/admin/users/me",
+    middlewares: [skipEnvelopeMiddleware],
+  },
+  ...customApiMatchers.map((matcher) => ({
+    matcher,
+    middlewares: [apiEnvelopeMiddleware],
+  })),
+]
