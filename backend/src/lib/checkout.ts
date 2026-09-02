@@ -1,6 +1,7 @@
 import { Modules } from "@medusajs/framework/utils"
+import type { IPromotionModuleService } from "@medusajs/framework/types"
 import type { ServiceScope } from "../lib/module-services"
-import { getPromotionMetadata } from "../lib/promotion-metadata"
+import { getPromotionMetadata, countPromotionUsage } from "../lib/promotion-metadata"
 
 export async function processCheckoutPromotions({
   scope,
@@ -19,7 +20,7 @@ export async function processCheckoutPromotions({
   let appliedPromotionCode = null
 
   if (promotion_code) {
-    const promotionModuleService = scope.resolve(Modules.PROMOTION)
+    const promotionModuleService = scope.resolve<IPromotionModuleService>(Modules.PROMOTION)
     const promotions = await promotionModuleService.listPromotions({
       code: promotion_code.toUpperCase()
     }, { relations: ["application_method", "campaign", "campaign.budget"], take: 1 })
@@ -40,14 +41,7 @@ export async function processCheckoutPromotions({
         isValid = false
       }
       if (usageLimit > 0) {
-        const query = scope.resolve("query")
-        const { data } = await query.graph({
-          entity: "order",
-          fields: ["id", "metadata"],
-        })
-        const usedCount = (data as Array<{ metadata?: Record<string, unknown> | null }>)
-          .filter((order) => order.metadata?.promotion_code === promo.code)
-          .length
+        const usedCount = await countPromotionUsage(scope, promo.code)
         if (usedCount >= usageLimit) {
           isValid = false
         }
@@ -72,6 +66,10 @@ export async function processCheckoutPromotions({
           if (maxDiscount > 0 && discountAmount > maxDiscount) {
             discountAmount = maxDiscount
           }
+          // A misconfigured promotion (percentage value above 100, no
+          // max_discount cap) shouldn't be able to discount more than the
+          // order is actually worth — clamp regardless of max_discount.
+          discountAmount = Math.min(discountAmount, originalSubtotal)
         }
         appliedPromotionCode = promo.code
       }

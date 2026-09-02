@@ -1,3 +1,6 @@
+import type SiteModuleService from "../modules/site/service"
+import type { ServiceScope } from "./module-services"
+
 export type PromotionMetadata = {
   min_order_value?: number | null
   max_discount?: number | null
@@ -35,4 +38,23 @@ export async function updatePromotionMetadata(
 
   return metadata
 }
-import type SiteModuleService from "../modules/site/service"
+
+// Counts how many orders used a given promotion code. Medusa's core Order
+// model has no built-in promotion-usage relation for our custom checkout
+// flow, so usage is tracked ad hoc via order.metadata.promotion_code — this
+// pulls every order's id+metadata and filters in JS rather than a
+// server-side JSON filter, since no other route in this codebase filters
+// query.graph by a metadata sub-field and this hasn't been verified to
+// work reliably; cost grows with total order count, acceptable at this
+// store's scale but worth revisiting with a real usage counter if order
+// volume grows significantly.
+export async function countPromotionUsage(scope: ServiceScope, promotionCode: string): Promise<number> {
+  const query = scope.resolve<{ graph(input: unknown): Promise<{ data: unknown[] }> }>("query")
+  const { data } = await query.graph({
+    entity: "order",
+    fields: ["id", "metadata"],
+  })
+  return (data as Array<{ metadata?: Record<string, unknown> | null }>)
+    .filter((order) => order.metadata?.promotion_code === promotionCode)
+    .length
+}
