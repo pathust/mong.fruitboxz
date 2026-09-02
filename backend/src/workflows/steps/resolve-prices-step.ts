@@ -18,7 +18,7 @@ export const resolvePricesStep = createStep(
     if (variantIds.length > 0) {
       const { data } = await query.graph({
         entity: "product_variant",
-        fields: ["id", "title", "prices.*", "product.title", "metadata", "manage_inventory", "inventory_quantity"],
+        fields: ["id", "title", "prices.*", "product.id", "product.title", "metadata", "manage_inventory", "inventory_quantity"],
         filters: { id: variantIds }
       })
       
@@ -82,7 +82,13 @@ export const resolvePricesStep = createStep(
           variant_label: variantTitle,
           frontend_item_id: item.frontend_item_id || item.variant_id || null,
           variant_id: item.variant_id,
-          product_id: item.product_id || null,
+          // Prefer the server-resolved product id from the variant's real
+          // product relationship over the client-supplied one — the client
+          // value is only a fallback for the (should-be-impossible) case
+          // where the variant has no linked product. This is what makes
+          // the "did this customer actually buy this product" check in
+          // store/reviews/[handle]/route.ts trustworthy.
+          product_id: variant.product?.id || item.product_id || null,
           cost_price: costPrice,
         },
       })

@@ -5,25 +5,17 @@ import { resolveSiteService } from "../../../../lib/module-services"
 
 type PurchasedOrder = {
   items?: Array<{
-    title?: string | null
     metadata?: Record<string, unknown> | null
   }>
 }
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const handle = (req.params.handle || "").toString()
-  const query = req.scope.resolve("query")
-  const { data: reviews } = await query.graph({
-    entity: "site_review",
-    filters: { handle, approved: true },
-    fields: [
-      "id", "rating", "comment", "created_at",
-      "customer_id",
-    ],
-    pagination: {
-      order: { created_at: "DESC" },
-    },
-  })
+  const siteService = resolveSiteService(req.scope)
+  const reviews = await siteService.listReviews(
+    { handle, approved: true },
+    { select: ["id", "rating", "comment", "created_at"], order: { created_at: "DESC" } }
+  )
 
   const count = reviews.length
   const average = count ? reviews.reduce((sum, r) => sum + Number(r.rating || 0), 0) / count : 0
@@ -36,7 +28,22 @@ export async function POST(req: AuthenticatedMedusaRequest<ReviewBody>, res: Med
   const handle = (req.params.handle || "").toString()
   const customerId = req.auth_context.actor_id
 
-  const { rating, comment, product_id, product_title } = req.validatedBody
+  const { rating, comment } = req.validatedBody
+
+  // Resolve the real product being reviewed from the URL handle — never
+  // trust a client-supplied product_id/product_title for the "did this
+  // customer actually buy this" check below, since both come straight
+  // from the request body and don't have to relate to `handle` at all.
+  const query = req.scope.resolve("query")
+  const { data: products } = await query.graph({
+    entity: "product",
+    filters: { handle },
+    fields: ["id"],
+  })
+  const productId = products[0]?.id
+  if (!productId) {
+    return res.status(404).json({ message: "San pham khong ton tai" })
+  }
 
   const orderModuleService = req.scope.resolve(Modules.ORDER)
   const orders = await orderModuleService.listOrders(
@@ -45,10 +52,7 @@ export async function POST(req: AuthenticatedMedusaRequest<ReviewBody>, res: Med
   )
 
   const hasPurchased = (orders as PurchasedOrder[]).some((order) =>
-    (order.items || []).some((item) =>
-      item?.metadata?.frontend_item_id === product_id ||
-      item?.title === product_title
-    )
+    (order.items || []).some((item) => item?.metadata?.product_id === productId)
   )
 
   if (!hasPurchased) {
@@ -57,7 +61,7 @@ export async function POST(req: AuthenticatedMedusaRequest<ReviewBody>, res: Med
 
   const review = await siteService.createReviews({
     handle,
-    product_id,
+    product_id: productId,
     customer_id: customerId,
     rating: Number(rating),
     comment: (comment || "").toString().trim(),
