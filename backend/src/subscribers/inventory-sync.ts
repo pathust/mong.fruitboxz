@@ -51,21 +51,35 @@ export default async function inventorySyncHandler({
             const levelUpdates: any[] = []
             
             for (const ing of ingData as any[]) {
-              const amountToDeduct = deductions[ing.id]
+              let remaining = deductions[ing.id] || 0
               const locationLevels = ing.inventory_item?.location_levels || []
-              
-              if (locationLevels.length > 0 && amountToDeduct) {
-                const level = locationLevels[0]
-                const currentStock = level.stocked_quantity || 0
-                const newStock = Math.max(0, currentStock - amountToDeduct)
-                
-                logger.info(`[Queue] Updating level for ing ${ing.id}: current ${currentStock}, deducting ${amountToDeduct}, new ${newStock}`)
-                
-                levelUpdates.push({
-                  inventory_item_id: level.inventory_item_id,
-                  location_id: level.location_id,
-                  stocked_quantity: newStock
-                })
+
+              if (locationLevels.length > 0 && remaining) {
+                // Stock validation (validate-inventory-step.ts) checks
+                // availability against the SUM across every location level,
+                // so deduction has to draw from all of them too — pulling
+                // the whole amount from locationLevels[0] alone silently
+                // overstates remaining total stock whenever an ingredient's
+                // stock is split across more than one location.
+                for (const level of locationLevels) {
+                  if (remaining <= 0) break
+                  const currentStock = level.stocked_quantity || 0
+                  const take = Math.min(currentStock, remaining)
+                  if (take <= 0) continue
+                  remaining -= take
+                  const newStock = currentStock - take
+
+                  logger.info(`[Queue] Updating level for ing ${ing.id} @ ${level.location_id}: current ${currentStock}, deducting ${take}, new ${newStock}`)
+
+                  levelUpdates.push({
+                    inventory_item_id: level.inventory_item_id,
+                    location_id: level.location_id,
+                    stocked_quantity: newStock
+                  })
+                }
+                if (remaining > 0) {
+                  logger.info(`[Queue] Ing ${ing.id}: ${remaining} still undeducted after exhausting all location levels (stock already ran out)`)
+                }
               } else {
                 logger.info(`[Queue] No location levels found for ing ${ing.id} or amountToDeduct is falsy`)
               }
