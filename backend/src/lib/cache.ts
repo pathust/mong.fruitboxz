@@ -5,6 +5,7 @@ export const CACHE_KEYS = {
   product: (id: string) => `product:${id}:v1`,
   search: (query: string) => `search:${encodeURIComponent(query)}:v1`,
   cart: (id: string) => `cart:${id}:v1`,
+  ingredients: "ingredients:all:v1",
 }
 
 export const TTL = {
@@ -12,6 +13,11 @@ export const TTL = {
   product: 1800,
   search: 300,
   cart: 60 * 60 * 24 * 7,
+  // Short TTL rather than event-driven invalidation: admin ingredient/BOM
+  // edits don't currently trigger a cache purge anywhere, so this bounds
+  // staleness instead of requiring every ingredients/recipes CRUD route to
+  // remember to invalidate it.
+  ingredients: 300,
 }
 
 export interface CacheService {

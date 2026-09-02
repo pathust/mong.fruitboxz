@@ -1,20 +1,29 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
-import { INGREDIENTS_MODULE } from "../../../modules/ingredients"
+import { CACHE_KEYS, TTL, cached, resolveCache } from "../../../lib/cache"
+import { sendInternalError } from "../../../lib/api-error"
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   try {
     const query = req.scope.resolve("query")
-    const { data: ingredients } = await query.graph({
-      entity: "ingredient",
-      fields: ["*"],
+    const cache = resolveCache(req.scope)
+
+    const result = await cached(cache, CACHE_KEYS.ingredients, TTL.ingredients, async () => {
+      const [{ data: ingredients }, { data: recipeItems }] = await Promise.all([
+        query.graph({
+          entity: "ingredient",
+          fields: ["*"],
+        }),
+        query.graph({
+          entity: "recipe_item",
+          fields: ["*", "ingredient.*"],
+          pagination: { skip: 0, take: 5000 }
+        }),
+      ])
+      return { ingredients, recipeItems }
     })
-    const { data: recipeItems } = await query.graph({
-      entity: "recipe_item",
-      fields: ["*", "ingredient.*"],
-      pagination: { skip: 0, take: 5000 }
-    })
-    res.json({ ingredients, recipeItems })
-  } catch (error) {
-    res.status(500).json({ message: error.message })
+
+    res.json(result)
+  } catch (error: unknown) {
+    sendInternalError(req, res, error, "Unable to fetch ingredients", "INGREDIENTS_LIST_FAILED")
   }
 }

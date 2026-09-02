@@ -19,30 +19,31 @@ export async function POST(req: MedusaRequest<CartValidateBody>, res: MedusaResp
   const variantIds = items.map(i => i.variant_id).filter(Boolean)
 
   try {
-    const { data: recipeItems } = await query.graph({
-      entity: "recipe_item",
-      fields: [
-        "*",
-        "ingredient.*",
-        "ingredient.inventory_item.*",
-        "ingredient.inventory_item.location_levels.*"
-      ],
-      filters: { variant_id: variantIds }
-    })
-
-    const { data: variants } = await query.graph({
-      entity: "variant",
-      fields: [
-        "id",
-        "title",
-        "manage_inventory",
-        "allow_backorder",
-        "inventory_items.*",
-        "inventory_items.inventory.*",
-        "inventory_items.inventory.location_levels.*"
-      ],
-      filters: { id: variantIds }
-    })
+    const [{ data: recipeItems }, { data: variants }] = await Promise.all([
+      query.graph({
+        entity: "recipe_item",
+        fields: [
+          "*",
+          "ingredient.*",
+          "ingredient.inventory_item.*",
+          "ingredient.inventory_item.location_levels.*"
+        ],
+        filters: { variant_id: variantIds }
+      }),
+      query.graph({
+        entity: "variant",
+        fields: [
+          "id",
+          "title",
+          "manage_inventory",
+          "allow_backorder",
+          "inventory_items.*",
+          "inventory_items.inventory.*",
+          "inventory_items.inventory.location_levels.*"
+        ],
+        filters: { id: variantIds }
+      }),
+    ])
 
     const requiredIngredients: Record<string, { name: string, required: number, stock: number }> = {}
 
