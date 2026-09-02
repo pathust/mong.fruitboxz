@@ -2,17 +2,20 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
+const backendTarget = process.env.VITE_PROXY_TARGET || 'http://127.0.0.1:9000'
+
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   build: {
     copyPublicDir: false,
   },
   server: {
+    host: true,
     port: 5173,
     proxy: {
-      '/api': { target: 'http://127.0.0.1:9000', changeOrigin: true },
+      '/api': { target: backendTarget, changeOrigin: true },
       '/auth': {
-        target: 'http://127.0.0.1:9000',
+        target: backendTarget,
         changeOrigin: true,
         bypass: (req) => {
           if (req.headers.accept?.includes('text/html')) {
@@ -20,9 +23,9 @@ export default defineConfig({
           }
         },
       },
-      '/media': { target: 'http://127.0.0.1:9000', changeOrigin: true },
+      '/media': { target: backendTarget, changeOrigin: true },
       '/admin': {
-        target: 'http://127.0.0.1:9000',
+        target: backendTarget,
         changeOrigin: true,
         bypass: (req) => {
           if (req.headers.accept?.includes('text/html')) {
@@ -30,7 +33,7 @@ export default defineConfig({
           }
         },
       },
-      '/store': { target: 'http://127.0.0.1:9000', changeOrigin: true },
+      '/store': { target: backendTarget, changeOrigin: true },
     },
   },
 })
