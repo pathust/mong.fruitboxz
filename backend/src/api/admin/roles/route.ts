@@ -1,7 +1,7 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import type { NameFilterQuery, RoleBody } from "../../middlewares/validation"
 import { resolveRbacService } from "../../../lib/module-services"
-import type RbacModuleService from "../../../modules/rbac/service"
+import RbacModuleService, { toPermissionsJson } from "../../../modules/rbac/service"
 
 function normalizeRoleName(name: unknown) {
   return String(name || "").trim().replace(/\s+/g, " ")
@@ -35,6 +35,10 @@ export async function POST(req: MedusaRequest<RoleBody>, res: MedusaResponse) {
     return res.status(409).json({ error: "Tên role đã tồn tại" })
   }
 
-  const role = await rbacService.createRoles({ ...body, name })
+  const role = await rbacService.createRoles({
+    ...body,
+    name,
+    permissions: toPermissionsJson(body.permissions),
+  })
   res.status(201).json({ role })
 }

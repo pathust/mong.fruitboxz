@@ -20,3 +20,14 @@ class RbacModuleService extends MedusaService({
 }
 
 export default RbacModuleService
+
+// `Role.permissions` is a `model.json()` column (see ./models/role.ts).
+// Medusa's model DSL has no generic form for json fields, so the
+// create/update signatures MedusaService generates for it default to
+// `Record<string, unknown> | null`. Every actual read/write in this
+// codebase treats it as a plain `string[]` of permission ids (see
+// backend/src/lib/rbac.ts's `Array.isArray(role.permissions)` check) —
+// this is the single place that bridges that gap for callers.
+export function toPermissionsJson(permissions?: string[] | null) {
+  return permissions as unknown as Record<string, unknown> | null | undefined
+}

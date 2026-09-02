@@ -1,7 +1,7 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import type { RoleBody } from "../../../middlewares/validation"
 import { resolveRbacService } from "../../../../lib/module-services"
-import type RbacModuleService from "../../../../modules/rbac/service"
+import RbacModuleService, { toPermissionsJson } from "../../../../modules/rbac/service"
 
 function normalizeRoleName(name: unknown) {
   return String(name || "").trim().replace(/\s+/g, " ")
@@ -38,7 +38,13 @@ export async function POST(req: MedusaRequest<RoleBody>, res: MedusaResponse) {
     }
   }
 
-  const role = await rbacService.updateRoles({ id, ...body, ...(name ? { name } : {}) })
+  const { permissions, ...restBody } = body
+  const role = await rbacService.updateRoles({
+    id,
+    ...restBody,
+    ...(name ? { name } : {}),
+    ...(permissions !== undefined ? { permissions: toPermissionsJson(permissions) } : {}),
+  })
   res.json({ role })
 }
 
