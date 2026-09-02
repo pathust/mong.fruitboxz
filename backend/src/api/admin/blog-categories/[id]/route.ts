@@ -25,6 +25,11 @@ export async function POST(req: MedusaRequest<BlogCategoryBody>, res: MedusaResp
     const { id } = req.params
     const payload = req.validatedBody
 
+    const existing = await siteService.retrieveBlogCategory(id).catch(() => null)
+    if (!existing) {
+      return res.status(404).json({ message: "Blog category not found" })
+    }
+
     const blog_category = await siteService.updateBlogCategories({ id, ...payload })
     res.json({ blog_category })
   } catch (error: unknown) {
@@ -36,6 +41,11 @@ export async function DELETE(req: MedusaRequest, res: MedusaResponse) {
   try {
     const siteService = resolveSiteService(req.scope)
     const { id } = req.params
+
+    const existing = await siteService.retrieveBlogCategory(id).catch(() => null)
+    if (!existing) {
+      return res.status(404).json({ message: "Blog category not found" })
+    }
 
     await siteService.deleteBlogCategories(id)
     res.json({ id, object: "blog_category", deleted: true })

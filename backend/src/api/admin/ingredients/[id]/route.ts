@@ -1,6 +1,8 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { INGREDIENTS_MODULE } from "../../../../modules/ingredients"
+import type IngredientsModuleService from "../../../../modules/ingredients/service"
 import { Modules, ContainerRegistrationKeys } from "@medusajs/framework/utils"
+import { sendInternalError } from "../../../../lib/api-error"
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const { id } = req.params
@@ -40,43 +42,56 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
 
 export async function PUT(req: MedusaRequest, res: MedusaResponse) {
   const { id } = req.params
-  const ingredientsService = req.scope.resolve(INGREDIENTS_MODULE)
-  const inventoryService = req.scope.resolve(Modules.INVENTORY)
-  const stockLocationService = req.scope.resolve(Modules.STOCK_LOCATION)
-  const query = req.scope.resolve(ContainerRegistrationKeys.QUERY)
-  
-  const bodyData = req.body as Record<string, unknown>
-  const ingredientData = { ...bodyData }
-  delete ingredientData.stock_quantity // Just in case it's passed
-  
-  const ingredient = await ingredientsService.updateIngredients({
-    id,
-    ...ingredientData
-  })
 
-  // Sync inventory title if ingredient name changed
-  if (ingredientData.name) {
-    const { data: qData } = await query.graph({
+  try {
+    const ingredientsService = req.scope.resolve<IngredientsModuleService>(INGREDIENTS_MODULE)
+    const inventoryService = req.scope.resolve(Modules.INVENTORY)
+    const query = req.scope.resolve(ContainerRegistrationKeys.QUERY)
+
+    const { data: existing } = await query.graph({
       entity: "ingredient",
-      fields: ["*", "inventory_item.*"],
-      filters: { id }
+      fields: ["id"],
+      filters: { id },
     })
-    const invItem = qData[0]?.inventory_item as Record<string, unknown>
-    
-    if (invItem) {
-      await inventoryService.updateInventoryItems({
-        id: invItem.id,
-        title: ingredientData.name
-      })
+    if (!existing.length) {
+      return res.status(404).json({ message: "Ingredient not found" })
     }
+
+    const bodyData = req.body as Record<string, unknown>
+    const ingredientData = { ...bodyData }
+    delete ingredientData.stock_quantity // Just in case it's passed
+
+    const ingredient = await ingredientsService.updateIngredients({
+      id,
+      ...ingredientData
+    })
+
+    // Sync inventory title if ingredient name changed
+    if (ingredientData.name) {
+      const { data: qData } = await query.graph({
+        entity: "ingredient",
+        fields: ["*", "inventory_item.*"],
+        filters: { id }
+      })
+      const invItem = qData[0]?.inventory_item as Record<string, unknown>
+
+      if (invItem) {
+        await inventoryService.updateInventoryItems({
+          id: String(invItem.id),
+          title: String(ingredientData.name)
+        })
+      }
+    }
+
+    res.json({ ingredient })
+  } catch (error: unknown) {
+    sendInternalError(req, res, error, "Unable to update ingredient", "INGREDIENT_UPDATE_FAILED")
   }
-  
-  res.json({ ingredient })
 }
 
 export async function DELETE(req: MedusaRequest, res: MedusaResponse) {
   const { id } = req.params
-  const ingredientsService = req.scope.resolve(INGREDIENTS_MODULE)
+  const ingredientsService = req.scope.resolve<IngredientsModuleService>(INGREDIENTS_MODULE)
   const inventoryService = req.scope.resolve(Modules.INVENTORY)
   const linkService = req.scope.resolve(ContainerRegistrationKeys.LINK)
   const query = req.scope.resolve(ContainerRegistrationKeys.QUERY)
