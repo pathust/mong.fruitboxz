@@ -294,6 +294,17 @@ export default class ShippingModuleService {
     const districtNorm = normalizeAddress(input.district)
     const compactDistrictNorm = compactDistrictQuery(input.district)
     const addressNorm = normalizeAddress(`${input.address || ""} ${input.district || ""} ${input.city || ""}`)
+    const hasCoordinates = typeof input.lat === "number" && typeof input.lng === "number"
+    const nearestByCoordinates = hasCoordinates ? nearestDistrict(input.lat as number, input.lng as number) : null
+    const nearestDistanceKm = nearestByCoordinates && hasCoordinates
+      ? haversineKm(input.lat as number, input.lng as number, nearestByCoordinates.lat, nearestByCoordinates.lng)
+      : Infinity
+    // A coordinate is only trusted as "in Hanoi" when the district name
+    // didn't match anything by name if it's within this distance of a known
+    // Hanoi district's center — otherwise ANY lat/lng (e.g. a customer in Ho
+    // Chi Minh City) was accepted as Hanoi and quoted Hanoi-distance-based
+    // shipping instead of the flat non-Hanoi fee.
+    const MAX_HANOI_COORDINATE_SLOP_KM = 15
     const matched =
       HANOI_DISTRICTS.find((record) =>
         [record.district, ...record.aliases].map(normalizeAddress).some((value) =>
@@ -302,9 +313,9 @@ export default class ShippingModuleService {
           addressNorm.includes(value)
         )
       ) ||
-      (typeof input.lat === "number" && typeof input.lng === "number"
+      (hasCoordinates && nearestDistanceKm <= MAX_HANOI_COORDINATE_SLOP_KM
         ? {
-            district: input.district || "Ha Noi",
+            district: input.district || nearestByCoordinates!.district,
             city: input.city || "Ha Noi",
             lat: Number(input.lat),
             lng: Number(input.lng),
