@@ -31,7 +31,7 @@ CREATE TYPE public.claim_reason_enum AS ENUM (
 );
 
 
-ALTER TYPE public.claim_reason_enum OWNER TO taiphan;
+ALTER TYPE public.claim_reason_enum OWNER TO postgres;
 
 --
 -- Name: order_claim_type_enum; Type: TYPE; Schema: public; Owner: taiphan
@@ -43,7 +43,7 @@ CREATE TYPE public.order_claim_type_enum AS ENUM (
 );
 
 
-ALTER TYPE public.order_claim_type_enum OWNER TO taiphan;
+ALTER TYPE public.order_claim_type_enum OWNER TO postgres;
 
 --
 -- Name: order_status_enum; Type: TYPE; Schema: public; Owner: taiphan
@@ -59,7 +59,7 @@ CREATE TYPE public.order_status_enum AS ENUM (
 );
 
 
-ALTER TYPE public.order_status_enum OWNER TO taiphan;
+ALTER TYPE public.order_status_enum OWNER TO postgres;
 
 --
 -- Name: return_status_enum; Type: TYPE; Schema: public; Owner: taiphan
@@ -74,7 +74,7 @@ CREATE TYPE public.return_status_enum AS ENUM (
 );
 
 
-ALTER TYPE public.return_status_enum OWNER TO taiphan;
+ALTER TYPE public.return_status_enum OWNER TO postgres;
 
 SET default_tablespace = '';
 
@@ -97,7 +97,7 @@ CREATE TABLE public.account_holder (
 );
 
 
-ALTER TABLE public.account_holder OWNER TO taiphan;
+ALTER TABLE public.account_holder OWNER TO postgres;
 
 --
 -- Name: api_key; Type: TABLE; Schema: public; Owner: taiphan
@@ -121,7 +121,7 @@ CREATE TABLE public.api_key (
 );
 
 
-ALTER TABLE public.api_key OWNER TO taiphan;
+ALTER TABLE public.api_key OWNER TO postgres;
 
 --
 -- Name: application_method_buy_rules; Type: TABLE; Schema: public; Owner: taiphan
@@ -133,7 +133,7 @@ CREATE TABLE public.application_method_buy_rules (
 );
 
 
-ALTER TABLE public.application_method_buy_rules OWNER TO taiphan;
+ALTER TABLE public.application_method_buy_rules OWNER TO postgres;
 
 --
 -- Name: application_method_target_rules; Type: TABLE; Schema: public; Owner: taiphan
@@ -145,7 +145,7 @@ CREATE TABLE public.application_method_target_rules (
 );
 
 
-ALTER TABLE public.application_method_target_rules OWNER TO taiphan;
+ALTER TABLE public.application_method_target_rules OWNER TO postgres;
 
 --
 -- Name: auth_identity; Type: TABLE; Schema: public; Owner: taiphan
@@ -160,7 +160,7 @@ CREATE TABLE public.auth_identity (
 );
 
 
-ALTER TABLE public.auth_identity OWNER TO taiphan;
+ALTER TABLE public.auth_identity OWNER TO postgres;
 
 --
 -- Name: auth_mfa_factor; Type: TABLE; Schema: public; Owner: taiphan
@@ -179,7 +179,7 @@ CREATE TABLE public.auth_mfa_factor (
 );
 
 
-ALTER TABLE public.auth_mfa_factor OWNER TO taiphan;
+ALTER TABLE public.auth_mfa_factor OWNER TO postgres;
 
 --
 -- Name: auth_mfa_recovery_code; Type: TABLE; Schema: public; Owner: taiphan
@@ -195,7 +195,7 @@ CREATE TABLE public.auth_mfa_recovery_code (
 );
 
 
-ALTER TABLE public.auth_mfa_recovery_code OWNER TO taiphan;
+ALTER TABLE public.auth_mfa_recovery_code OWNER TO postgres;
 
 --
 -- Name: capture; Type: TABLE; Schema: public; Owner: taiphan
@@ -214,7 +214,7 @@ CREATE TABLE public.capture (
 );
 
 
-ALTER TABLE public.capture OWNER TO taiphan;
+ALTER TABLE public.capture OWNER TO postgres;
 
 --
 -- Name: cart; Type: TABLE; Schema: public; Owner: taiphan
@@ -238,7 +238,7 @@ CREATE TABLE public.cart (
 );
 
 
-ALTER TABLE public.cart OWNER TO taiphan;
+ALTER TABLE public.cart OWNER TO postgres;
 
 --
 -- Name: cart_address; Type: TABLE; Schema: public; Owner: taiphan
@@ -264,7 +264,7 @@ CREATE TABLE public.cart_address (
 );
 
 
-ALTER TABLE public.cart_address OWNER TO taiphan;
+ALTER TABLE public.cart_address OWNER TO postgres;
 
 --
 -- Name: cart_line_item; Type: TABLE; Schema: public; Owner: taiphan
@@ -308,7 +308,7 @@ CREATE TABLE public.cart_line_item (
 );
 
 
-ALTER TABLE public.cart_line_item OWNER TO taiphan;
+ALTER TABLE public.cart_line_item OWNER TO postgres;
 
 --
 -- Name: cart_line_item_adjustment; Type: TABLE; Schema: public; Owner: taiphan
@@ -332,7 +332,7 @@ CREATE TABLE public.cart_line_item_adjustment (
 );
 
 
-ALTER TABLE public.cart_line_item_adjustment OWNER TO taiphan;
+ALTER TABLE public.cart_line_item_adjustment OWNER TO postgres;
 
 --
 -- Name: cart_line_item_tax_line; Type: TABLE; Schema: public; Owner: taiphan
@@ -353,7 +353,7 @@ CREATE TABLE public.cart_line_item_tax_line (
 );
 
 
-ALTER TABLE public.cart_line_item_tax_line OWNER TO taiphan;
+ALTER TABLE public.cart_line_item_tax_line OWNER TO postgres;
 
 --
 -- Name: cart_payment_collection; Type: TABLE; Schema: public; Owner: taiphan
@@ -369,7 +369,7 @@ CREATE TABLE public.cart_payment_collection (
 );
 
 
-ALTER TABLE public.cart_payment_collection OWNER TO taiphan;
+ALTER TABLE public.cart_payment_collection OWNER TO postgres;
 
 --
 -- Name: cart_promotion; Type: TABLE; Schema: public; Owner: taiphan
@@ -385,7 +385,7 @@ CREATE TABLE public.cart_promotion (
 );
 
 
-ALTER TABLE public.cart_promotion OWNER TO taiphan;
+ALTER TABLE public.cart_promotion OWNER TO postgres;
 
 --
 -- Name: cart_shipping_method; Type: TABLE; Schema: public; Owner: taiphan
@@ -409,7 +409,7 @@ CREATE TABLE public.cart_shipping_method (
 );
 
 
-ALTER TABLE public.cart_shipping_method OWNER TO taiphan;
+ALTER TABLE public.cart_shipping_method OWNER TO postgres;
 
 --
 -- Name: cart_shipping_method_adjustment; Type: TABLE; Schema: public; Owner: taiphan
@@ -431,7 +431,7 @@ CREATE TABLE public.cart_shipping_method_adjustment (
 );
 
 
-ALTER TABLE public.cart_shipping_method_adjustment OWNER TO taiphan;
+ALTER TABLE public.cart_shipping_method_adjustment OWNER TO postgres;
 
 --
 -- Name: cart_shipping_method_tax_line; Type: TABLE; Schema: public; Owner: taiphan
@@ -452,7 +452,7 @@ CREATE TABLE public.cart_shipping_method_tax_line (
 );
 
 
-ALTER TABLE public.cart_shipping_method_tax_line OWNER TO taiphan;
+ALTER TABLE public.cart_shipping_method_tax_line OWNER TO postgres;
 
 --
 -- Name: credit_line; Type: TABLE; Schema: public; Owner: taiphan
@@ -472,7 +472,7 @@ CREATE TABLE public.credit_line (
 );
 
 
-ALTER TABLE public.credit_line OWNER TO taiphan;
+ALTER TABLE public.credit_line OWNER TO postgres;
 
 --
 -- Name: currency; Type: TABLE; Schema: public; Owner: taiphan
@@ -492,7 +492,7 @@ CREATE TABLE public.currency (
 );
 
 
-ALTER TABLE public.currency OWNER TO taiphan;
+ALTER TABLE public.currency OWNER TO postgres;
 
 --
 -- Name: customer; Type: TABLE; Schema: public; Owner: taiphan
@@ -514,7 +514,7 @@ CREATE TABLE public.customer (
 );
 
 
-ALTER TABLE public.customer OWNER TO taiphan;
+ALTER TABLE public.customer OWNER TO postgres;
 
 --
 -- Name: customer_account_holder; Type: TABLE; Schema: public; Owner: taiphan
@@ -530,7 +530,7 @@ CREATE TABLE public.customer_account_holder (
 );
 
 
-ALTER TABLE public.customer_account_holder OWNER TO taiphan;
+ALTER TABLE public.customer_account_holder OWNER TO postgres;
 
 --
 -- Name: customer_address; Type: TABLE; Schema: public; Owner: taiphan
@@ -559,7 +559,7 @@ CREATE TABLE public.customer_address (
 );
 
 
-ALTER TABLE public.customer_address OWNER TO taiphan;
+ALTER TABLE public.customer_address OWNER TO postgres;
 
 --
 -- Name: customer_group; Type: TABLE; Schema: public; Owner: taiphan
@@ -576,7 +576,7 @@ CREATE TABLE public.customer_group (
 );
 
 
-ALTER TABLE public.customer_group OWNER TO taiphan;
+ALTER TABLE public.customer_group OWNER TO postgres;
 
 --
 -- Name: customer_group_customer; Type: TABLE; Schema: public; Owner: taiphan
@@ -594,7 +594,7 @@ CREATE TABLE public.customer_group_customer (
 );
 
 
-ALTER TABLE public.customer_group_customer OWNER TO taiphan;
+ALTER TABLE public.customer_group_customer OWNER TO postgres;
 
 --
 -- Name: fulfillment; Type: TABLE; Schema: public; Owner: taiphan
@@ -621,7 +621,7 @@ CREATE TABLE public.fulfillment (
 );
 
 
-ALTER TABLE public.fulfillment OWNER TO taiphan;
+ALTER TABLE public.fulfillment OWNER TO postgres;
 
 --
 -- Name: fulfillment_address; Type: TABLE; Schema: public; Owner: taiphan
@@ -646,7 +646,7 @@ CREATE TABLE public.fulfillment_address (
 );
 
 
-ALTER TABLE public.fulfillment_address OWNER TO taiphan;
+ALTER TABLE public.fulfillment_address OWNER TO postgres;
 
 --
 -- Name: fulfillment_item; Type: TABLE; Schema: public; Owner: taiphan
@@ -668,7 +668,7 @@ CREATE TABLE public.fulfillment_item (
 );
 
 
-ALTER TABLE public.fulfillment_item OWNER TO taiphan;
+ALTER TABLE public.fulfillment_item OWNER TO postgres;
 
 --
 -- Name: fulfillment_label; Type: TABLE; Schema: public; Owner: taiphan
@@ -686,7 +686,7 @@ CREATE TABLE public.fulfillment_label (
 );
 
 
-ALTER TABLE public.fulfillment_label OWNER TO taiphan;
+ALTER TABLE public.fulfillment_label OWNER TO postgres;
 
 --
 -- Name: fulfillment_provider; Type: TABLE; Schema: public; Owner: taiphan
@@ -701,7 +701,7 @@ CREATE TABLE public.fulfillment_provider (
 );
 
 
-ALTER TABLE public.fulfillment_provider OWNER TO taiphan;
+ALTER TABLE public.fulfillment_provider OWNER TO postgres;
 
 --
 -- Name: fulfillment_set; Type: TABLE; Schema: public; Owner: taiphan
@@ -718,7 +718,7 @@ CREATE TABLE public.fulfillment_set (
 );
 
 
-ALTER TABLE public.fulfillment_set OWNER TO taiphan;
+ALTER TABLE public.fulfillment_set OWNER TO postgres;
 
 --
 -- Name: geo_zone; Type: TABLE; Schema: public; Owner: taiphan
@@ -740,7 +740,7 @@ CREATE TABLE public.geo_zone (
 );
 
 
-ALTER TABLE public.geo_zone OWNER TO taiphan;
+ALTER TABLE public.geo_zone OWNER TO postgres;
 
 --
 -- Name: image; Type: TABLE; Schema: public; Owner: taiphan
@@ -758,7 +758,7 @@ CREATE TABLE public.image (
 );
 
 
-ALTER TABLE public.image OWNER TO taiphan;
+ALTER TABLE public.image OWNER TO postgres;
 
 --
 -- Name: ingredient; Type: TABLE; Schema: public; Owner: taiphan
@@ -777,7 +777,7 @@ CREATE TABLE public.ingredient (
 );
 
 
-ALTER TABLE public.ingredient OWNER TO taiphan;
+ALTER TABLE public.ingredient OWNER TO postgres;
 
 --
 -- Name: ingredients_ingredient_inventory_inventory_item; Type: TABLE; Schema: public; Owner: taiphan
@@ -793,7 +793,7 @@ CREATE TABLE public.ingredients_ingredient_inventory_inventory_item (
 );
 
 
-ALTER TABLE public.ingredients_ingredient_inventory_inventory_item OWNER TO taiphan;
+ALTER TABLE public.ingredients_ingredient_inventory_inventory_item OWNER TO postgres;
 
 --
 -- Name: inventory_item; Type: TABLE; Schema: public; Owner: taiphan
@@ -821,7 +821,7 @@ CREATE TABLE public.inventory_item (
 );
 
 
-ALTER TABLE public.inventory_item OWNER TO taiphan;
+ALTER TABLE public.inventory_item OWNER TO postgres;
 
 --
 -- Name: inventory_level; Type: TABLE; Schema: public; Owner: taiphan
@@ -844,7 +844,7 @@ CREATE TABLE public.inventory_level (
 );
 
 
-ALTER TABLE public.inventory_level OWNER TO taiphan;
+ALTER TABLE public.inventory_level OWNER TO postgres;
 
 --
 -- Name: invite; Type: TABLE; Schema: public; Owner: taiphan
@@ -863,7 +863,7 @@ CREATE TABLE public.invite (
 );
 
 
-ALTER TABLE public.invite OWNER TO taiphan;
+ALTER TABLE public.invite OWNER TO postgres;
 
 --
 -- Name: invite_rbac_role; Type: TABLE; Schema: public; Owner: taiphan
@@ -879,7 +879,7 @@ CREATE TABLE public.invite_rbac_role (
 );
 
 
-ALTER TABLE public.invite_rbac_role OWNER TO taiphan;
+ALTER TABLE public.invite_rbac_role OWNER TO postgres;
 
 --
 -- Name: link_module_migrations; Type: TABLE; Schema: public; Owner: taiphan
@@ -893,7 +893,7 @@ CREATE TABLE public.link_module_migrations (
 );
 
 
-ALTER TABLE public.link_module_migrations OWNER TO taiphan;
+ALTER TABLE public.link_module_migrations OWNER TO postgres;
 
 --
 -- Name: link_module_migrations_id_seq; Type: SEQUENCE; Schema: public; Owner: taiphan
@@ -908,7 +908,7 @@ CREATE SEQUENCE public.link_module_migrations_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.link_module_migrations_id_seq OWNER TO taiphan;
+ALTER SEQUENCE public.link_module_migrations_id_seq OWNER TO postgres;
 
 --
 -- Name: link_module_migrations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: taiphan
@@ -931,7 +931,7 @@ CREATE TABLE public.location_fulfillment_provider (
 );
 
 
-ALTER TABLE public.location_fulfillment_provider OWNER TO taiphan;
+ALTER TABLE public.location_fulfillment_provider OWNER TO postgres;
 
 --
 -- Name: location_fulfillment_set; Type: TABLE; Schema: public; Owner: taiphan
@@ -947,7 +947,7 @@ CREATE TABLE public.location_fulfillment_set (
 );
 
 
-ALTER TABLE public.location_fulfillment_set OWNER TO taiphan;
+ALTER TABLE public.location_fulfillment_set OWNER TO postgres;
 
 --
 -- Name: mikro_orm_migrations; Type: TABLE; Schema: public; Owner: taiphan
@@ -960,7 +960,7 @@ CREATE TABLE public.mikro_orm_migrations (
 );
 
 
-ALTER TABLE public.mikro_orm_migrations OWNER TO taiphan;
+ALTER TABLE public.mikro_orm_migrations OWNER TO postgres;
 
 --
 -- Name: mikro_orm_migrations_id_seq; Type: SEQUENCE; Schema: public; Owner: taiphan
@@ -975,7 +975,7 @@ CREATE SEQUENCE public.mikro_orm_migrations_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.mikro_orm_migrations_id_seq OWNER TO taiphan;
+ALTER SEQUENCE public.mikro_orm_migrations_id_seq OWNER TO postgres;
 
 --
 -- Name: mikro_orm_migrations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: taiphan
@@ -1012,7 +1012,7 @@ CREATE TABLE public.notification (
 );
 
 
-ALTER TABLE public.notification OWNER TO taiphan;
+ALTER TABLE public.notification OWNER TO postgres;
 
 --
 -- Name: notification_provider; Type: TABLE; Schema: public; Owner: taiphan
@@ -1030,7 +1030,7 @@ CREATE TABLE public.notification_provider (
 );
 
 
-ALTER TABLE public.notification_provider OWNER TO taiphan;
+ALTER TABLE public.notification_provider OWNER TO postgres;
 
 --
 -- Name: order; Type: TABLE; Schema: public; Owner: taiphan
@@ -1060,7 +1060,7 @@ CREATE TABLE public."order" (
 );
 
 
-ALTER TABLE public."order" OWNER TO taiphan;
+ALTER TABLE public."order" OWNER TO postgres;
 
 --
 -- Name: order_address; Type: TABLE; Schema: public; Owner: taiphan
@@ -1086,7 +1086,7 @@ CREATE TABLE public.order_address (
 );
 
 
-ALTER TABLE public.order_address OWNER TO taiphan;
+ALTER TABLE public.order_address OWNER TO postgres;
 
 --
 -- Name: order_cart; Type: TABLE; Schema: public; Owner: taiphan
@@ -1102,7 +1102,7 @@ CREATE TABLE public.order_cart (
 );
 
 
-ALTER TABLE public.order_cart OWNER TO taiphan;
+ALTER TABLE public.order_cart OWNER TO postgres;
 
 --
 -- Name: order_change; Type: TABLE; Schema: public; Owner: taiphan
@@ -1138,7 +1138,7 @@ CREATE TABLE public.order_change (
 );
 
 
-ALTER TABLE public.order_change OWNER TO taiphan;
+ALTER TABLE public.order_change OWNER TO postgres;
 
 --
 -- Name: order_change_action; Type: TABLE; Schema: public; Owner: taiphan
@@ -1167,7 +1167,7 @@ CREATE TABLE public.order_change_action (
 );
 
 
-ALTER TABLE public.order_change_action OWNER TO taiphan;
+ALTER TABLE public.order_change_action OWNER TO postgres;
 
 --
 -- Name: order_change_action_ordering_seq; Type: SEQUENCE; Schema: public; Owner: taiphan
@@ -1181,7 +1181,7 @@ CREATE SEQUENCE public.order_change_action_ordering_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.order_change_action_ordering_seq OWNER TO taiphan;
+ALTER SEQUENCE public.order_change_action_ordering_seq OWNER TO postgres;
 
 --
 -- Name: order_change_action_ordering_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: taiphan
@@ -1213,7 +1213,7 @@ CREATE TABLE public.order_claim (
 );
 
 
-ALTER TABLE public.order_claim OWNER TO taiphan;
+ALTER TABLE public.order_claim OWNER TO postgres;
 
 --
 -- Name: order_claim_display_id_seq; Type: SEQUENCE; Schema: public; Owner: taiphan
@@ -1228,7 +1228,7 @@ CREATE SEQUENCE public.order_claim_display_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.order_claim_display_id_seq OWNER TO taiphan;
+ALTER SEQUENCE public.order_claim_display_id_seq OWNER TO postgres;
 
 --
 -- Name: order_claim_display_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: taiphan
@@ -1257,7 +1257,7 @@ CREATE TABLE public.order_claim_item (
 );
 
 
-ALTER TABLE public.order_claim_item OWNER TO taiphan;
+ALTER TABLE public.order_claim_item OWNER TO postgres;
 
 --
 -- Name: order_claim_item_image; Type: TABLE; Schema: public; Owner: taiphan
@@ -1274,7 +1274,7 @@ CREATE TABLE public.order_claim_item_image (
 );
 
 
-ALTER TABLE public.order_claim_item_image OWNER TO taiphan;
+ALTER TABLE public.order_claim_item_image OWNER TO postgres;
 
 --
 -- Name: order_credit_line; Type: TABLE; Schema: public; Owner: taiphan
@@ -1295,7 +1295,7 @@ CREATE TABLE public.order_credit_line (
 );
 
 
-ALTER TABLE public.order_credit_line OWNER TO taiphan;
+ALTER TABLE public.order_credit_line OWNER TO postgres;
 
 --
 -- Name: order_display_id_seq; Type: SEQUENCE; Schema: public; Owner: taiphan
@@ -1310,7 +1310,7 @@ CREATE SEQUENCE public.order_display_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.order_display_id_seq OWNER TO taiphan;
+ALTER SEQUENCE public.order_display_id_seq OWNER TO postgres;
 
 --
 -- Name: order_display_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: taiphan
@@ -1342,7 +1342,7 @@ CREATE TABLE public.order_exchange (
 );
 
 
-ALTER TABLE public.order_exchange OWNER TO taiphan;
+ALTER TABLE public.order_exchange OWNER TO postgres;
 
 --
 -- Name: order_exchange_display_id_seq; Type: SEQUENCE; Schema: public; Owner: taiphan
@@ -1357,7 +1357,7 @@ CREATE SEQUENCE public.order_exchange_display_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.order_exchange_display_id_seq OWNER TO taiphan;
+ALTER SEQUENCE public.order_exchange_display_id_seq OWNER TO postgres;
 
 --
 -- Name: order_exchange_display_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: taiphan
@@ -1384,7 +1384,7 @@ CREATE TABLE public.order_exchange_item (
 );
 
 
-ALTER TABLE public.order_exchange_item OWNER TO taiphan;
+ALTER TABLE public.order_exchange_item OWNER TO postgres;
 
 --
 -- Name: order_fulfillment; Type: TABLE; Schema: public; Owner: taiphan
@@ -1400,7 +1400,7 @@ CREATE TABLE public.order_fulfillment (
 );
 
 
-ALTER TABLE public.order_fulfillment OWNER TO taiphan;
+ALTER TABLE public.order_fulfillment OWNER TO postgres;
 
 --
 -- Name: order_item; Type: TABLE; Schema: public; Owner: taiphan
@@ -1438,7 +1438,7 @@ CREATE TABLE public.order_item (
 );
 
 
-ALTER TABLE public.order_item OWNER TO taiphan;
+ALTER TABLE public.order_item OWNER TO postgres;
 
 --
 -- Name: order_line_item; Type: TABLE; Schema: public; Owner: taiphan
@@ -1479,7 +1479,7 @@ CREATE TABLE public.order_line_item (
 );
 
 
-ALTER TABLE public.order_line_item OWNER TO taiphan;
+ALTER TABLE public.order_line_item OWNER TO postgres;
 
 --
 -- Name: order_line_item_adjustment; Type: TABLE; Schema: public; Owner: taiphan
@@ -1502,7 +1502,7 @@ CREATE TABLE public.order_line_item_adjustment (
 );
 
 
-ALTER TABLE public.order_line_item_adjustment OWNER TO taiphan;
+ALTER TABLE public.order_line_item_adjustment OWNER TO postgres;
 
 --
 -- Name: order_line_item_tax_line; Type: TABLE; Schema: public; Owner: taiphan
@@ -1523,7 +1523,7 @@ CREATE TABLE public.order_line_item_tax_line (
 );
 
 
-ALTER TABLE public.order_line_item_tax_line OWNER TO taiphan;
+ALTER TABLE public.order_line_item_tax_line OWNER TO postgres;
 
 --
 -- Name: order_payment_collection; Type: TABLE; Schema: public; Owner: taiphan
@@ -1539,7 +1539,7 @@ CREATE TABLE public.order_payment_collection (
 );
 
 
-ALTER TABLE public.order_payment_collection OWNER TO taiphan;
+ALTER TABLE public.order_payment_collection OWNER TO postgres;
 
 --
 -- Name: order_promotion; Type: TABLE; Schema: public; Owner: taiphan
@@ -1555,7 +1555,7 @@ CREATE TABLE public.order_promotion (
 );
 
 
-ALTER TABLE public.order_promotion OWNER TO taiphan;
+ALTER TABLE public.order_promotion OWNER TO postgres;
 
 --
 -- Name: order_shipping; Type: TABLE; Schema: public; Owner: taiphan
@@ -1575,7 +1575,7 @@ CREATE TABLE public.order_shipping (
 );
 
 
-ALTER TABLE public.order_shipping OWNER TO taiphan;
+ALTER TABLE public.order_shipping OWNER TO postgres;
 
 --
 -- Name: order_shipping_method; Type: TABLE; Schema: public; Owner: taiphan
@@ -1598,7 +1598,7 @@ CREATE TABLE public.order_shipping_method (
 );
 
 
-ALTER TABLE public.order_shipping_method OWNER TO taiphan;
+ALTER TABLE public.order_shipping_method OWNER TO postgres;
 
 --
 -- Name: order_shipping_method_adjustment; Type: TABLE; Schema: public; Owner: taiphan
@@ -1620,7 +1620,7 @@ CREATE TABLE public.order_shipping_method_adjustment (
 );
 
 
-ALTER TABLE public.order_shipping_method_adjustment OWNER TO taiphan;
+ALTER TABLE public.order_shipping_method_adjustment OWNER TO postgres;
 
 --
 -- Name: order_shipping_method_tax_line; Type: TABLE; Schema: public; Owner: taiphan
@@ -1641,7 +1641,7 @@ CREATE TABLE public.order_shipping_method_tax_line (
 );
 
 
-ALTER TABLE public.order_shipping_method_tax_line OWNER TO taiphan;
+ALTER TABLE public.order_shipping_method_tax_line OWNER TO postgres;
 
 --
 -- Name: order_summary; Type: TABLE; Schema: public; Owner: taiphan
@@ -1658,7 +1658,7 @@ CREATE TABLE public.order_summary (
 );
 
 
-ALTER TABLE public.order_summary OWNER TO taiphan;
+ALTER TABLE public.order_summary OWNER TO postgres;
 
 --
 -- Name: order_transaction; Type: TABLE; Schema: public; Owner: taiphan
@@ -1682,7 +1682,7 @@ CREATE TABLE public.order_transaction (
 );
 
 
-ALTER TABLE public.order_transaction OWNER TO taiphan;
+ALTER TABLE public.order_transaction OWNER TO postgres;
 
 --
 -- Name: payment; Type: TABLE; Schema: public; Owner: taiphan
@@ -1706,7 +1706,7 @@ CREATE TABLE public.payment (
 );
 
 
-ALTER TABLE public.payment OWNER TO taiphan;
+ALTER TABLE public.payment OWNER TO postgres;
 
 --
 -- Name: payment_collection; Type: TABLE; Schema: public; Owner: taiphan
@@ -1733,7 +1733,7 @@ CREATE TABLE public.payment_collection (
 );
 
 
-ALTER TABLE public.payment_collection OWNER TO taiphan;
+ALTER TABLE public.payment_collection OWNER TO postgres;
 
 --
 -- Name: payment_collection_payment_providers; Type: TABLE; Schema: public; Owner: taiphan
@@ -1745,7 +1745,7 @@ CREATE TABLE public.payment_collection_payment_providers (
 );
 
 
-ALTER TABLE public.payment_collection_payment_providers OWNER TO taiphan;
+ALTER TABLE public.payment_collection_payment_providers OWNER TO postgres;
 
 --
 -- Name: payment_provider; Type: TABLE; Schema: public; Owner: taiphan
@@ -1760,7 +1760,7 @@ CREATE TABLE public.payment_provider (
 );
 
 
-ALTER TABLE public.payment_provider OWNER TO taiphan;
+ALTER TABLE public.payment_provider OWNER TO postgres;
 
 --
 -- Name: payment_session; Type: TABLE; Schema: public; Owner: taiphan
@@ -1785,7 +1785,7 @@ CREATE TABLE public.payment_session (
 );
 
 
-ALTER TABLE public.payment_session OWNER TO taiphan;
+ALTER TABLE public.payment_session OWNER TO postgres;
 
 --
 -- Name: permission; Type: TABLE; Schema: public; Owner: taiphan
@@ -1802,7 +1802,7 @@ CREATE TABLE public.permission (
 );
 
 
-ALTER TABLE public.permission OWNER TO taiphan;
+ALTER TABLE public.permission OWNER TO postgres;
 
 --
 -- Name: price; Type: TABLE; Schema: public; Owner: taiphan
@@ -1829,7 +1829,7 @@ CREATE TABLE public.price (
 );
 
 
-ALTER TABLE public.price OWNER TO taiphan;
+ALTER TABLE public.price OWNER TO postgres;
 
 --
 -- Name: price_list; Type: TABLE; Schema: public; Owner: taiphan
@@ -1853,7 +1853,7 @@ CREATE TABLE public.price_list (
 );
 
 
-ALTER TABLE public.price_list OWNER TO taiphan;
+ALTER TABLE public.price_list OWNER TO postgres;
 
 --
 -- Name: price_list_rule; Type: TABLE; Schema: public; Owner: taiphan
@@ -1870,7 +1870,7 @@ CREATE TABLE public.price_list_rule (
 );
 
 
-ALTER TABLE public.price_list_rule OWNER TO taiphan;
+ALTER TABLE public.price_list_rule OWNER TO postgres;
 
 --
 -- Name: price_preference; Type: TABLE; Schema: public; Owner: taiphan
@@ -1887,7 +1887,7 @@ CREATE TABLE public.price_preference (
 );
 
 
-ALTER TABLE public.price_preference OWNER TO taiphan;
+ALTER TABLE public.price_preference OWNER TO postgres;
 
 --
 -- Name: price_rule; Type: TABLE; Schema: public; Owner: taiphan
@@ -1907,7 +1907,7 @@ CREATE TABLE public.price_rule (
 );
 
 
-ALTER TABLE public.price_rule OWNER TO taiphan;
+ALTER TABLE public.price_rule OWNER TO postgres;
 
 --
 -- Name: price_set; Type: TABLE; Schema: public; Owner: taiphan
@@ -1921,7 +1921,7 @@ CREATE TABLE public.price_set (
 );
 
 
-ALTER TABLE public.price_set OWNER TO taiphan;
+ALTER TABLE public.price_set OWNER TO postgres;
 
 --
 -- Name: product; Type: TABLE; Schema: public; Owner: taiphan
@@ -1956,7 +1956,7 @@ CREATE TABLE public.product (
 );
 
 
-ALTER TABLE public.product OWNER TO taiphan;
+ALTER TABLE public.product OWNER TO postgres;
 
 --
 -- Name: product_category; Type: TABLE; Schema: public; Owner: taiphan
@@ -1980,7 +1980,7 @@ CREATE TABLE public.product_category (
 );
 
 
-ALTER TABLE public.product_category OWNER TO taiphan;
+ALTER TABLE public.product_category OWNER TO postgres;
 
 --
 -- Name: product_category_product; Type: TABLE; Schema: public; Owner: taiphan
@@ -1992,7 +1992,7 @@ CREATE TABLE public.product_category_product (
 );
 
 
-ALTER TABLE public.product_category_product OWNER TO taiphan;
+ALTER TABLE public.product_category_product OWNER TO postgres;
 
 --
 -- Name: product_collection; Type: TABLE; Schema: public; Owner: taiphan
@@ -2010,7 +2010,7 @@ CREATE TABLE public.product_collection (
 );
 
 
-ALTER TABLE public.product_collection OWNER TO taiphan;
+ALTER TABLE public.product_collection OWNER TO postgres;
 
 --
 -- Name: product_option; Type: TABLE; Schema: public; Owner: taiphan
@@ -2027,7 +2027,7 @@ CREATE TABLE public.product_option (
 );
 
 
-ALTER TABLE public.product_option OWNER TO taiphan;
+ALTER TABLE public.product_option OWNER TO postgres;
 
 --
 -- Name: product_option_value; Type: TABLE; Schema: public; Owner: taiphan
@@ -2044,7 +2044,7 @@ CREATE TABLE public.product_option_value (
 );
 
 
-ALTER TABLE public.product_option_value OWNER TO taiphan;
+ALTER TABLE public.product_option_value OWNER TO postgres;
 
 --
 -- Name: product_sales_channel; Type: TABLE; Schema: public; Owner: taiphan
@@ -2060,7 +2060,7 @@ CREATE TABLE public.product_sales_channel (
 );
 
 
-ALTER TABLE public.product_sales_channel OWNER TO taiphan;
+ALTER TABLE public.product_sales_channel OWNER TO postgres;
 
 --
 -- Name: product_shipping_profile; Type: TABLE; Schema: public; Owner: taiphan
@@ -2076,7 +2076,7 @@ CREATE TABLE public.product_shipping_profile (
 );
 
 
-ALTER TABLE public.product_shipping_profile OWNER TO taiphan;
+ALTER TABLE public.product_shipping_profile OWNER TO postgres;
 
 --
 -- Name: product_tag; Type: TABLE; Schema: public; Owner: taiphan
@@ -2093,7 +2093,7 @@ CREATE TABLE public.product_tag (
 );
 
 
-ALTER TABLE public.product_tag OWNER TO taiphan;
+ALTER TABLE public.product_tag OWNER TO postgres;
 
 --
 -- Name: product_tags; Type: TABLE; Schema: public; Owner: taiphan
@@ -2105,7 +2105,7 @@ CREATE TABLE public.product_tags (
 );
 
 
-ALTER TABLE public.product_tags OWNER TO taiphan;
+ALTER TABLE public.product_tags OWNER TO postgres;
 
 --
 -- Name: product_type; Type: TABLE; Schema: public; Owner: taiphan
@@ -2122,7 +2122,7 @@ CREATE TABLE public.product_type (
 );
 
 
-ALTER TABLE public.product_type OWNER TO taiphan;
+ALTER TABLE public.product_type OWNER TO postgres;
 
 --
 -- Name: product_variant; Type: TABLE; Schema: public; Owner: taiphan
@@ -2155,7 +2155,7 @@ CREATE TABLE public.product_variant (
 );
 
 
-ALTER TABLE public.product_variant OWNER TO taiphan;
+ALTER TABLE public.product_variant OWNER TO postgres;
 
 --
 -- Name: product_variant_inventory_item; Type: TABLE; Schema: public; Owner: taiphan
@@ -2172,7 +2172,7 @@ CREATE TABLE public.product_variant_inventory_item (
 );
 
 
-ALTER TABLE public.product_variant_inventory_item OWNER TO taiphan;
+ALTER TABLE public.product_variant_inventory_item OWNER TO postgres;
 
 --
 -- Name: product_variant_option; Type: TABLE; Schema: public; Owner: taiphan
@@ -2184,7 +2184,7 @@ CREATE TABLE public.product_variant_option (
 );
 
 
-ALTER TABLE public.product_variant_option OWNER TO taiphan;
+ALTER TABLE public.product_variant_option OWNER TO postgres;
 
 --
 -- Name: product_variant_price_set; Type: TABLE; Schema: public; Owner: taiphan
@@ -2200,7 +2200,7 @@ CREATE TABLE public.product_variant_price_set (
 );
 
 
-ALTER TABLE public.product_variant_price_set OWNER TO taiphan;
+ALTER TABLE public.product_variant_price_set OWNER TO postgres;
 
 --
 -- Name: product_variant_product_image; Type: TABLE; Schema: public; Owner: taiphan
@@ -2216,7 +2216,7 @@ CREATE TABLE public.product_variant_product_image (
 );
 
 
-ALTER TABLE public.product_variant_product_image OWNER TO taiphan;
+ALTER TABLE public.product_variant_product_image OWNER TO postgres;
 
 --
 -- Name: promotion; Type: TABLE; Schema: public; Owner: taiphan
@@ -2241,7 +2241,7 @@ CREATE TABLE public.promotion (
 );
 
 
-ALTER TABLE public.promotion OWNER TO taiphan;
+ALTER TABLE public.promotion OWNER TO postgres;
 
 --
 -- Name: promotion_application_method; Type: TABLE; Schema: public; Owner: taiphan
@@ -2268,7 +2268,7 @@ CREATE TABLE public.promotion_application_method (
 );
 
 
-ALTER TABLE public.promotion_application_method OWNER TO taiphan;
+ALTER TABLE public.promotion_application_method OWNER TO postgres;
 
 --
 -- Name: promotion_campaign; Type: TABLE; Schema: public; Owner: taiphan
@@ -2287,7 +2287,7 @@ CREATE TABLE public.promotion_campaign (
 );
 
 
-ALTER TABLE public.promotion_campaign OWNER TO taiphan;
+ALTER TABLE public.promotion_campaign OWNER TO postgres;
 
 --
 -- Name: promotion_campaign_budget; Type: TABLE; Schema: public; Owner: taiphan
@@ -2310,7 +2310,7 @@ CREATE TABLE public.promotion_campaign_budget (
 );
 
 
-ALTER TABLE public.promotion_campaign_budget OWNER TO taiphan;
+ALTER TABLE public.promotion_campaign_budget OWNER TO postgres;
 
 --
 -- Name: promotion_campaign_budget_usage; Type: TABLE; Schema: public; Owner: taiphan
@@ -2328,7 +2328,7 @@ CREATE TABLE public.promotion_campaign_budget_usage (
 );
 
 
-ALTER TABLE public.promotion_campaign_budget_usage OWNER TO taiphan;
+ALTER TABLE public.promotion_campaign_budget_usage OWNER TO postgres;
 
 --
 -- Name: promotion_promotion_rule; Type: TABLE; Schema: public; Owner: taiphan
@@ -2340,7 +2340,7 @@ CREATE TABLE public.promotion_promotion_rule (
 );
 
 
-ALTER TABLE public.promotion_promotion_rule OWNER TO taiphan;
+ALTER TABLE public.promotion_promotion_rule OWNER TO postgres;
 
 --
 -- Name: promotion_rule; Type: TABLE; Schema: public; Owner: taiphan
@@ -2358,7 +2358,7 @@ CREATE TABLE public.promotion_rule (
 );
 
 
-ALTER TABLE public.promotion_rule OWNER TO taiphan;
+ALTER TABLE public.promotion_rule OWNER TO postgres;
 
 --
 -- Name: promotion_rule_value; Type: TABLE; Schema: public; Owner: taiphan
@@ -2374,7 +2374,7 @@ CREATE TABLE public.promotion_rule_value (
 );
 
 
-ALTER TABLE public.promotion_rule_value OWNER TO taiphan;
+ALTER TABLE public.promotion_rule_value OWNER TO postgres;
 
 --
 -- Name: property_label; Type: TABLE; Schema: public; Owner: taiphan
@@ -2392,7 +2392,7 @@ CREATE TABLE public.property_label (
 );
 
 
-ALTER TABLE public.property_label OWNER TO taiphan;
+ALTER TABLE public.property_label OWNER TO postgres;
 
 --
 -- Name: provider_identity; Type: TABLE; Schema: public; Owner: taiphan
@@ -2411,7 +2411,7 @@ CREATE TABLE public.provider_identity (
 );
 
 
-ALTER TABLE public.provider_identity OWNER TO taiphan;
+ALTER TABLE public.provider_identity OWNER TO postgres;
 
 --
 -- Name: publishable_api_key_sales_channel; Type: TABLE; Schema: public; Owner: taiphan
@@ -2427,7 +2427,7 @@ CREATE TABLE public.publishable_api_key_sales_channel (
 );
 
 
-ALTER TABLE public.publishable_api_key_sales_channel OWNER TO taiphan;
+ALTER TABLE public.publishable_api_key_sales_channel OWNER TO postgres;
 
 --
 -- Name: recipe_item; Type: TABLE; Schema: public; Owner: taiphan
@@ -2444,7 +2444,7 @@ CREATE TABLE public.recipe_item (
 );
 
 
-ALTER TABLE public.recipe_item OWNER TO taiphan;
+ALTER TABLE public.recipe_item OWNER TO postgres;
 
 --
 -- Name: refund; Type: TABLE; Schema: public; Owner: taiphan
@@ -2465,7 +2465,7 @@ CREATE TABLE public.refund (
 );
 
 
-ALTER TABLE public.refund OWNER TO taiphan;
+ALTER TABLE public.refund OWNER TO postgres;
 
 --
 -- Name: refund_reason; Type: TABLE; Schema: public; Owner: taiphan
@@ -2483,7 +2483,7 @@ CREATE TABLE public.refund_reason (
 );
 
 
-ALTER TABLE public.refund_reason OWNER TO taiphan;
+ALTER TABLE public.refund_reason OWNER TO postgres;
 
 --
 -- Name: region; Type: TABLE; Schema: public; Owner: taiphan
@@ -2501,7 +2501,7 @@ CREATE TABLE public.region (
 );
 
 
-ALTER TABLE public.region OWNER TO taiphan;
+ALTER TABLE public.region OWNER TO postgres;
 
 --
 -- Name: region_country; Type: TABLE; Schema: public; Owner: taiphan
@@ -2521,7 +2521,7 @@ CREATE TABLE public.region_country (
 );
 
 
-ALTER TABLE public.region_country OWNER TO taiphan;
+ALTER TABLE public.region_country OWNER TO postgres;
 
 --
 -- Name: region_payment_provider; Type: TABLE; Schema: public; Owner: taiphan
@@ -2537,7 +2537,7 @@ CREATE TABLE public.region_payment_provider (
 );
 
 
-ALTER TABLE public.region_payment_provider OWNER TO taiphan;
+ALTER TABLE public.region_payment_provider OWNER TO postgres;
 
 --
 -- Name: reservation_item; Type: TABLE; Schema: public; Owner: taiphan
@@ -2561,7 +2561,7 @@ CREATE TABLE public.reservation_item (
 );
 
 
-ALTER TABLE public.reservation_item OWNER TO taiphan;
+ALTER TABLE public.reservation_item OWNER TO postgres;
 
 --
 -- Name: return; Type: TABLE; Schema: public; Owner: taiphan
@@ -2590,7 +2590,7 @@ CREATE TABLE public.return (
 );
 
 
-ALTER TABLE public.return OWNER TO taiphan;
+ALTER TABLE public.return OWNER TO postgres;
 
 --
 -- Name: return_display_id_seq; Type: SEQUENCE; Schema: public; Owner: taiphan
@@ -2605,7 +2605,7 @@ CREATE SEQUENCE public.return_display_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.return_display_id_seq OWNER TO taiphan;
+ALTER SEQUENCE public.return_display_id_seq OWNER TO postgres;
 
 --
 -- Name: return_display_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: taiphan
@@ -2628,7 +2628,7 @@ CREATE TABLE public.return_fulfillment (
 );
 
 
-ALTER TABLE public.return_fulfillment OWNER TO taiphan;
+ALTER TABLE public.return_fulfillment OWNER TO postgres;
 
 --
 -- Name: return_item; Type: TABLE; Schema: public; Owner: taiphan
@@ -2653,7 +2653,7 @@ CREATE TABLE public.return_item (
 );
 
 
-ALTER TABLE public.return_item OWNER TO taiphan;
+ALTER TABLE public.return_item OWNER TO postgres;
 
 --
 -- Name: return_reason; Type: TABLE; Schema: public; Owner: taiphan
@@ -2672,7 +2672,7 @@ CREATE TABLE public.return_reason (
 );
 
 
-ALTER TABLE public.return_reason OWNER TO taiphan;
+ALTER TABLE public.return_reason OWNER TO postgres;
 
 --
 -- Name: role; Type: TABLE; Schema: public; Owner: taiphan
@@ -2691,7 +2691,7 @@ CREATE TABLE public.role (
 );
 
 
-ALTER TABLE public.role OWNER TO taiphan;
+ALTER TABLE public.role OWNER TO postgres;
 
 --
 -- Name: sales_channel; Type: TABLE; Schema: public; Owner: taiphan
@@ -2709,7 +2709,7 @@ CREATE TABLE public.sales_channel (
 );
 
 
-ALTER TABLE public.sales_channel OWNER TO taiphan;
+ALTER TABLE public.sales_channel OWNER TO postgres;
 
 --
 -- Name: sales_channel_stock_location; Type: TABLE; Schema: public; Owner: taiphan
@@ -2725,7 +2725,7 @@ CREATE TABLE public.sales_channel_stock_location (
 );
 
 
-ALTER TABLE public.sales_channel_stock_location OWNER TO taiphan;
+ALTER TABLE public.sales_channel_stock_location OWNER TO postgres;
 
 --
 -- Name: script_migrations; Type: TABLE; Schema: public; Owner: taiphan
@@ -2739,7 +2739,7 @@ CREATE TABLE public.script_migrations (
 );
 
 
-ALTER TABLE public.script_migrations OWNER TO taiphan;
+ALTER TABLE public.script_migrations OWNER TO postgres;
 
 --
 -- Name: script_migrations_id_seq; Type: SEQUENCE; Schema: public; Owner: taiphan
@@ -2754,7 +2754,7 @@ CREATE SEQUENCE public.script_migrations_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.script_migrations_id_seq OWNER TO taiphan;
+ALTER SEQUENCE public.script_migrations_id_seq OWNER TO postgres;
 
 --
 -- Name: script_migrations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: taiphan
@@ -2778,7 +2778,7 @@ CREATE TABLE public.service_zone (
 );
 
 
-ALTER TABLE public.service_zone OWNER TO taiphan;
+ALTER TABLE public.service_zone OWNER TO postgres;
 
 --
 -- Name: shipping_option; Type: TABLE; Schema: public; Owner: taiphan
@@ -2801,7 +2801,7 @@ CREATE TABLE public.shipping_option (
 );
 
 
-ALTER TABLE public.shipping_option OWNER TO taiphan;
+ALTER TABLE public.shipping_option OWNER TO postgres;
 
 --
 -- Name: shipping_option_price_set; Type: TABLE; Schema: public; Owner: taiphan
@@ -2817,7 +2817,7 @@ CREATE TABLE public.shipping_option_price_set (
 );
 
 
-ALTER TABLE public.shipping_option_price_set OWNER TO taiphan;
+ALTER TABLE public.shipping_option_price_set OWNER TO postgres;
 
 --
 -- Name: shipping_option_rule; Type: TABLE; Schema: public; Owner: taiphan
@@ -2836,7 +2836,7 @@ CREATE TABLE public.shipping_option_rule (
 );
 
 
-ALTER TABLE public.shipping_option_rule OWNER TO taiphan;
+ALTER TABLE public.shipping_option_rule OWNER TO postgres;
 
 --
 -- Name: shipping_option_type; Type: TABLE; Schema: public; Owner: taiphan
@@ -2853,7 +2853,7 @@ CREATE TABLE public.shipping_option_type (
 );
 
 
-ALTER TABLE public.shipping_option_type OWNER TO taiphan;
+ALTER TABLE public.shipping_option_type OWNER TO postgres;
 
 --
 -- Name: shipping_profile; Type: TABLE; Schema: public; Owner: taiphan
@@ -2870,7 +2870,7 @@ CREATE TABLE public.shipping_profile (
 );
 
 
-ALTER TABLE public.shipping_profile OWNER TO taiphan;
+ALTER TABLE public.shipping_profile OWNER TO postgres;
 
 --
 -- Name: site_banner; Type: TABLE; Schema: public; Owner: taiphan
@@ -2890,7 +2890,7 @@ CREATE TABLE public.site_banner (
 );
 
 
-ALTER TABLE public.site_banner OWNER TO taiphan;
+ALTER TABLE public.site_banner OWNER TO postgres;
 
 --
 -- Name: site_blog_category; Type: TABLE; Schema: public; Owner: taiphan
@@ -2907,7 +2907,7 @@ CREATE TABLE public.site_blog_category (
 );
 
 
-ALTER TABLE public.site_blog_category OWNER TO taiphan;
+ALTER TABLE public.site_blog_category OWNER TO postgres;
 
 --
 -- Name: site_blog_post; Type: TABLE; Schema: public; Owner: taiphan
@@ -2930,7 +2930,7 @@ CREATE TABLE public.site_blog_post (
 );
 
 
-ALTER TABLE public.site_blog_post OWNER TO taiphan;
+ALTER TABLE public.site_blog_post OWNER TO postgres;
 
 --
 -- Name: site_chatbot_question_log; Type: TABLE; Schema: public; Owner: taiphan
@@ -2949,7 +2949,7 @@ CREATE TABLE public.site_chatbot_question_log (
 );
 
 
-ALTER TABLE public.site_chatbot_question_log OWNER TO taiphan;
+ALTER TABLE public.site_chatbot_question_log OWNER TO postgres;
 
 --
 -- Name: site_contact_message; Type: TABLE; Schema: public; Owner: taiphan
@@ -2969,7 +2969,7 @@ CREATE TABLE public.site_contact_message (
 );
 
 
-ALTER TABLE public.site_contact_message OWNER TO taiphan;
+ALTER TABLE public.site_contact_message OWNER TO postgres;
 
 --
 -- Name: site_setting; Type: TABLE; Schema: public; Owner: taiphan
@@ -2985,7 +2985,7 @@ CREATE TABLE public.site_setting (
 );
 
 
-ALTER TABLE public.site_setting OWNER TO taiphan;
+ALTER TABLE public.site_setting OWNER TO postgres;
 
 --
 -- Name: stock_location; Type: TABLE; Schema: public; Owner: taiphan
@@ -3002,7 +3002,7 @@ CREATE TABLE public.stock_location (
 );
 
 
-ALTER TABLE public.stock_location OWNER TO taiphan;
+ALTER TABLE public.stock_location OWNER TO postgres;
 
 --
 -- Name: stock_location_address; Type: TABLE; Schema: public; Owner: taiphan
@@ -3025,7 +3025,7 @@ CREATE TABLE public.stock_location_address (
 );
 
 
-ALTER TABLE public.stock_location_address OWNER TO taiphan;
+ALTER TABLE public.stock_location_address OWNER TO postgres;
 
 --
 -- Name: store; Type: TABLE; Schema: public; Owner: taiphan
@@ -3044,7 +3044,7 @@ CREATE TABLE public.store (
 );
 
 
-ALTER TABLE public.store OWNER TO taiphan;
+ALTER TABLE public.store OWNER TO postgres;
 
 --
 -- Name: store_currency; Type: TABLE; Schema: public; Owner: taiphan
@@ -3061,7 +3061,7 @@ CREATE TABLE public.store_currency (
 );
 
 
-ALTER TABLE public.store_currency OWNER TO taiphan;
+ALTER TABLE public.store_currency OWNER TO postgres;
 
 --
 -- Name: store_locale; Type: TABLE; Schema: public; Owner: taiphan
@@ -3077,7 +3077,7 @@ CREATE TABLE public.store_locale (
 );
 
 
-ALTER TABLE public.store_locale OWNER TO taiphan;
+ALTER TABLE public.store_locale OWNER TO postgres;
 
 --
 -- Name: tax_provider; Type: TABLE; Schema: public; Owner: taiphan
@@ -3092,7 +3092,7 @@ CREATE TABLE public.tax_provider (
 );
 
 
-ALTER TABLE public.tax_provider OWNER TO taiphan;
+ALTER TABLE public.tax_provider OWNER TO postgres;
 
 --
 -- Name: tax_rate; Type: TABLE; Schema: public; Owner: taiphan
@@ -3114,7 +3114,7 @@ CREATE TABLE public.tax_rate (
 );
 
 
-ALTER TABLE public.tax_rate OWNER TO taiphan;
+ALTER TABLE public.tax_rate OWNER TO postgres;
 
 --
 -- Name: tax_rate_rule; Type: TABLE; Schema: public; Owner: taiphan
@@ -3133,7 +3133,7 @@ CREATE TABLE public.tax_rate_rule (
 );
 
 
-ALTER TABLE public.tax_rate_rule OWNER TO taiphan;
+ALTER TABLE public.tax_rate_rule OWNER TO postgres;
 
 --
 -- Name: tax_region; Type: TABLE; Schema: public; Owner: taiphan
@@ -3155,7 +3155,7 @@ CREATE TABLE public.tax_region (
 );
 
 
-ALTER TABLE public.tax_region OWNER TO taiphan;
+ALTER TABLE public.tax_region OWNER TO postgres;
 
 --
 -- Name: user; Type: TABLE; Schema: public; Owner: taiphan
@@ -3174,7 +3174,7 @@ CREATE TABLE public."user" (
 );
 
 
-ALTER TABLE public."user" OWNER TO taiphan;
+ALTER TABLE public."user" OWNER TO postgres;
 
 --
 -- Name: user_preference; Type: TABLE; Schema: public; Owner: taiphan
@@ -3191,7 +3191,7 @@ CREATE TABLE public.user_preference (
 );
 
 
-ALTER TABLE public.user_preference OWNER TO taiphan;
+ALTER TABLE public.user_preference OWNER TO postgres;
 
 --
 -- Name: user_rbac_role; Type: TABLE; Schema: public; Owner: taiphan
@@ -3207,7 +3207,7 @@ CREATE TABLE public.user_rbac_role (
 );
 
 
-ALTER TABLE public.user_rbac_role OWNER TO taiphan;
+ALTER TABLE public.user_rbac_role OWNER TO postgres;
 
 --
 -- Name: user_user_rbac_role; Type: TABLE; Schema: public; Owner: taiphan
@@ -3223,7 +3223,7 @@ CREATE TABLE public.user_user_rbac_role (
 );
 
 
-ALTER TABLE public.user_user_rbac_role OWNER TO taiphan;
+ALTER TABLE public.user_user_rbac_role OWNER TO postgres;
 
 --
 -- Name: view_configuration; Type: TABLE; Schema: public; Owner: taiphan
@@ -3242,7 +3242,7 @@ CREATE TABLE public.view_configuration (
 );
 
 
-ALTER TABLE public.view_configuration OWNER TO taiphan;
+ALTER TABLE public.view_configuration OWNER TO postgres;
 
 --
 -- Name: workflow_execution; Type: TABLE; Schema: public; Owner: taiphan
@@ -3263,7 +3263,7 @@ CREATE TABLE public.workflow_execution (
 );
 
 
-ALTER TABLE public.workflow_execution OWNER TO taiphan;
+ALTER TABLE public.workflow_execution OWNER TO postgres;
 
 --
 -- Name: link_module_migrations id; Type: DEFAULT; Schema: public; Owner: taiphan
