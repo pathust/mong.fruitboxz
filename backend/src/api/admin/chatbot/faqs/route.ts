@@ -2,6 +2,7 @@ import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { getGlobalSettings, updateGlobalSettings } from "../../../../lib/global-settings"
 import type { ChatbotFaqBody } from "../../../middlewares/validation"
 import { resolveSiteService } from "../../../../lib/module-services"
+import { sendInternalError } from "../../../../lib/api-error"
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   try {
@@ -16,8 +17,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
       meta: {}
     })
   } catch (error) {
-    req.scope.resolve("logger").error("Failed to fetch FAQs", error);
-    res.status(500).json({ data: null, error: { message: "Internal server error" }, meta: {} })
+    sendInternalError(req, res, error, "Failed to fetch FAQs", "CHATBOT_FAQS_FETCH_FAILED")
   }
 }
 
@@ -38,7 +38,6 @@ export async function POST(req: MedusaRequest<ChatbotFaqBody>, res: MedusaRespon
       meta: {}
     })
   } catch (error) {
-    req.scope.resolve("logger").error("Failed to update FAQs", error);
-    res.status(500).json({ data: null, error: { message: "Failed to update FAQs" }, meta: {} })
+    sendInternalError(req, res, error, "Failed to update FAQs", "CHATBOT_FAQS_UPDATE_FAILED")
   }
 }

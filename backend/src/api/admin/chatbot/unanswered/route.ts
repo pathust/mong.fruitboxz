@@ -1,5 +1,6 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { resolveSiteService } from "../../../../lib/module-services"
+import { sendInternalError } from "../../../../lib/api-error"
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   try {
@@ -10,8 +11,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
     )
     res.json({ data: { items: items || [] }, error: null, meta: {} })
   } catch (error) {
-    req.scope.resolve("logger").error("Failed to fetch unanswered logs", error);
-    res.status(500).json({ data: null, error: { message: "Internal server error" }, meta: {} })
+    sendInternalError(req, res, error, "Failed to fetch unanswered logs", "CHATBOT_UNANSWERED_FETCH_FAILED")
   }
 }
 
@@ -35,7 +35,6 @@ export async function DELETE(req: MedusaRequest, res: MedusaResponse) {
     }
     res.json({ data: { success: true, deleted: idsToDelete.length }, error: null, meta: {} })
   } catch (error) {
-    req.scope.resolve("logger").error("Failed to delete logs", error);
-    res.status(500).json({ data: null, error: { message: "Failed to delete question logs" }, meta: {} })
+    sendInternalError(req, res, error, "Failed to delete question logs", "CHATBOT_UNANSWERED_DELETE_FAILED")
   }
 }

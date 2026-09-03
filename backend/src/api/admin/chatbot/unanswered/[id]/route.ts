@@ -1,5 +1,6 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { resolveSiteService } from "../../../../../lib/module-services"
+import { sendInternalError } from "../../../../../lib/api-error"
 
 export async function DELETE(req: MedusaRequest, res: MedusaResponse) {
   try {
@@ -8,6 +9,6 @@ export async function DELETE(req: MedusaRequest, res: MedusaResponse) {
     await siteService.deleteChatbotQuestionLogs([id])
     res.json({ success: true })
   } catch (error) {
-    res.status(500).json({ error: "Failed to delete question log" })
+    sendInternalError(req, res, error, "Failed to delete question log", "CHATBOT_QUESTION_LOG_DELETE_FAILED")
   }
 }

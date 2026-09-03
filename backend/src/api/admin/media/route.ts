@@ -1,6 +1,7 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { isObjectStorageEnabled, listMediaObjects } from "../../../lib/media"
 import type { MediaListQuery } from "../../middlewares/validation"
+import { sendInternalError } from "../../../lib/api-error"
 
 export async function GET(req: MedusaRequest<unknown, MediaListQuery>, res: MedusaResponse) {
   try {
@@ -15,6 +16,6 @@ export async function GET(req: MedusaRequest<unknown, MediaListQuery>, res: Medu
       object_storage: isObjectStorageEnabled(),
     })
   } catch (err) {
-    res.status(500).json({ message: "Failed to list images" })
+    sendInternalError(req, res, err, "Failed to list images", "MEDIA_LIST_FAILED")
   }
 }
