@@ -4,28 +4,39 @@
 
 ## 1. Luồng đăng ký Customer
 
+Medusa v2 tách làm 3 lời gọi tuần tự (không phải 1 endpoint duy nhất như doc cũ mô tả).
+
 ```mermaid
 sequenceDiagram
     participant U as Người dùng
     participant SF as Frontend
-    participant API as /auth/register
+    participant AUTH as /auth/customer/emailpass/register
+    participant CUST as /store/customers
+    participant LOGIN as /auth/customer/emailpass
     participant DB as PostgreSQL
 
     U->>SF: Điền form đăng ký
-    SF->>SF: Validate client-side (email format, password length)
-    SF->>API: POST /auth/register {email, password, first_name, last_name, phone}
+    SF->>SF: Validate client-side (mật khẩu khớp, ≥ 6 ký tự)
+    SF->>AUTH: POST {email, password}
 
     alt Email đã tồn tại
-        API-->>SF: 422 "Email already exists"
+        AUTH-->>SF: 401 "Identity with email already exists"
         SF-->>U: Hiển thị lỗi
     else Hợp lệ
-        API->>API: Hash password (bcrypt)
-        API->>DB: INSERT INTO customer
-        DB-->>API: Customer record
-        API-->>SF: 201 {customer}
-        SF-->>U: Redirect → trang đăng nhập / trang chủ
+        AUTH->>DB: INSERT auth_identity + provider_identity (hash password)
+        AUTH-->>SF: 200 {token} (registration token, actor_id rỗng)
+        SF->>CUST: POST {email, first_name, last_name, phone}\nAuthorization: Bearer <registration token>
+        CUST->>DB: INSERT INTO customer, link auth_identity.app_metadata.customer_id
+        DB-->>CUST: Customer record
+        CUST-->>SF: 200 {data: {customer}, error: null, meta: null}
+        SF->>LOGIN: POST {email, password}
+        LOGIN-->>SF: 200 {token} (session token, actor_id = cus_...)
+        SF->>SF: localStorage["customer_token"] = token
+        SF-->>U: Redirect → /account
     end
 ```
+
+**Lưu ý**: gọi thẳng `POST /store/customers` với `password` trong body mà bỏ qua bước đăng ký danh tính sẽ luôn trả `401` — endpoint này bắt buộc `Authorization: Bearer <registration token>` từ bước 1.
 
 ---
 
@@ -35,23 +46,22 @@ sequenceDiagram
 sequenceDiagram
     participant U as Người dùng
     participant SF as Frontend
-    participant API as /auth/login
+    participant API as /auth/customer/emailpass
     participant DB as PostgreSQL
     participant LS as localStorage
 
     U->>SF: Nhập email + password
-    SF->>API: POST /auth/login {email, password}
+    SF->>API: POST {email, password}
 
     alt Sai thông tin
-        API-->>SF: 401 "Invalid credentials"
-        SF-->>U: Hiển thị lỗi "Sai email hoặc mật khẩu"
+        API-->>SF: 401 "Invalid email or password"
+        SF-->>U: Hiển thị lỗi
     else Đúng thông tin
-        API->>DB: SELECT customer WHERE email = ?
-        DB-->>API: Customer record
-        API->>API: Verify bcrypt hash
-        API->>API: Sign JWT {actor_id, actor_type, exp}
-        API-->>SF: 200 {token, customer}
-        SF->>LS: Lưu token vào localStorage
+        API->>DB: Tra auth_identity theo email, verify hash
+        API->>API: Sign JWT {actor_id, actor_type: "customer", auth_identity_id, app_metadata: {customer_id}, ...}
+        API-->>SF: 200 {token}
+        SF->>SF: Decode JWT để lấy id/email hiển thị (không có object customer trong response)
+        SF->>LS: localStorage["customer_token"] = token
         SF-->>U: Redirect → trang trước đó / trang chủ
     end
 ```
@@ -62,21 +72,20 @@ sequenceDiagram
 
 ```mermaid
 flowchart TD
-    A[Request đến API] --> B{Header có Authorization?}
-    B -- Không --> C[Response 401 Unauthorized]
-    B -- Có --> D{Decode JWT}
+    A[Request đến /admin/*] --> B{Header có Authorization?}
+    B -- Không --> C[401 Unauthorized]
+    B -- Có --> D{Verify + decode JWT}
     D -- Lỗi / hết hạn --> C
-    D -- OK --> E[Lấy actor_id từ payload]
-    E --> F{actor_type?}
-    F -- customer --> G[Load Customer từ DB]
-    F -- admin --> H[Load Admin User từ DB]
-    G --> I[Gắn ctx.customer vào request]
-    H --> J[Load Role + Permissions]
-    J --> K{rbacMiddleware: route permission match?}
-    K -- Không --> L[Response 403 Forbidden]
-    K -- Có --> M[Tiếp tục xử lý request]
-    I --> M
+    D -- OK --> E[req.auth_context = actor_id, actor_type, app_metadata...]
+    E --> F{Path bắt đầu bằng\n/admin/users/me hoặc /admin/auth?}
+    F -- Có --> M[Bỏ qua RBAC, tiếp tục xử lý]
+    F -- Không --> G[rbacMiddleware: derive required permission\ntừ req.originalUrl + method]
+    G --> H{User có permission phù hợp\nhoặc là Super Admin?}
+    H -- Không --> L[403 Forbidden]
+    H -- Có --> M
 ```
+
+`/store/*` không có middleware auth toàn cục — mỗi route tự khai báo `authenticate("customer", ...)` nếu cần (ví dụ `/store/checkout`, `POST /store/reviews/:handle`); phần lớn route store là public.
 
 ---
 
@@ -85,22 +94,21 @@ flowchart TD
 ```mermaid
 sequenceDiagram
     participant ADM as Admin User
-    participant UI as Admin SPA
-    participant API as /admin/login
-    participant DB as PostgreSQL
-    participant RBAC as RBAC Module
+    participant UI as Admin SPA (React)
+    participant API as /auth/user/emailpass
+    participant PERM as /admin/users/me/permissions
 
     ADM->>UI: Nhập email + password
-    UI->>API: POST /admin/login {email, password}
-    API->>DB: SELECT user WHERE email = ?
-    DB-->>API: User + role_id
-    API->>API: Verify password
-    API->>RBAC: Load role & permissions for role_id
-    RBAC-->>API: {role, permissions[]}
-    API-->>UI: 200 {user, token, permissions}
-    UI->>UI: Lưu token, render menu theo permissions
+    UI->>API: POST {email, password}
+    API-->>UI: 200 {token} (không có object user)
+    UI->>UI: Decode JWT (app_metadata.user_id), lưu localStorage["admin_token"], localStorage["admin_user"]
+    UI->>PERM: GET (Authorization: Bearer <token>)
+    PERM-->>UI: 200 {permissions: ["orders.read", ...]}
+    UI->>UI: Cập nhật localStorage["admin_user"] với permissions, render menu
     UI-->>ADM: Dashboard
 ```
+
+Không có endpoint `/admin/login` — đây là quy ước Medusa v1 cũ, v2 dùng `/auth/user/emailpass` giống hệt customer (chỉ khác `actor_type`).
 
 ---
 
@@ -108,23 +116,18 @@ sequenceDiagram
 
 ```mermaid
 flowchart LR
-    A[User nhấn Logout] --> B[Xóa token khỏi localStorage]
+    A[User nhấn Logout] --> B["Xóa customer_token / admin_token + admin_user khỏi localStorage"]
     B --> C[Clear React auth context]
-    C --> D[Redirect về /login]
+    C --> D[Redirect về trang chủ / /auth/login]
 ```
 
-> **Lưu ý**: Hệ thống chưa có token blacklist. JWT hết hạn tự nhiên sau thời gian cấu hình.
+> **Lưu ý**: Hệ thống chưa có token blacklist / revoke phía server. JWT hết hạn tự nhiên sau thời gian cấu hình (`JWT_SECRET`/mặc định của Medusa).
 
 ---
 
-## 6. Token refresh (nếu được implement)
+## 6. Token refresh
 
-> Hiện tại chưa implement refresh token. Khi JWT hết hạn, user phải đăng nhập lại.
-
-**Khuyến nghị tương lai**:
-- Implement `/auth/refresh` với refresh token (httpOnly cookie)
-- Thời gian access token: 1 giờ
-- Thời gian refresh token: 7 ngày
+> Hiện tại **chưa implement** refresh token. Khi JWT hết hạn, user phải đăng nhập lại. Medusa v2 core có sẵn route `POST /auth/token/refresh`, nhưng frontend project này chưa gọi tới.
 
 ---
 
@@ -132,11 +135,11 @@ flowchart LR
 
 | Biện pháp | Mô tả |
 |---|---|
-| Password hashing | bcrypt với salt rounds ≥ 10 |
-| JWT signing | HS256 với secret key từ env |
+| Password hashing | Do module Auth của Medusa xử lý (provider `emailpass`), không tự implement |
+| JWT signing | HS256, secret từ `JWT_SECRET` env |
 | HTTPS | Bắt buộc trong production |
-| Rate limiting | Giới hạn request login (tránh brute force) |
-| Input sanitization | Validate & sanitize tất cả input |
+| Rate limiting | Chỉ áp dụng riêng cho `/store/chatbot/message` (IP-based qua Redis) — **không** có rate limit chung cho login/register |
+| Input sanitization | Validate qua zod schema ở các route custom; route auth dùng validation nội bộ của Medusa |
 
 ---
 
