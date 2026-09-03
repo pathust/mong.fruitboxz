@@ -1,6 +1,7 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { ContainerRegistrationKeys, MedusaError } from "@medusajs/framework/utils"
 import { CACHE_KEYS, TTL, cached, resolveCache } from "../../../../../lib/cache"
+import { enrichWithIngredientStock } from "../../../../../lib/inventory"
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const handle = req.params.handle
@@ -27,55 +28,16 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
     throw new MedusaError(MedusaError.Types.NOT_FOUND, "Product not found")
   }
 
-  try {
-    const query = req.scope.resolve("query")
-    const variantIds = (product.variants || []).map((v: any) => v.id)
-    if (variantIds.length > 0) {
-      const { data: recipeItems } = await query.graph({
-        entity: "recipe_item",
-        fields: [
-          "*",
-          "ingredient.*",
-          "ingredient.inventory_item.*",
-          "ingredient.inventory_item.location_levels.*"
-        ],
-        filters: { variant_id: variantIds }
-      })
-      const itemsMap = new Map()
-      for (const item of (recipeItems || [])) {
-        if (!itemsMap.has(item.variant_id)) itemsMap.set(item.variant_id, [])
-        itemsMap.get(item.variant_id).push(item)
-      }
-      for (const variant of product.variants || []) {
-        const reqItems = itemsMap.get(variant.id) || []
-        let hasStock = true
-        let minCountX = Infinity
-        
-        for (const reqItem of reqItems) {
-          const invItem = reqItem.ingredient?.inventory_item
-          const stock = invItem?.location_levels?.reduce((sum: number, l: any) => sum + (l.stocked_quantity || 0), 0) || 0
-          
-          if (stock < reqItem.quantity) {
-            hasStock = false
-          }
-          if (reqItem.quantity > 0) {
-            const countX = Math.floor(stock / reqItem.quantity)
-            if (countX < minCountX) minCountX = countX
-          }
-        }
-        
-        if (reqItems.length > 0) {
-          variant.in_stock = hasStock
-          const actualCount = minCountX === Infinity ? 0 : minCountX
-          variant.purchasable_quantity = Math.min(actualCount, Math.max(5, Math.floor(actualCount * 0.8)))
-        } else {
-          variant.purchasable_quantity = variant.inventory_quantity ?? 0
-        }
-      }
-    }
-  } catch (err) {
-    console.error("Failed to enrich ingredient stock", err)
-  }
+  // Stock changes far more often than the product data above, so it's kept
+  // on its own short-lived cache entry rather than folded into the 30-minute
+  // product cache — bounds repeated ingredient/inventory lookups on a
+  // popular product page without letting the stock badge go stale for long.
+  const stockCacheKey = `${CACHE_KEYS.product(handle)}:stock`
+  const variants = await cached(cache, stockCacheKey, 30, async () => {
+    const [enriched] = await enrichWithIngredientStock([{ variants: product.variants }], req.scope)
+    return enriched.variants
+  })
+  product.variants = variants
 
   res.json({ product })
 }
