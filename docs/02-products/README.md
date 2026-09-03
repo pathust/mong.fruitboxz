@@ -1,159 +1,80 @@
 # 02 · Products — Tổng quan
 
-> Module quản lý sản phẩm bao gồm hai phần: **Frontend** (khách hàng xem) và **Admin** (quản trị viên CRUD).
+> Module quản lý sản phẩm bao gồm **Frontend** (khách hàng xem) và **Admin** (quản trị viên CRUD). Phần Admin CRUD sản phẩm (`/admin/products*`) là route **core Medusa**, chưa được test trực tiếp trong đợt soát tài liệu này — các phần đánh dấu "core Medusa, chưa verify" nên được coi là mô tả tổng quát theo quy ước Medusa v2, không phải đã xác nhận 100% khớp version cụ thể của dự án.
 
 ---
 
 ## 1. Tổng quan
 
-Hệ thống sản phẩm của Mong Fruitboxz có các loại:
-- **Hộp tiêu chuẩn**: Hộp trái cây định sẵn (VD: Hộp 5 loại, Hộp Premium)
-- **Custom Box**: Khách tự chọn các loại trái cây theo ý muốn
+- **Hộp tiêu chuẩn**: sản phẩm định sẵn, CRUD qua `/admin/products` (core Medusa)
+- **Custom Box**: khách tự chọn trái cây lẻ — dùng chung dữ liệu sản phẩm, không phải model riêng
+
+**Quan trọng**: dự án dùng **3 cơ chế đọc sản phẩm song song** cho các mục đích khác nhau, không phải 1 endpoint duy nhất như tài liệu cũ mô tả:
+
+| Cơ chế | Dùng ở đâu (frontend) | Nguồn dữ liệu |
+|---|---|---|
+| `GET /store/products` (core Medusa) | Trang chủ (sản phẩm nổi bật theo danh mục), trang Custom Box | Query trực tiếp DB, không cache |
+| `GET /store/catalog/products/:handle`, `GET /store/catalog/categories` (custom) | Trang chi tiết sản phẩm, danh sách danh mục | Có cache (30 phút cho sản phẩm, 1 giờ cho danh mục, tồn kho cache riêng 30s) |
+| `GET /store/search` (custom, **Meilisearch**) | Trang "Sản phẩm" (browse/tìm kiếm chính) | Meilisearch, fallback sang query DB trực tiếp nếu Meilisearch lỗi |
 
 ---
 
 ## 2. Data Models
 
-### Product
+Product/ProductVariant/ProductCategory là entity **core Medusa** — bảng dưới liệt kê field hay dùng trong dự án này, không phải toàn bộ schema Medusa.
 
-| Trường | Kiểu | Mô tả |
-|---|---|---|
-| `id` | string | PK, format `prod_XXXX` |
-| `title` | string | Tên sản phẩm |
-| `subtitle` | string | Mô tả ngắn |
-| `description` | text | Mô tả đầy đủ (HTML) |
-| `handle` | string | Slug URL, unique |
-| `status` | enum | `draft`, `published`, `archived` |
-| `thumbnail` | string | URL ảnh đại diện |
-| `category_id` | string | FK → ProductCategory |
-| `tags` | string[] | Mảng tags |
-| `metadata` | jsonb | Dữ liệu mở rộng |
-| `created_at` | timestamp | |
-| `updated_at` | timestamp | |
+### ProductVariant.metadata — field tuỳ biến quan trọng
 
-### ProductVariant
+| Key | Mô tả |
+|---|---|
+| `cost_price` | Giá vốn, dùng tính lợi nhuận ở dashboard (`/admin/custom?mode=dashboard`) — nếu thiếu, dashboard tự ước tính bằng `default_cost_percent` × giá bán |
 
-| Trường | Kiểu | Mô tả |
-|---|---|---|
-| `id` | string | PK, format `variant_XXXX` |
-| `product_id` | string | FK → Product |
-| `title` | string | Tên variant (VD: "Hộp nhỏ 500g") |
-| `sku` | string | Mã SKU, unique |
-| `price` | number | Giá bán (VND) |
-| `inventory_quantity` | number | Tồn kho |
-| `metadata` | jsonb | Chứa `cost_price` |
-| `allow_backorder` | boolean | Cho phép đặt khi hết hàng |
+### Ingredient / recipe_item (module `ingredients`, không phải core Medusa)
 
-> **Quan trọng**: `metadata.cost_price` lưu giá vốn để tính lợi nhuận
-
-### ProductImage
-
-| Trường | Kiểu | Mô tả |
-|---|---|---|
-| `id` | string | PK |
-| `product_id` | string | FK → Product |
-| `url` | string | URL ảnh từ S3 |
-| `rank` | number | Thứ tự hiển thị |
-
-### ProductCategory
-
-| Trường | Kiểu | Mô tả |
-|---|---|---|
-| `id` | string | PK |
-| `name` | string | Tên danh mục |
-| `handle` | string | Slug URL |
-| `description` | string | Mô tả |
-| `parent_category_id` | string | FK (nested categories) |
-| `rank` | number | Thứ tự hiển thị |
+Sản phẩm có công thức nguyên liệu (BOM) liên kết qua `recipe_item` (`variant_id` → `ingredient_id` + `quantity`) — đây là cơ sở để tính tồn kho thật (mục 8), không dùng trực tiếp `variant.inventory_quantity` cho sản phẩm có công thức. Xem `.claude/agents/db-schema-reviewer.md` cho chi tiết schema.
 
 ---
 
-## 3. API Endpoints — Frontend
+## 3. API Endpoints — Frontend (custom routes, đã verify)
+
+### `GET /store/catalog/categories`
+
+Trả `{ categories: [{id, name, slug, description, image}] }` — `image` ưu tiên lấy từ `metadata.image` của category, fallback sang ảnh sản phẩm đầu tiên trong danh mục đó. Cache 1 giờ.
+
+### `GET /store/catalog/products/:handle`
+
+Trả `{ product: {...} }` — 404 nếu không tìm thấy handle. `product.variants[].in_stock`/`.purchasable_quantity` tính theo công thức nguyên liệu, cache riêng 30 giây (tách khỏi cache 30 phút của phần còn lại sản phẩm).
+
+### `GET /store/search`
+
+Dùng **Meilisearch** làm engine chính (không phải PostgreSQL tsvector như tài liệu cũ), fallback query DB trực tiếp nếu Meilisearch không phản hồi. Kết quả cache 5 phút, tồn kho enrich riêng mỗi lần gọi (không cache — xem mục 7 để biết vì sao chưa cache được an toàn).
+
+Query params thật: `q`, `category`, `price_range` (`under-100`/`100-300`/`300-500`/`over-500`), `sort` (`price:asc`/`price:desc`/`created_at:desc`/`sales_count:desc`), `limit` (≤24), `offset` (≤10000).
+
+### `GET /store/products` (core Medusa, dùng ở trang chủ + Custom Box)
+
+Query params thường dùng trong dự án: `limit`, `fields` (chọn field trả về, hỗ trợ `*variants`, `+variants.inventory_quantity` — cú pháp field-selection của Medusa v2), `category_id[]`, `q`. Response theo format chuẩn Medusa core (`{products: [...], count, offset, limit}`), **không đi qua envelope `{data,error,meta}`** của dự án vì đây là route core.
+
+---
+
+## 4. API Endpoints — Admin (core Medusa `/admin/products*`, chưa verify sâu)
 
 | Method | Path | Mô tả |
 |---|---|---|
-| `GET` | `/store/products` | Danh sách sản phẩm (phân trang, filter) |
-| `GET` | `/store/products/:id` | Chi tiết sản phẩm |
-| `GET` | `/store/products?q=keyword` | Tìm kiếm fulltext |
-| `GET` | `/store/product-categories` | Danh sách danh mục |
-| `GET` | `/store/products?category_id=xxx` | Lọc theo danh mục |
+| `GET` | `/admin/products` | Danh sách (bao gồm draft) |
+| `POST` | `/admin/products` | Tạo sản phẩm mới |
+| `POST` | `/admin/products/:id` | Cập nhật (Medusa v2 core cũng dùng `POST` cho update, không phải `PUT`) |
+| `DELETE` | `/admin/products/:id` | Xóa sản phẩm |
 
-### Query Parameters cho `/store/products`
+**Về permission**: `/admin/products*` **có** trong `protectedModules` của RBAC middleware tùy biến (`products.read/create/edit/delete`) — khác với `/admin/promotions*`/`/admin/campaigns*` (core Medusa nhưng KHÔNG được RBAC tùy biến bảo vệ). Xem [RBAC](../05-admin/rbac.md).
 
-| Param | Kiểu | Mô tả |
-|---|---|---|
-| `q` | string | Tìm kiếm fulltext |
-| `category_id` | string | Filter theo danh mục |
-| `limit` | number | Số lượng / trang (default: 12) |
-| `offset` | number | Offset phân trang |
-| `order` | string | Sắp xếp: `created_at`, `price` |
+### Upload ảnh — **không phải `/admin/uploads`**
 
-### Response `/store/products`
-
+`POST /admin/media/upload` — nhận **JSON body `{filename, data}`** với `data` là ảnh **base64** (`≤14MB` sau decode), **không phải `multipart/form-data`**:
 ```json
-{
-  "products": [
-    {
-      "id": "prod_01XXXXX",
-      "title": "Hộp Trái Cây Premium",
-      "handle": "hop-trai-cay-premium",
-      "thumbnail": "https://s3.../thumbnail.jpg",
-      "status": "published",
-      "variants": [
-        {
-          "id": "variant_01XXXXX",
-          "title": "Hộp nhỏ",
-          "price": 150000,
-          "inventory_quantity": 50
-        }
-      ],
-      "images": [...],
-      "category": {...}
-    }
-  ],
-  "count": 100,
-  "offset": 0,
-  "limit": 12
-}
+{ "filename": "hop-qua.jpg", "data": "data:image/jpeg;base64,/9j/4AAQ..." }
 ```
-
----
-
-## 4. API Endpoints — Admin
-
-| Method | Path | Mô tả | Permission |
-|---|---|---|---|
-| `GET` | `/admin/products` | Danh sách (bao gồm draft) | `products:read` |
-| `POST` | `/admin/products` | Tạo sản phẩm mới | `products:write` |
-| `PUT` | `/admin/products/:id` | Cập nhật sản phẩm | `products:write` |
-| `DELETE` | `/admin/products/:id` | Xóa sản phẩm | `products:delete` |
-| `POST` | `/admin/products/:id/variants` | Thêm variant | `products:write` |
-| `PUT` | `/admin/products/:id/variants/:vid` | Cập nhật variant | `products:write` |
-| `DELETE` | `/admin/products/:id/variants/:vid` | Xóa variant | `products:delete` |
-| `POST` | `/admin/uploads` | Upload ảnh lên S3 | `products:write` |
-
-### Request Body — Tạo sản phẩm
-
-```json
-{
-  "title": "Hộp Trái Cây Premium",
-  "subtitle": "Tuyển chọn trái cây nhập khẩu cao cấp",
-  "description": "<p>Mô tả chi tiết...</p>",
-  "handle": "hop-trai-cay-premium",
-  "status": "published",
-  "category_id": "cat_01XXXXX",
-  "images": [{ "url": "https://s3.../img.jpg" }],
-  "variants": [
-    {
-      "title": "Hộp nhỏ 500g",
-      "sku": "FRB-PREMIUM-S",
-      "prices": [{ "amount": 150000, "currency_code": "vnd" }],
-      "inventory_quantity": 100,
-      "metadata": { "cost_price": 80000 }
-    }
-  ]
-}
-```
+Response: `{ url: "..." }`. Permission: `media.create`.
 
 ---
 
@@ -166,50 +87,36 @@ sequenceDiagram
     participant API as Backend
 
     U->>SF: Truy cập trang Custom Box
-    SF->>API: GET /store/products?category_id=fruits
-    API-->>SF: Danh sách trái cây đơn lẻ
+    SF->>API: GET /store/products?limit=200&fields=...
+    API-->>SF: Toàn bộ sản phẩm (không filter theo danh mục ở server)
+    SF->>SF: Lọc/nhóm theo category ở client, tính giá realtime
     U->>SF: Chọn loại trái cây + số lượng
-    SF->>SF: Tính giá realtime (sum prices)
-    U->>SF: Thêm vào giỏ hàng
-    SF->>SF: Lưu custom items vào localStorage
+    U->>SF: Thêm vào giỏ hàng (localStorage, xem Cart & Checkout)
 ```
 
 ---
 
-## 6. Upload ảnh lên S3
+## 6. Trang chủ Frontend (sửa nguồn dữ liệu sai)
 
-```mermaid
-sequenceDiagram
-    participant ADM as Admin
-    participant UI as Admin SPA
-    participant API as /admin/uploads
-    participant S3 as AWS S3
-
-    ADM->>UI: Chọn file ảnh
-    UI->>API: POST /admin/uploads (multipart/form-data)
-    API->>S3: Upload file
-    S3-->>API: File URL
-    API-->>UI: { url: "https://s3.../filename.jpg" }
-    UI->>UI: Gắn URL vào form sản phẩm
-```
-
----
-
-## 7. Trang chủ Frontend
-
-| Component | Data source |
+| Component | Data source thật |
 |---|---|
-| Banner slider | `GET /store/banners` (Site module) |
-| Featured products | `GET /store/products?is_featured=true` |
-| Danh mục nhanh | `GET /store/product-categories` |
+| Banner slider | `GET /store/custom?mode=homepage` → `data.banners` (**không phải** `GET /store/banners` — route này không tồn tại) |
+| Sản phẩm nổi bật theo danh mục | `GET /store/catalog/categories` rồi `GET /store/products?category_id[]=...` cho từng danh mục |
+| Danh mục nhanh | `GET /store/catalog/categories` (**không phải** `/store/product-categories`) |
 
 ---
 
-## 8. Tìm kiếm
+## 7. Tìm kiếm (sửa hoàn toàn — tài liệu cũ mô tả sai cơ chế)
 
-- Sử dụng **PostgreSQL fulltext search** (tsvector)
-- Đánh index trên `title`, `description`, `tags`
-- Query: `GET /store/products?q=xoài`
+- Engine chính: **Meilisearch** (index đồng bộ qua subscriber khi product được tạo/sửa/xóa), **không phải** PostgreSQL tsvector
+- Nếu Meilisearch không phản hồi: fallback tự động sang query trực tiếp Postgres (không dùng fulltext index riêng, so khớp đơn giản hơn)
+- Endpoint: `GET /store/search?q=xoài`
+
+---
+
+## 8. Tồn kho — theo công thức nguyên liệu, không phải `inventory_quantity` trực tiếp
+
+Với sản phẩm có liên kết `recipe_item`, tồn kho hiển thị (`in_stock`, `purchasable_quantity`) được tính từ tồn kho **nguyên liệu** (cộng dồn qua **mọi location**), không đọc trực tiếp `variant.inventory_quantity`. Sản phẩm không có công thức mới dùng `inventory_quantity` như bình thường. Logic dùng chung ở `backend/src/lib/inventory.ts`'s `enrichWithIngredientStock`, áp dụng cho cả `/store/search`, `/store/catalog/products/:handle`, và `/store/cart/validate`.
 
 ---
 
@@ -217,12 +124,10 @@ sequenceDiagram
 
 | Tình huống | Xử lý |
 |---|---|
-| Sản phẩm `draft` | Không hiển thị ở frontend |
-| Sản phẩm `archived` | Không hiển thị, không thể đặt hàng |
-| Hết tồn kho | Hiển thị "Hết hàng", disable nút thêm giỏ |
-| Ảnh upload > 5MB | Reject, trả về lỗi |
-| Handle trùng lặp | HTTP 422 "Handle already exists" |
-| Variant không có giá | Không publish được |
+| Sản phẩm `draft`/`archived` | Không hiển thị ở các route store custom (`catalog/*`, `search`) |
+| Hết tồn kho theo công thức nguyên liệu | `in_stock: false`, `purchasable_quantity` giảm tương ứng — không phải chỉ dựa `inventory_quantity` |
+| Ảnh upload qua `/admin/media/upload` | Giới hạn ~14MB sau decode base64, **không phải giới hạn 5MB** như tài liệu cũ |
+| Handle trùng lặp khi tạo sản phẩm | Hành vi thật của route core Medusa — **chưa verify** mã lỗi cụ thể trong dự án này, tài liệu cũ ghi `422` chưa được xác nhận |
 
 ---
 
