@@ -11,13 +11,16 @@ sequenceDiagram
     participant U as Khách hàng
     participant SF as Frontend (React)
     participant LS as localStorage
+    participant SESS as /store/session-cart/:id
     participant SHIP as /store/shipping/quote
     participant PROMO as /store/promotions/validate
     participant CHK as /store/checkout
     participant DB as PostgreSQL
 
     U->>SF: Nhấn "Thêm vào giỏ"
-    SF->>LS: Upsert CartItem {variantId, qty, price, ...}
+    SF->>LS: Upsert CartItem {id, variantId, quantity, price, ...}
+    Note over SF,SESS: debounce 250ms
+    SF->>SESS: POST cart hiện tại (đồng bộ nền, không chặn UI)
     SF-->>U: Cập nhật icon giỏ hàng
 
     U->>SF: Mở trang Checkout
@@ -28,31 +31,32 @@ sequenceDiagram
     Note over SF: debounce 260ms
     SF->>SHIP: POST /store/shipping/quote {address, lat, lng}
     alt API OK
-        SHIP-->>SF: {fee, distance_km}
+        SHIP-->>SF: {data: {shipping, mode, distance_km, matched_location}}
     else API lỗi
-        SF->>SF: Tự tính Haversine (fallback)
+        SF->>SF: Tự tính Haversine (fallback, không đảm bảo khớp công thức server)
     end
     SF-->>U: Hiển thị phí vận chuyển
 
     U->>SF: Nhập mã khuyến mại
     SF->>PROMO: POST /store/promotions/validate {code, subtotal}
     alt Mã hợp lệ
-        PROMO-->>SF: {valid:true, discount_amount}
+        PROMO-->>SF: {data: {valid:true, code, type, discount_amount, remaining_usages}}
         SF-->>U: Hiển thị giảm giá
     else Mã không hợp lệ
-        PROMO-->>SF: {valid:false, reason}
-        SF-->>U: Hiển thị lỗi mã
+        PROMO-->>SF: HTTP 400/404, {error: {code, message}}
+        SF-->>U: Hiển thị error.message (không có field valid:false/reason)
     end
 
     U->>SF: Nhấn "Đặt hàng"
-    SF->>CHK: POST /store/checkout {items, shipping, promotion_code}
-    CHK->>DB: Kiểm tra variants + tồn kho
-    CHK->>DB: Lấy giá từ DB
-    CHK->>DB: Validate promotion
-    CHK->>DB: INSERT Order (pending, not_paid, not_fulfilled)
-    CHK-->>SF: {order, summary, vietqr}
+    SF->>CHK: POST /store/checkout {items, shipping, promotion_code, idempotency_key?}
+    CHK->>DB: Kiểm tra tồn kho theo công thức nguyên liệu (recipe_item), tổng theo mọi location
+    CHK->>DB: Lấy giá thật + product_id thật từ variant
+    CHK->>DB: Validate promotion (hạn/lượt dùng/đơn tối thiểu)
+    CHK->>DB: INSERT Order (status=pending, payment_status/fulfillment_status trong metadata)
+    CHK-->>SF: {data: {order, summary}} — KHÔNG có vietqr
+    SF->>SF: Tự dựng VietQR từ tài khoản ngân hàng cấu hình sẵn ở client
     SF->>LS: Xóa cart (clear localStorage)
-    SF-->>U: Hiển thị trang thành công + QR thanh toán
+    SF-->>U: Hiển thị trang thành công + QR thanh toán (QR do frontend tạo)
 ```
 
 ---
@@ -67,22 +71,18 @@ flowchart TD
     A --> E[Xóa sản phẩm]
     A --> F[Xóa toàn bộ giỏ]
 
-    B --> G[CartContext.addItem]
-    C --> H[CartContext.updateQty]
+    B --> G[dispatch ADD_ITEM]
+    C --> H[dispatch UPDATE_QTY]
     D --> H
-    E --> I[CartContext.removeItem]
-    F --> J[CartContext.clearCart]
+    E --> I[dispatch REMOVE_ITEM]
+    F --> J[dispatch CLEAR]
 
-    G --> K[Upsert vào localStorage]
-    H --> L{qty > 0?}
-    L -- Có --> K
-    L -- Không --> M[Xóa item]
-    M --> K
-    I --> N[Lọc bỏ item]
-    N --> K
-    J --> O[Set cart = empty array]
-    O --> K
+    G --> K[localStorage.setItem]
+    H --> K
+    I --> K
+    J --> K
 
+    K --> L["Debounce 250ms → POST /store/session-cart/:id"]
     K --> P[Re-render UI]
 ```
 
@@ -92,71 +92,55 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A[User nhập địa chỉ] --> B{Có lat/lng chính xác?}
-    B -- Không --> C[Geocoding: Gọi Maps API\nhoặc yêu cầu chọn trên map]
+    A[User nhập địa chỉ] --> B{Có lat/lng?}
+    B -- Không --> C["Chỉ dùng city/district (text match với danh sách quận Hà Nội)"]
     B -- Có --> D[Debounce 260ms]
     C --> D
     D --> E[POST /store/shipping/quote]
     E --> F{API response?}
-    F -- Success --> G[Hiển thị fee chính xác]
+    F -- Success --> G["Hiển thị shipping (VND) + mode"]
     F -- Error/Timeout --> H[Tính Haversine client-side]
-    H --> I[Hiển thị fee + label '(ước tính)']
+    H --> I["Hiển thị fee ước tính + label '(ước tính)'"]
 
-    G --> J[Lưu fee vào checkout state]
+    G --> J[Lưu vào checkout state]
     I --> J
 ```
 
----
-
-## 4. Luồng phân bổ Discount
-
-Server phân bổ discount tỷ lệ theo giá trị từng item:
-
-```
-Ví dụ:
-  Item A: 300,000 VND (60%)
-  Item B: 200,000 VND (40%)
-  Subtotal: 500,000 VND
-  Discount: 100,000 VND
-
-  → Item A discount: 60,000 VND
-  → Item B discount: 40,000 VND
-
-  Công thức: item_discount = discount * (item_total / subtotal)
-  Làm tròn: item_discount = floor(item_discount)
-  Remainder: phân bổ cho item đắt nhất
-```
-
-```mermaid
-flowchart LR
-    A[Total Discount D] --> B[Tính ratio = item_total / subtotal]
-    B --> C[item_discount = floor D * ratio]
-    C --> D{Tổng đã phân bổ == D?}
-    D -- Không --> E[Phần dư → item đắt nhất]
-    D -- Có --> F[Hoàn thành]
-    E --> F
-```
+Toạ độ chỉ được nhận là "trong Hà Nội" khi nằm trong bán kính 15km quanh một quận Hà Nội đã biết — nếu chỉ có `city`/`district` không khớp tên quận nào và không có toạ độ hợp lệ, kết quả rơi vào `static-non-hanoi` (phí cố định) chứ không báo lỗi.
 
 ---
 
-## 5. State Management Cart (React)
+## 4. Luồng phân bổ Discount (thật, khác tài liệu cũ)
 
-```typescript
-// Cart Context State
-interface CartState {
-  items: CartItem[];
-  shippingFee: number | null;
-  shippingEstimated: boolean;
-  promotionCode: string | null;
-  promotionDiscount: number;
-  shippingAddress: ShippingAddress | null;
+Server phân bổ discount tỷ lệ theo giá trị từng item, **làm tròn bằng `Math.round`** (không phải `floor`), và phần dư dồn về **item cuối cùng trong mảng** (không phải "item đắt nhất" — thứ tự là thứ tự client gửi lên):
+
+```
+Với mỗi item TRỪ item cuối:
+  itemTotalDiscount = round(unit_price * quantity * (discountAmount / originalSubtotal))
+  discountPerUnit    = round(itemTotalDiscount / quantity)
+  unit_price         = max(0, unit_price - discountPerUnit)
+  totalAllocated    += discountPerUnit * quantity
+
+Item cuối cùng (nhận toàn bộ phần còn lại, tránh lệch làm tròn):
+  remainingDiscount = discountAmount - totalAllocated
+  discountPerUnit    = round(remainingDiscount / quantity)
+  unit_price         = max(0, unit_price - discountPerUnit)
+```
+
+Khuyến mãi kiểu phần trăm luôn được **clamp không vượt quá `originalSubtotal`** trước khi phân bổ, kể cả khi promotion bị cấu hình sai (value >100% và không có `max_discount`).
+
+---
+
+## 5. State Management Cart (React) — thật
+
+```javascript
+// frontend/src/context/CartContext.jsx — cartReducer state thật
+{
+  items: [],   // mỗi item: {id, variantId, productId, title, price, quantity, image, slug, variantId}
+  count: 0,
 }
-
-// Computed values (derived state)
-const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-const total = subtotal - promotionDiscount + (shippingFee ?? 0);
-const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 ```
+Không có các field `shippingFee`/`promotionDiscount`/`shippingAddress` trong CartContext state như tài liệu cũ mô tả — các giá trị đó được quản lý riêng ở trang Checkout, không nằm trong Cart Context.
 
 ---
 
@@ -165,38 +149,39 @@ const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 ```mermaid
 flowchart TD
     A[POST /store/checkout OK] --> B[Clear localStorage cart]
-    B --> C[Navigate to /order-success/:orderId]
+    B --> C[Navigate to trang thành công]
     C --> D{Render Success Page}
-    D --> E[Hiển thị Order ID + tóm tắt]
-    D --> F[Hiển thị VietQR Image]
-    D --> G[Hiển thị thông tin chuyển khoản:\nNgân hàng, STK, Tên TK, Số tiền, Nội dung]
+    D --> E[Hiển thị Order ID + tóm tắt từ response summary]
+    D --> F["Tự dựng VietQR ở client (không nhận từ backend)"]
+    D --> G[Hiển thị thông tin chuyển khoản: Ngân hàng, STK, Tên TK — hardcode ở frontend]
     D --> H[Nút: Xem đơn hàng của tôi]
-    D --> I[Timer: QR hết hạn sau X phút]
 ```
 
 ---
 
-## 7. Cấu trúc localStorage
+## 7. Cấu trúc localStorage (thật)
 
 ```
-Key: "mong_cart"
-Value: JSON string
-
+Key: "mong_fruitbox_cart"
+Value:
 {
   "items": [
     {
-      "id": "uuid-v4",
+      "id": "uuid hoặc variant_id",
       "variantId": "variant_01XXX",
       "productId": "prod_01XXX",
       "title": "Hộp Premium - Nhỏ",
       "price": 150000,
       "quantity": 2,
-      "image": "https://s3.../img.jpg"
+      "image": "https://.../img.jpg",
+      "slug": "hop-premium-nho"
     }
   ],
-  "updatedAt": "2026-06-06T10:00:00Z"
+  "count": 2
 }
 ```
+
+Key riêng thứ hai — `"mong_fruitbox_cart_session"` — chỉ chứa **id phiên** (UUID, hoặc fallback `cart_<timestamp>_<random>` nếu trình duyệt không hỗ trợ `crypto.randomUUID`), dùng làm khóa khi gọi `/store/session-cart/:id`. Entropy cao nên khó đoán, nhưng endpoint này **không xác thực chủ sở hữu** — ai biết id phiên đều đọc/ghi được cart đó (rủi ro thấp trong thực tế vì id khó đoán, không lưu dữ liệu nhạy cảm).
 
 ---
 
