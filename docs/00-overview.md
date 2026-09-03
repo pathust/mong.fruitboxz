@@ -39,7 +39,6 @@ graph TB
         RBAC["Custom: RBAC Module"]
         SITE["Custom: Site Module\n(Banner, Blog, Chatbot, Settings)"]
         SHIP["Custom: Shipping\n(Haversine distance)"]
-        FIN["Custom: Finance\n(Profit calculation)"]
     end
 
     subgraph Storage
@@ -54,7 +53,6 @@ graph TB
     API --> RBAC
     API --> SITE
     API --> SHIP
-    API --> FIN
     CORE --> PG
     RBAC --> PG
     SITE --> PG
@@ -74,7 +72,6 @@ graph TB
 | 04 | **ORDERS** | Quản lý đơn hàng, trạng thái, lịch sử |
 | 05 | **ADMIN** | Dashboard admin, RBAC, quản trị hệ thống |
 | 06 | **MARKETING** | Promotion, banner, blog |
-| 07 | **FINANCE** | Doanh thu, lợi nhuận, cost tracking |
 | 08 | **SYSTEM** | Cài đặt hệ thống, site settings, chatbot log |
 | 09 | **TESTING** | Test plan, E2E scenarios |
 
@@ -115,16 +112,13 @@ sequenceDiagram
 
 ```mermaid
 graph LR
-    A["Super Admin"] -->|owns| R1["Role: Admin"]
+    A["Super Admin"] -->|owns| R1["Role: Manager"]
     A -->|owns| R2["Role: Staff"]
-    A -->|owns| R3["Role: Finance"]
-    R1 -->|has| P1["products:write"]
-    R1 -->|has| P2["orders:write"]
-    R1 -->|has| P3["customers:read"]
+    R1 -->|has| P1["products.edit"]
+    R1 -->|has| P2["orders.edit"]
+    R1 -->|has| P3["customers.read"]
     R2 -->|has| P2
     R2 -->|has| P3
-    R3 -->|has| P4["finance:read"]
-    R3 -->|has| P5["finance:write"]
 ```
 
 ---
@@ -157,6 +151,5 @@ graph LR
 - [04 · Orders](./04-orders/README.md)
 - [05 · Admin & RBAC](./05-admin/README.md)
 - [06 · Marketing](./06-marketing/README.md)
-- [07 · Finance](./07-finance/README.md)
 - [08 · System](./08-system/README.md)
 - [09 · Testing](./09-testing/test-plan.md)

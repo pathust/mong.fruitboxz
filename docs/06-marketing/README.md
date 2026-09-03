@@ -225,4 +225,3 @@ sequenceDiagram
 
 - [Cart & Checkout (áp promo)](../03-cart-checkout/README.md)
 - [Site Module (banners)](../08-system/README.md)
-- [Finance (promo impact)](../07-finance/README.md)

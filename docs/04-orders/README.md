@@ -171,9 +171,9 @@ flowchart LR
 
 | Tình huống | Xử lý |
 |---|---|
-| Hủy đơn đã giao (`delivered`) | ❌ Không cho phép |
-| Hủy đơn đã thanh toán | Cần xử lý refund thủ công trước |
-| Cập nhật sai transition | Trả lỗi 422 nếu vi phạm state machine |
+| Hủy đơn đã giao (`delivered`) | ⚠️ Không bị chặn — backend không validate transition, xem [Status Machine §5](./status-machine.md) |
+| Hủy đơn đã thanh toán | Cần xử lý refund thủ công trước (không tự động) |
+| Cập nhật sai transition (vd. `completed` → `pending`) | ⚠️ Không bị chặn — mọi giá trị status/payment_status/fulfillment_status đều được chấp nhận, không trả lỗi 422 |
 | Đơn guest (không login) | Tìm theo email |
 | Xem đơn của customer khác | 403 Forbidden |
 
@@ -182,5 +182,4 @@ flowchart LR
 ## 8. Liên kết
 
 - [Status Machine](./status-machine.md)
-- [Finance (profit calculation)](../07-finance/README.md)
 - [Cart & Checkout](../03-cart-checkout/README.md)

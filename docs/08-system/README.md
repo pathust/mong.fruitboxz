@@ -169,6 +169,5 @@ sequenceDiagram
 
 ## 7. Liên kết
 
-- [Finance (cost settings)](../07-finance/README.md)
 - [Marketing (banners)](../06-marketing/README.md)
 - [RBAC (permissions)](../05-admin/rbac.md)

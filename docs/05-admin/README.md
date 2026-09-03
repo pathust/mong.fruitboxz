@@ -15,7 +15,6 @@ graph TB
         ORD["Orders Management"]
         CUST["Customers"]
         MKT["Marketing"]
-        FIN["Finance"]
         SYS["System Settings"]
     end
 
@@ -103,14 +102,20 @@ sequenceDiagram
 
 ### Widgets hiển thị
 
-| Widget | Data source | Mô tả |
+Không có module/API "Finance" riêng — toàn bộ dashboard doanh thu/lợi nhuận nằm chung trong một endpoint duy nhất: `GET /admin/custom?mode=dashboard`.
+
+| Widget | Trường trong response | Mô tả |
 |---|---|---|
-| Tổng đơn hôm nay | `/admin/finance/summary?period=today` | Count orders |
-| Doanh thu hôm nay | `/admin/finance/summary?period=today` | Sum order.total |
+| Đơn hôm nay | `metrics.orders_today` | Count orders (ngày hiện tại) |
+| Tổng doanh thu | `metrics.revenue_total` | Tổng revenue các đơn chưa huỷ/lưu trữ |
+| Tổng lợi nhuận | `metrics.profit_total` | revenue - cost (cost_price hoặc default_cost_percent) |
+| Đơn chưa thanh toán (giá trị) | `metrics.unpaid_total` | Tổng revenue của đơn có payment_status khác paid/captured |
 | Đơn chưa xử lý | `/admin/orders?status=pending` | Count |
 | Đơn chưa thanh toán | `/admin/orders?payment_status=not_paid` | Count |
-| Top sản phẩm | `/admin/finance/top-products` | Bestsellers |
-| Biểu đồ doanh thu 7 ngày | `/admin/finance/chart?period=7d` | Line chart |
+| Top sản phẩm | `top_products` | 5 sản phẩm bán chạy nhất (theo số lượng) |
+| Biểu đồ doanh thu/lợi nhuận 7 ngày | `revenue_7d` | Mảng `{date, revenue, profit, orders}` theo ngày |
+
+Endpoint này yêu cầu quyền `finance.read` hoặc `settings.read` (xem [RBAC](./rbac.md)).
 
 ---
 
@@ -121,17 +126,15 @@ flowchart TD
     LOGIN[Đăng nhập Admin] --> LOAD[Load User + Permissions]
     LOAD --> RENDER[Render Sidebar]
 
-    RENDER --> P1{products:read?}
-    RENDER --> P2{orders:read?}
-    RENDER --> P3{customers:read?}
-    RENDER --> P4{finance:read?}
-    RENDER --> P5{marketing:write?}
-    RENDER --> P6{settings:write?}
+    RENDER --> P1{products.read?}
+    RENDER --> P2{orders.read?}
+    RENDER --> P3{customers.read?}
+    RENDER --> P5{promotions.read?}
+    RENDER --> P6{settings.read?}
 
     P1 -- Có --> NAV1[Menu: Sản phẩm]
     P2 -- Có --> NAV2[Menu: Đơn hàng]
     P3 -- Có --> NAV3[Menu: Khách hàng]
-    P4 -- Có --> NAV4[Menu: Tài chính]
     P5 -- Có --> NAV5[Menu: Marketing]
     P6 -- Có --> NAV6[Menu: Cài đặt]
 ```
@@ -143,4 +146,3 @@ flowchart TD
 - [RBAC chi tiết](./rbac.md)
 - [Orders](../04-orders/README.md)
 - [Products](../02-products/README.md)
-- [Finance](../07-finance/README.md)

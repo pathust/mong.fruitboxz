@@ -1,6 +1,11 @@
 # 04 · Orders — State Machine
 
 > Ba chiều trạng thái độc lập: **Order Status**, **Payment Status**, **Fulfillment Status**.
+>
+> Chỉ `status` là cột thật trên bảng `order` (core Medusa). `payment_status`
+> và `fulfillment_status` không phải cột riêng — cả hai được lưu trong
+> `order.metadata` (xem `POST /admin/custom/orders/:id/status`), vì Medusa
+> v2 không cho ghi trực tiếp lên các trường đó theo cách project này cần.
 
 ---
 
@@ -110,26 +115,36 @@ Các kết hợp trạng thái phổ biến trong vòng đời đơn hàng:
 
 ## 5. Transition Rules
 
-### Điều kiện Complete đơn
+> ⚠️ **Các quy tắc dưới đây KHÔNG được backend validate.** `POST
+> /admin/custom/orders/:id/status` chấp nhận bất kỳ giá trị nào cho
+> `status`/`payment_status`/`fulfillment_status` mà không kiểm tra
+> transition có hợp lệ hay không — đây là quyết định thiết kế có chủ đích
+> (admin cần toàn quyền sửa trạng thái thủ công, kể cả để sửa sai sót nhập
+> liệu), không phải thiếu sót. Các bảng dưới đây là **hướng dẫn quy trình
+> khuyến nghị cho admin**, không phải ràng buộc hệ thống — không có gì
+> ngăn một request set `completed` ngược về `pending`, hay set `paid`
+> ngược về `not_paid`.
+
+### Điều kiện Complete đơn (khuyến nghị, không bắt buộc)
 
 ```
 status = pending → completed
-Yêu cầu:
+Khuyến nghị chỉ thực hiện khi:
   - payment_status = "paid"
   - fulfillment_status = "delivered"
 ```
 
-### Điều kiện Cancel đơn
+### Điều kiện Cancel đơn (khuyến nghị, không bắt buộc)
 
 ```
 status = pending → canceled
-Cho phép khi:
+Khuyến nghị chỉ thực hiện khi:
   - fulfillment_status ∈ {not_fulfilled, processing}
-Không cho phép khi:
+Tránh thực hiện khi:
   - fulfillment_status ∈ {shipped, delivered}
 ```
 
-### Không cho phép
+### Nên tránh (nhưng hệ thống không chặn)
 
 | Từ | Sang | Lý do |
 |---|---|---|
@@ -168,4 +183,3 @@ flowchart TD
 ## 7. Liên kết
 
 - [Orders README](./README.md)
-- [Finance (profit per status)](../07-finance/README.md)

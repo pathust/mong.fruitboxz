@@ -230,4 +230,3 @@ sequenceDiagram
 
 - [Status Machine](./status-machine.md)
 - [Cart & Checkout](../03-cart-checkout/README.md)
-- [Finance (cost_price)](../07-finance/README.md)

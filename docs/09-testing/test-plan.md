@@ -107,16 +107,18 @@
 | Chatbot log lưu đúng message | Integration | P1 |
 | Site settings update | Integration | P0 |
 
-### 3.7 FINANCE Module
+### 3.7 Admin Dashboard (`GET /admin/custom?mode=dashboard`)
+
+Không có module "Finance" riêng — các test case dưới đây nhắm vào endpoint dashboard doanh thu/lợi nhuận duy nhất.
 
 | Test case | Loại | Priority |
 |---|---|---|
-| Finance summary tính đúng revenue | Integration | P0 |
-| Profit tính với cost_price | Unit | P0 |
-| Profit fallback với default_cost_percent | Unit | P0 |
-| Filter theo date range | Integration | P1 |
-| Top products sort đúng | Integration | P1 |
-| Settings update → cost thay đổi ngay | Integration | P0 |
+| Dashboard tính đúng revenue_total, orders_today | Integration | P0 |
+| Profit tính với cost_price của variant | Unit | P0 |
+| Profit fallback với default_cost_percent khi thiếu cost_price | Unit | P0 |
+| Đơn canceled/archived không tính vào revenue | Unit | P1 |
+| Top products sort đúng theo số lượng bán | Integration | P1 |
+| Cập nhật settings (packaging_cost, labor_cost_per_order) → profit thay đổi ở lần gọi tiếp theo | Integration | P0 |
 
 ---
 
@@ -125,7 +127,7 @@
 ### Seed data cần có
 
 ```
-Roles: Super Admin, Admin, Staff, Finance
+Roles: Super Admin, Manager, Staff
 Users: 1 per role
 Categories: Hộp tiêu chuẩn, Trái cây đơn, Custom
 Products: ≥5 published, 2 draft, 1 archived
@@ -160,7 +162,7 @@ test-pipeline:
 | `GET /store/products/:id` | < 100ms | < 300ms |
 | `POST /store/checkout` | < 1000ms | < 2000ms |
 | `POST /store/shipping/quote` | < 500ms | < 1000ms |
-| `GET /admin/finance/summary` | < 500ms | < 1000ms |
+| `GET /admin/custom?mode=dashboard` | < 500ms | < 1000ms |
 
 ---
 

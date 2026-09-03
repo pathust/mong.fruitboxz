@@ -89,13 +89,6 @@ graph LR
 | `marketing:read` | Xem promotions, banners |
 | `marketing:write` | Tạo, sửa promotions, banners |
 
-### Finance
-
-| Permission | Mô tả |
-|---|---|
-| `finance:read` | Xem báo cáo tài chính |
-| `finance:write` | Sửa cost settings |
-
 ### Settings
 
 | Permission | Mô tả |
@@ -119,7 +112,6 @@ graph LR
 | **Super Admin** | Tất cả permissions |
 | **Admin** | Tất cả trừ `roles:write`, `settings:write` |
 | **Staff** | `products:read`, `orders:read`, `orders:write`, `customers:read` |
-| **Finance** | `finance:read`, `finance:write`, `orders:read` |
 
 ---
 
@@ -179,8 +171,6 @@ flowchart TD
 | `GET /admin/orders` | `orders:read` |
 | `POST /admin/custom/orders/:id/status` | `orders:write` |
 | `GET /admin/customers` | `customers:read` |
-| `GET /admin/finance/*` | `finance:read` |
-| `PUT /admin/finance/settings` | `finance:write` |
 | `GET /admin/roles` | `roles:read` |
 | `POST /admin/roles` | `roles:write` |
 | `GET /admin/settings` | `settings:read` |
