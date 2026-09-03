@@ -199,7 +199,7 @@ test('Admin login and view orders', async ({ page }) => {
 
 ## 8. Scenario 07 — Admin Cập nhật trạng thái đơn hàng
 
-**Priority**: P0 | **Actor**: Admin có `orders:write`
+**Priority**: P0 | **Actor**: Admin có `orders.edit`
 
 ```mermaid
 sequenceDiagram
