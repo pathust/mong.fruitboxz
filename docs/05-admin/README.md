@@ -42,12 +42,12 @@ graph TB
 
 | Use Case | Actor | Precondition | Flow |
 |---|---|---|---|
-| Tạo sản phẩm | Admin có `products:write` | Đã đăng nhập | Form → POST /admin/products |
+| Tạo sản phẩm | Admin có `products.create` | Đã đăng nhập | Form → POST /admin/products |
 | Thêm variant | Admin | Sản phẩm tồn tại | Form variant → POST /admin/products/:id/variants |
-| Upload ảnh | Admin | Sản phẩm tồn tại | Chọn file → POST /admin/uploads → gắn URL |
-| Publish sản phẩm | Admin | Draft, đủ variant + giá | PUT status=published |
-| Archive sản phẩm | Admin | Đang published | PUT status=archived |
-| Cập nhật tồn kho | Admin | Sản phẩm tồn tại | PUT inventory_quantity |
+| Upload ảnh | Admin | — | Chọn file → POST /admin/media/upload (base64) → gắn URL |
+| Publish sản phẩm | Admin | Draft, đủ variant + giá | POST status=published |
+| Archive sản phẩm | Admin | Đang published | POST status=archived |
+| Cập nhật tồn kho | Admin | Sản phẩm tồn tại | POST /admin/custom/inventory |
 
 ### Luồng tạo sản phẩm
 
@@ -60,8 +60,8 @@ sequenceDiagram
     ADM->>UI: Mở form tạo sản phẩm
     ADM->>UI: Điền thông tin cơ bản (title, description, category)
     ADM->>UI: Upload ảnh
-    UI->>API: POST /admin/uploads (multipart)
-    API-->>UI: {url: "https://s3.../img.jpg"}
+    UI->>API: POST /admin/media/upload {filename, data: base64}
+    API-->>UI: {url: "https://.../img.jpg"}
     ADM->>UI: Thêm variants (title, SKU, price, cost_price, quantity)
     ADM->>UI: Nhấn "Tạo sản phẩm"
     UI->>API: POST /admin/products {title, images, variants, ...}
@@ -77,12 +77,12 @@ sequenceDiagram
 
 | Use Case | Actor | Flow |
 |---|---|---|
-| Xem danh sách đơn | Admin `orders:read` | Bảng với filter/search |
-| Xem chi tiết đơn | Admin `orders:read` | Click vào đơn |
-| Xác nhận thanh toán | Admin `orders:write` | Cập nhật payment_status=paid |
-| Cập nhật giao hàng | Admin `orders:write` | Cập nhật fulfillment_status |
-| Hủy đơn | Admin `orders:write` | status=canceled (nếu chưa ship) |
-| Hoàn thành đơn | Admin `orders:write` | status=completed |
+| Xem danh sách đơn | Admin `orders.read` | Bảng với filter/search |
+| Xem chi tiết đơn | Admin `orders.read` | Click vào đơn |
+| Xác nhận thanh toán | Admin `orders.edit` | `POST /admin/custom/orders/:id/status {payment_status:"paid"}` |
+| Cập nhật giao hàng | Admin `orders.edit` | `POST /admin/custom/orders/:id/status {fulfillment_status:...}` |
+| Hủy đơn | Admin `orders.edit` | `status=canceled` — **không có ràng buộc "nếu chưa ship"**, xem [Status Machine](../04-orders/status-machine.md) |
+| Hoàn thành đơn | Admin `orders.edit` | `status=completed` — **không validate điều kiện trước đó**, admin có thể set bất kỳ lúc nào |
 
 ---
 
@@ -92,9 +92,9 @@ sequenceDiagram
 
 | Method | Path | Mô tả | Permission |
 |---|---|---|---|
-| `GET` | `/admin/customers` | Danh sách khách hàng | `customers:read` |
-| `GET` | `/admin/customers/:id` | Chi tiết + lịch sử đơn | `customers:read` |
-| `GET` | `/admin/customers/:id/orders` | Đơn hàng của khách | `customers:read` |
+| `GET` | `/admin/customers` | Danh sách khách hàng | `customers.read` |
+| `GET` | `/admin/customers/:id` | Chi tiết + lịch sử đơn | `customers.read` |
+| `GET` | `/admin/customers/:id/orders` | Đơn hàng của khách | `customers.read` |
 
 ---
 
