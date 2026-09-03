@@ -1,6 +1,6 @@
 # 06 · Marketing — Tổng quan
 
-> Module Marketing quản lý các công cụ khuyến mãi và tiếp thị: **Promotions** (mã giảm giá), **Banners** (slider trang chủ), **Blog** (nội dung tĩnh).
+> Module Marketing quản lý **Promotions** (mã giảm giá, core Medusa + metadata tùy biến), **Banners** (Site module), **Blog** (Site module, **đã có API động** — không phải static content như tài liệu cũ). Toàn bộ response custom route bọc trong envelope `{ data, error, meta }`, ví dụ dưới đây chỉ hiện phần `data`.
 
 ---
 
@@ -8,183 +8,156 @@
 
 ```mermaid
 graph LR
-    subgraph Marketing Module
-        PROMO["Promotions\n(Medusa core)"]
+    subgraph Marketing
+        PROMO["Promotions\n(Medusa core + site_settings metadata)"]
         BANNER["Banners\n(Site module)"]
-        BLOG["Blog\n(Static/CMS)"]
+        BLOG["Blog Post/Category\n(Site module)"]
     end
 
     subgraph Frontend
-        HOME["Trang chủ\n(banners + featured)"]
-        CART["Checkout\n(apply promo code)"]
+        HOME["Trang chủ"]
+        CART["Checkout"]
         BLOG_PAGE["Trang blog"]
     end
 
-    BANNER -->|GET /store/banners| HOME
+    BANNER -->|"GET /store/custom?mode=homepage\n(banners nằm trong response này)"| HOME
     PROMO -->|POST /store/promotions/validate| CART
-    BLOG -->|Serve static| BLOG_PAGE
+    BLOG -->|"GET /store/blog, /store/blog-categories"| BLOG_PAGE
 ```
+
+**Không có** `GET /store/banners` riêng — banner trang chủ nằm trong `data.banners` của `GET /store/custom?mode=homepage` (cùng response với site settings).
 
 ---
 
 ## 2. Promotions (Mã giảm giá)
 
-### Data Model — Promotion
+### Data Model — thật, không phải 1 bảng custom
 
-| Trường | Kiểu | Mô tả |
-|---|---|---|
-| `id` | string | PK |
-| `code` | string | Mã coupon (VD: "SUMMER20"), unique, uppercase |
-| `type` | enum | `percentage` hoặc `fixed_amount` |
-| `value` | number | Giá trị giảm (% hoặc VND) |
-| `campaign_id` | string | FK → Campaign (nullable) |
-| `starts_at` | timestamp | Ngày bắt đầu hiệu lực |
-| `ends_at` | timestamp | Ngày hết hạn |
-| `usage_limit` | number | Số lần dùng tối đa (nullable = không giới hạn) |
-| `usage_count` | number | Số lần đã dùng |
-| `min_subtotal` | number | Đơn hàng tối thiểu để áp dụng |
-| `is_active` | boolean | Bật/tắt promotion |
+`Promotion` là entity **core Medusa** (`Modules.PROMOTION`), có `code`, `application_method` (chứa `type`: `"fixed"` hoặc `"percentage"`, `value`), có thể liên kết `campaign` (core Medusa, có `budget`).
 
-### Data Model — Campaign
+Các field nghiệp vụ riêng của dự án này — **`starts_at`, `ends_at`, `usage_limit`, `min_order_value`, `max_discount`** — **không nằm trên bảng promotion** mà lưu trong `site_settings` (key `promotion:<id>:metadata`, xem `backend/src/lib/promotion-metadata.ts`), đọc/ghi qua endpoint riêng ở mục 2.3. `campaign.starts_at`/`campaign.budget.limit` chỉ dùng làm **fallback** khi metadata chưa set.
 
-| Trường | Kiểu | Mô tả |
-|---|---|---|
-| `id` | string | PK |
-| `name` | string | Tên chiến dịch |
-| `budget_type` | enum | `spend` hoặc `usage` |
-| `budget_limit` | number | Ngân sách tối đa |
-| `starts_at` | timestamp | |
-| `ends_at` | timestamp | |
-
-### Promotion Types
-
-| Type | Mô tả | Ví dụ |
-|---|---|---|
-| `percentage` | Giảm theo % | 20% off → giảm 20% subtotal |
-| `fixed_amount` | Giảm số tiền cố định | Giảm 50,000 VND |
+> Field tên `min_subtotal` trong tài liệu cũ không tồn tại — tên thật là **`min_order_value`**.
 
 ### API Endpoints — Promotions
 
-| Method | Path | Mô tả | Auth |
+| Method | Path | Mô tả | Nguồn |
 |---|---|---|---|
-| `POST` | `/store/promotions/validate` | Validate mã coupon | Public |
-| `GET` | `/admin/promotions` | Danh sách promotions | `marketing:read` |
-| `POST` | `/admin/promotions` | Tạo promotion mới | `marketing:write` |
-| `PUT` | `/admin/promotions/:id` | Cập nhật promotion | `marketing:write` |
-| `DELETE` | `/admin/promotions/:id` | Xóa promotion | `marketing:write` |
-| `GET` | `/admin/campaigns` | Danh sách campaigns | `marketing:read` |
-| `POST` | `/admin/campaigns` | Tạo campaign | `marketing:write` |
+| `POST` | `/store/promotions/validate` | Validate mã (public) | Custom route |
+| `GET` | `/admin/promotions` | Danh sách promotions | Medusa core |
+| `POST` | `/admin/promotions` | Tạo promotion | Medusa core |
+| `POST` | `/admin/promotions/:id` | Cập nhật (không phải `PUT`) | Medusa core |
+| `DELETE` | `/admin/promotions/:id` | Xóa | Medusa core |
+| `GET` | `/admin/promotions/:id/metadata` | Đọc metadata tùy biến + `usage_count` tính động | Custom route |
+| `POST` | `/admin/promotions/:id/metadata` | Ghi metadata tùy biến | Custom route |
+| `GET` | `/admin/campaigns` | Danh sách campaigns | Medusa core |
 
-### Luồng apply Promotion tại Checkout
+Permission (xem [RBAC](../05-admin/rbac.md)): route core Medusa `/admin/promotions*`/`/admin/campaigns*` **không** nằm trong `protectedModules` của middleware tùy biến — chỉ cần đăng nhập admin là gọi được, không kiểm tra permission cụ thể. Riêng `/admin/promotions/:id/metadata` (route custom) yêu cầu `promotions.read`/`promotions.edit`.
+
+### `usage_count` tính thế nào
+
+**Không có cột `usage_count`** lưu sẵn. `GET /admin/promotions/:id/metadata` tính động bằng cách đếm số order có `metadata.promotion_code` khớp mã — quét toàn bộ order mỗi lần gọi (xem `countPromotionUsage()`), chấp nhận được ở quy mô cửa hàng hiện tại nhưng không có cache.
+
+### Luồng apply Promotion tại Checkout (thật)
 
 ```mermaid
 flowchart TD
-    A[User nhập mã] --> B[POST /store/promotions/validate]
+    A[User nhập mã] --> B["POST /store/promotions/validate {code, subtotal}"]
     B --> C{Mã tồn tại?}
-    C -- Không --> D["Lỗi: Mã không tồn tại"]
-    C -- Có --> E{is_active = true?}
-    E -- Không --> F["Lỗi: Mã đã bị vô hiệu"]
-    E -- Có --> G{starts_at <= now <= ends_at?}
-    G -- Không --> H["Lỗi: Mã đã hết hạn hoặc chưa có hiệu lực"]
-    G -- Có --> I{usage_count < usage_limit?}
-    I -- Không --> J["Lỗi: Mã đã hết lượt sử dụng"]
-    I -- Có (hoặc limit=null) --> K{subtotal >= min_subtotal?}
-    K -- Không --> L["Lỗi: Đơn hàng chưa đạt mức tối thiểu"]
-    K -- Có --> M[Tính discount_amount]
-    M --> N{type?}
-    N -- percentage --> O["discount = subtotal × value/100"]
-    N -- fixed_amount --> P["discount = value (nếu value <= subtotal)"]
-    O --> Q[Trả về discount_amount]
-    P --> Q
+    C -- Không --> D["404 Mã giảm giá không tồn tại hoặc đã hết hạn"]
+    C -- Có --> E{"starts_at/ends_at (từ metadata,\nfallback campaign) hợp lệ?"}
+    E -- Không --> D
+    E -- Có --> F{usage_count >= usage_limit?}
+    F -- Có --> D
+    F -- Không/không giới hạn --> G{subtotal >= min_order_value?}
+    G -- Không --> H["400 chưa đạt đơn tối thiểu"]
+    G -- Có --> I["Tính discount theo application_method.type\n(fixed hoặc percentage, clamp theo max_discount)"]
+    I --> J["Response phẳng: {valid, code, type, discount_amount, remaining_usages}"]
 ```
 
-### Validation Rules — Promotion
+Response thành công **không lồng trong object `promotion`** — xem chi tiết ở [Cart & Checkout](../03-cart-checkout/README.md#4-promotion-validation).
+
+### Validation Rules — thật
 
 | Rule | Mô tả |
 |---|---|
-| Code uppercase | Tự động chuyển code thành chữ hoa |
-| Unique code | Mỗi mã chỉ tồn tại một lần |
-| `ends_at > starts_at` | Ngày hết hạn phải sau ngày bắt đầu |
-| `value > 0` | Giá trị giảm phải dương |
-| `percentage <= 100` | Không vượt 100% |
-| Double-check tại checkout | Server validate lại khi POST /store/checkout |
+| Code | Tự động uppercase khi so khớp (`promotion_code.toUpperCase()`) |
+| `percentage` discount | Bị **clamp không vượt `subtotal`** dù `value` cấu hình sai (>100%) hoặc thiếu `max_discount` |
+| Double-check tại checkout | `processCheckoutPromotions` validate lại toàn bộ (hạn, lượt dùng, đơn tối thiểu) tại thời điểm checkout, không tin kết quả validate trước đó |
 
 ---
 
-## 3. Banners (Slider trang chủ)
+## 3. Banners (Site module)
 
-### Data Model — Banner
+### Data Model — thật (khớp `BannerBodySchema`)
 
 | Trường | Kiểu | Mô tả |
 |---|---|---|
 | `id` | string | PK |
-| `title` | string | Tiêu đề banner |
-| `subtitle` | string | Mô tả phụ |
-| `image` | string | URL ảnh (từ S3) |
-| `link` | string | URL click-through (nullable) |
-| `order` | number | Thứ tự hiển thị (ASC) |
-| `active` | boolean | Hiển thị hay ẩn |
-| `created_at` | timestamp | |
+| `title` | string | Tối đa 200 ký tự |
+| `subtitle` | string \| null | |
+| `image` | string \| null | |
+| `link` | string \| null | |
+| `order` | number | ≥0, mặc định = số banner hiện có (round-trip qua 1 lần đọc DB, có race condition nhẹ nếu 2 admin tạo cùng lúc) |
+| `active` | boolean | |
+| `created_at` / `updated_at` / `deleted_at` | timestamp | |
 
-### API Endpoints — Banners
+### API Endpoints — thật
 
 | Method | Path | Mô tả | Auth |
 |---|---|---|---|
-| `GET` | `/store/banners` | Lấy banners active | Public |
-| `GET` | `/admin/banners` | Tất cả banners | `marketing:read` |
-| `POST` | `/admin/banners` | Tạo banner | `marketing:write` |
-| `PUT` | `/admin/banners/:id` | Cập nhật banner | `marketing:write` |
-| `DELETE` | `/admin/banners/:id` | Xóa banner | `marketing:write` |
-| `PUT` | `/admin/banners/reorder` | Sắp xếp lại thứ tự | `marketing:write` |
+| `GET` | `/store/custom?mode=homepage` | Banner nằm trong `data.banners`, chỉ trả `active=true` | Public |
+| `GET` | `/admin/banners` | Tất cả banners (kể cả `active=false`) | `banners.read` |
+| `POST` | `/admin/banners` | Tạo banner | `banners.create` |
+| `POST` | `/admin/banners/:id` | Cập nhật (không phải `PUT`) | `banners.edit` |
+| `DELETE` | `/admin/banners/:id` | Xóa | `banners.delete` |
 
-### Response `/store/banners`
-
-```json
-{
-  "banners": [
-    {
-      "id": "banner_01",
-      "title": "Trái cây tươi mỗi ngày",
-      "subtitle": "Giao hàng trong 1 giờ",
-      "image": "https://s3.../banner1.jpg",
-      "link": "/products",
-      "order": 1
-    }
-  ]
-}
-```
+**Không có** `GET /store/banners` riêng và **không có** `PUT /admin/banners/reorder` — muốn đổi thứ tự phải `POST /admin/banners/:id` từng banner với `order` mới.
 
 ---
 
-## 4. Blog
+## 4. Blog (Site module) — **có API động, không phải static**
 
-> Blog hiện tại là **static content** hoặc tích hợp CMS đơn giản. Chưa có API động.
+> Tài liệu cũ mô tả blog là "static content, chưa có API động" — sai. Có đầy đủ CRUD qua Site module (`BlogPost`, `BlogCategory`), đã verify hoạt động trên backend đang chạy.
 
-### Cấu trúc hiện tại
-
-```
-/blog
-  /bai-viet-1           → Static page hoặc CMS entry
-  /meo-bao-quan-trai-cay
-  /...
-```
-
-### Kế hoạch tương lai (nếu cần động)
+### Data Model — BlogPost (khớp `BlogPostBodySchema`)
 
 | Trường | Kiểu | Mô tả |
 |---|---|---|
 | `id` | string | PK |
-| `title` | string | Tiêu đề bài |
-| `slug` | string | URL slug |
-| `content` | text | Nội dung (Markdown/HTML) |
-| `author` | string | Tác giả |
-| `published_at` | timestamp | |
-| `thumbnail` | string | Ảnh đại diện |
-| `tags` | string[] | Tags |
+| `title` | string | ≤240 ký tự |
+| `slug` | string | ≤260 ký tự, regex `[a-z0-9]+(-[a-z0-9]+)*` |
+| `excerpt` | string \| null | |
+| `content` | string \| null | |
+| `image` | string \| null | |
+| `author` | string \| null | |
+| `category_id` | string \| null | FK → BlogCategory |
+| `published` | boolean | |
+| `published_at` | timestamp \| null | |
+
+### Data Model — BlogCategory (khớp `BlogCategoryBodySchema`)
+
+| Trường | Kiểu | Mô tả |
+|---|---|---|
+| `id` | string | PK |
+| `name` | string | ≤120 ký tự |
+| `slug` | string | ≤160 ký tự, regex như trên, **unique** khi chưa xóa mềm |
+| `description` | string \| null | |
+
+### API Endpoints
+
+| Method | Path | Mô tả | Auth |
+|---|---|---|---|
+| `GET` | `/store/blog` | Danh sách bài đã publish | Public |
+| `GET` | `/store/blog-categories` | Danh sách danh mục | Public |
+| `GET` | `/admin/blog-posts` | Tất cả bài (kể cả chưa publish) | `blog-posts` → map vào `settings.read` (xem [RBAC](../05-admin/rbac.md#7-cách-permission-được-suy-ra-từ-route-thật-không-phải-bảng-tĩnh)) |
+| `POST` | `/admin/blog-posts` | Tạo bài | `settings.create` |
+| `POST` | `/admin/blog-posts/:id` | Cập nhật | `settings.edit` |
+| `GET`/`POST`/`DELETE` | `/admin/blog-categories*` | CRUD danh mục | `blog-categories.*` |
 
 ---
 
-## 5. Luồng quản lý Marketing (Admin)
+## 5. Luồng quản lý Marketing (Admin) — sửa endpoint sai
 
 ```mermaid
 sequenceDiagram
@@ -193,35 +166,34 @@ sequenceDiagram
     participant API as Backend
 
     ADM->>UI: Tạo Promotion mới
-    UI->>API: POST /admin/promotions {code, type, value, starts_at, ends_at}
+    UI->>API: POST /admin/promotions {code, application_method: {type, value}}
     API-->>UI: Promotion created
-    ADM-->>UI: Confirm
+    ADM->>UI: Set điều kiện riêng (hạn, đơn tối thiểu...)
+    UI->>API: POST /admin/promotions/:id/metadata {metadata}
+    API-->>UI: Metadata saved
 
     ADM->>UI: Tạo Banner mới
-    UI->>API: POST /admin/uploads (ảnh)
+    UI->>API: POST /admin/media/upload {filename, data: base64}
+    Note over API: KHÔNG phải /admin/uploads, KHÔNG phải multipart
     API-->>UI: {url}
     UI->>API: POST /admin/banners {title, image, link, order}
     API-->>UI: Banner created
-
-    ADM->>UI: Kéo thả để sắp xếp banners
-    UI->>API: PUT /admin/banners/reorder [{id, order}]
-    API-->>UI: OK
 ```
 
 ---
 
 ## 6. Edge Cases
 
-| Tình huống | Xử lý |
+| Tình huống | Xử lý thật |
 |---|---|
-| Áp 2 promotion cùng lúc | Hệ thống chỉ cho phép 1 mã tại 1 thời điểm |
-| Banner không có ảnh | Validate bắt buộc có `image` URL |
-| Banner `active=false` | Không trả về trong `/store/banners` |
-| Promotion dùng đúng giờ expires | Server kiểm tra `ends_at` tại thời điểm checkout |
+| Áp 2 promotion cùng lúc | `promotion_code` trong checkout body chỉ nhận 1 string — chỉ áp được 1 mã |
+| Banner `active=false` | Không xuất hiện trong `/store/custom?mode=homepage` |
+| Promotion phần trăm cấu hình sai (>100%) | Không lỗi — discount tự clamp về đúng subtotal |
+| 2 admin tạo banner cùng lúc | Có thể trùng `order` (không có transaction/lock) |
 
 ---
 
 ## 7. Liên kết
 
 - [Cart & Checkout (áp promo)](../03-cart-checkout/README.md)
-- [Site Module (banners)](../08-system/README.md)
+- [Site Module](../08-system/README.md)
