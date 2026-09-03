@@ -29,11 +29,19 @@ export default function Register() {
       const first_name = names[0] || ''
       const last_name = names.slice(1).join(' ') || first_name
 
+      // Medusa v2's POST /store/customers requires a registration-scoped
+      // token (from the auth identity register step) — it doesn't accept a
+      // bare password and self-register in one call.
+      const registration = await apiFetch('/auth/customer/emailpass/register', {
+        method: 'POST',
+        body: { email: form.email, password: form.password },
+      })
+
       await apiFetch('/store/customers', {
         method: 'POST',
+        token: registration.token,
         body: {
           email: form.email,
-          password: form.password,
           first_name,
           last_name,
           phone: form.phone || undefined,
